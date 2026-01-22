@@ -2,8 +2,6 @@
 const nextConfig = {
   // Otimizações de performance
   reactStrictMode: true,
-  swcMinify: true,
-  
   // Otimização de imagens
   images: {
     formats: ['image/avif', 'image/webp'],

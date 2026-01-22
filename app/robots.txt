@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://futuraandco.com/sitemap.xml
