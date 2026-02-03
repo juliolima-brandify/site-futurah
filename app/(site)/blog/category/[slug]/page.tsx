@@ -8,6 +8,7 @@ export async function generateStaticParams() {
 }
 
 export const dynamicParams = false
+export const dynamic = 'force-static'
 
 import Footer from "@/components/layout/Footer"
 import PostCard from "@/components/blog/PostCard"

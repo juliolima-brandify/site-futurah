@@ -8,6 +8,7 @@ export async function generateStaticParams() {
 }
 
 export const dynamicParams = false
+export const dynamic = 'force-static'
 
 import { notFound } from "next/navigation"
 import Header from "@/components/layout/Header"
