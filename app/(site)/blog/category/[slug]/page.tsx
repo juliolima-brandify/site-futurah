@@ -1,4 +1,11 @@
+import { getPosts, getCategories } from "@/lib/keystatic"
 import Header from "@/components/layout/Header"
+import Footer from "@/components/layout/Footer"
+import PostCard from "@/components/blog/PostCard"
+import Newsletter from "@/components/sections/Newsletter"
+import { notFound } from "next/navigation"
+import Link from "next/link"
+import { ArrowLeft } from "lucide-react"
 
 export async function generateStaticParams() {
     const categories = await getCategories()
@@ -8,15 +15,8 @@ export async function generateStaticParams() {
 }
 
 export const dynamicParams = false
-export const dynamic = 'force-static'
 
-import Footer from "@/components/layout/Footer"
-import PostCard from "@/components/blog/PostCard"
-import Newsletter from "@/components/sections/Newsletter"
-import { getPosts, getCategories } from "@/lib/keystatic"
-import { notFound } from "next/navigation"
-import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
+
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params

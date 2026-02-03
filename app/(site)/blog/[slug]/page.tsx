@@ -7,8 +7,6 @@ export async function generateStaticParams() {
     }))
 }
 
-export const dynamicParams = false
-export const dynamic = 'force-static'
 
 import { notFound } from "next/navigation"
 import Header from "@/components/layout/Header"
@@ -22,21 +20,11 @@ import { DocumentRenderer } from '@keystatic/core/renderer'
 
 export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params
-    console.log(`DEBUG: PostPage hit for slug: ${slug}`)
-
     const data = await getPostBySlug(slug)
-    console.log(`DEBUG: getPostBySlug returned:`, data ? 'FOUND' : 'NULL')
-
-    if (!data) {
-        console.log('DEBUG: Post not found')
-        notFound()
-    }
+    if (!data) notFound()
 
     const { metadata: post, content } = data
-    console.log('DEBUG: Post metadata:', JSON.stringify(post, null, 2))
-
     const allPosts = await getPosts()
-    console.log(`DEBUG: allPosts count: ${allPosts.length}`)
 
     // Get other posts for "Veja também" - prioritize same category but fallback to others if needed
     // For now, let's just show the latest 2 posts that aren't this one
@@ -45,12 +33,11 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         .slice(0, 2)
     // fs.appendFileSync('trace.log', `relatedPosts count: ${relatedPosts.length}\n`)
 
-    let postContent = null
+    let postContent: unknown = null
     try {
-        postContent = content ? await content() : null
-        console.log('DEBUG: postContent loaded successfully')
+        postContent = content && typeof content === 'function' ? await content() : null
     } catch (e) {
-        console.error('DEBUG: Failed to load post content', e)
+        console.error('Failed to load post content', e)
     }
 
     return (

@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "pages:build": "next build && next-on-pages",
+    "pages:check": "npm run build && npx @cloudflare/next-on-pages --experimental-minify --skip-build",
     "start": "next start",
     "lint": "next lint"
   },

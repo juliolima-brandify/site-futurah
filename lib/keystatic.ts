@@ -1,11 +1,11 @@
-import { createReader } from '@keystatic/core/reader'
 import config from '@/keystatic.config'
-// import fs from 'fs'
 
 let _reader: any = null;
 
-export function getReader() {
+export async function getReader() {
+    if (typeof window !== 'undefined') return null;
     if (!_reader) {
+        const { createReader } = await import('@keystatic/core/reader')
         _reader = createReader(process.cwd(), config)
     }
     return _reader
@@ -13,11 +13,11 @@ export function getReader() {
 
 export async function getPosts() {
     try {
-        const reader = getReader()
+        const reader = await getReader()
+        if (!reader) return []
         const posts = await reader.collections.posts.all()
         return posts.map((post: any) => {
             const entry = post.entry as any
-            // Return only serializable, necessary fields
             return {
                 slug: post.slug,
                 title: entry.title || post.slug,
@@ -29,13 +29,13 @@ export async function getPosts() {
             }
         })
     } catch (e: any) {
-        // fs.appendFileSync('trace.log', 'Error in getPosts: ' + e.message + '\n')
         throw e
     }
 }
 
 export async function getCategories() {
-    const reader = getReader()
+    const reader = await getReader()
+    if (!reader) return []
     const categories = await reader.collections.categories.all()
     return categories.map((cat: any) => {
         const entry = cat.entry as any
@@ -47,13 +47,20 @@ export async function getCategories() {
     })
 }
 
-export async function getPostBySlug(slug: string) {
-    const reader = getReader()
+/** Content loader: função que retorna o documento do post (lazy do Keystatic) */
+export type PostContentLoader = (() => Promise<unknown>) | undefined
+
+export async function getPostBySlug(slug: string): Promise<{
+    metadata: { slug: string; title: string; excerpt: string; coverImage: string | null; category: string; publishedAt: string | null }
+    content: PostContentLoader
+} | null> {
+    const reader = await getReader()
+    if (!reader) return null
     const post = await reader.collections.posts.read(slug)
     if (!post) return null
 
     const entry = post as any
-    // Return metadata and content separately to avoid serialization issues
+    const contentFn = typeof entry.content === 'function' ? entry.content : undefined
     return {
         metadata: {
             slug,
@@ -63,6 +70,6 @@ export async function getPostBySlug(slug: string) {
             category: entry.category || 'Geral',
             publishedAt: entry.publishedAt || null,
         },
-        content: entry.content // This is the function
+        content: contentFn,
     }
 }
