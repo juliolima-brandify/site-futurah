@@ -18,14 +18,14 @@ import { ArrowLeft } from "lucide-react"
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params
     const categories = await getCategories()
-    const category = categories.find((c) => c.slug === slug)
+    const category = categories.find((c: any) => c.slug === slug)
 
     if (!category) {
         notFound()
     }
 
     const allPosts = await getPosts()
-    const categoryPosts = allPosts.filter((post) => post.category === slug)
+    const categoryPosts = allPosts.filter((post: any) => post.category === slug)
 
     return (
         <div className="min-h-screen bg-black">
@@ -57,7 +57,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
 
                     <div className="border-t border-white/10 pt-16">
                         <div className="grid grid-cols-1 gap-x-8 gap-y-16 md:grid-cols-2 lg:grid-cols-3">
-                            {categoryPosts.map((post) => (
+                            {categoryPosts.map((post: any) => (
                                 <PostCard
                                     key={post.slug}
                                     title={post.title}

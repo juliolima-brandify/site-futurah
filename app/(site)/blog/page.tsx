@@ -12,11 +12,11 @@ export default async function BlogPage() {
     const categories = await getCategories()
 
     const featuredPosts = allPosts
-        .filter((post) => post.featured)
-        .sort((a, b) => new Date(b.publishedAt || '').getTime() - new Date(a.publishedAt || '').getTime())
+        .filter((post: any) => post.featured)
+        .sort((a: any, b: any) => new Date(b.publishedAt || '').getTime() - new Date(a.publishedAt || '').getTime())
         .slice(0, 3)
 
-    const regularPosts = allPosts.filter((post) => !post.featured || !featuredPosts.find(fp => fp.slug === post.slug))
+    const regularPosts = allPosts.filter((post: any) => !post.featured || !featuredPosts.find((fp: any) => fp.slug === post.slug))
 
     return (
         <div className="min-h-screen bg-white">

@@ -38,7 +38,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     // Get other posts for "Veja também" - prioritize same category but fallback to others if needed
     // For now, let's just show the latest 2 posts that aren't this one
     const relatedPosts = allPosts
-        .filter((p) => p.slug !== slug)
+        .filter((p: any) => p.slug !== slug)
         .slice(0, 2)
     // fs.appendFileSync('trace.log', `relatedPosts count: ${relatedPosts.length}\n`)
 
@@ -145,7 +145,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                             Veja também
                         </h2>
                         <div className="grid grid-cols-1 lg:grid-cols-[7fr_3fr] gap-6">
-                            {relatedPosts.map((p) => (
+                            {relatedPosts.map((p: any) => (
                                 <Link
                                     key={p.slug}
                                     href={`/blog/${p.slug}`}
