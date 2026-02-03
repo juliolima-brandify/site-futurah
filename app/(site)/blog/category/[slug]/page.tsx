@@ -1,4 +1,7 @@
 import Header from "@/components/layout/Header"
+
+export const runtime = 'edge'
+
 import Footer from "@/components/layout/Footer"
 import PostCard from "@/components/blog/PostCard"
 import Newsletter from "@/components/sections/Newsletter"

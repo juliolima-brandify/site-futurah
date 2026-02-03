@@ -42,6 +42,17 @@ npm run build
 npm start
 ```
 
+## ☁️ Deploy no Cloudflare Pages
+
+Para fazer o deploy corretamente, use as seguintes configurações no painel do Cloudflare Pages:
+
+1.  **Build Command**: `npm run pages:build`
+2.  **Build Output Directory**: `.vercel/output/static`
+3.  **Environment Variables**: `NODE_VERSION` = `20`
+
+> ⚠️ **Nota Importante**: Não use `npx wrangler deploy` como comando de build, pois ele não gera os arquivos necessários. O Cloudflare faz o deploy automaticamente após o sucesso do comando de build.
+
+
 ## 🏗️ Estrutura do Projeto
 
 ```

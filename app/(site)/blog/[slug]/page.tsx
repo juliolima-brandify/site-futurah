@@ -1,4 +1,7 @@
 import { getPostBySlug, getPosts } from "@/lib/keystatic"
+
+export const runtime = 'edge'
+
 import { notFound } from "next/navigation"
 import Header from "@/components/layout/Header"
 import Footer from "@/components/layout/Footer"
