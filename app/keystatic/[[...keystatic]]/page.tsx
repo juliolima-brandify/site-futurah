@@ -1,5 +1,11 @@
 'use client'
 
+export const runtime = 'edge'
+
+export async function generateStaticParams() {
+    return [{ keystatic: [] }]
+}
+
 import { makePage } from '@keystatic/next/ui/app'
 import config from '../../../keystatic.config'
 
