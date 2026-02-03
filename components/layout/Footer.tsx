@@ -3,23 +3,23 @@
 import Link from 'next/link';
 import { ArrowUp } from 'lucide-react';
 import Container from './Container';
+import OrbitIcon from '../ui/OrbitIcon';
 
 const footerLinks = {
   navegacao: [
-    { label: 'Core features', href: '#features' },
-    { label: 'Pro experience', href: '#pro' },
-    { label: 'Integrations', href: '#integrations' },
+    { label: 'Metodologia', href: '#metodologia' },
+    { label: 'Time', href: '#time' },
+    { label: 'Blog', href: '/blog' },
+    { label: 'Faq', href: '#faq' },
   ],
   redesSociais: [
-    { label: 'Blog', href: '#blog' },
-    { label: 'Case studies', href: '#cases' },
-    { label: 'Customer stories', href: '#stories' },
-    { label: 'Best practices', href: '#practices' },
+    { label: 'Instagram', href: '#' },
+    { label: 'Linkedin', href: '#' },
   ],
   informacoes: [
-    { label: 'Contact', href: '#contato' },
-    { label: 'Support', href: '#support' },
-    { label: 'Legal', href: '#legal' },
+    { label: 'Contato', href: '#contato' },
+    { label: 'Privacidade', href: '/privacidade' },
+    { label: 'Termos de uso', href: '/termos' },
   ],
 };
 
@@ -34,21 +34,24 @@ export default function Footer() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
           {/* Left Side - Brand */}
           <div className="lg:col-span-5 space-y-8">
+            <div className="hidden lg:block mb-24">
+              <OrbitIcon variant="dark" className="w-36 h-36" />
+            </div>
             <h2 className="text-5xl lg:text-6xl font-medium text-brand-title leading-[1.1]">
               Made for<br />
               tech brands.
             </h2>
             <Link href="/">
-              <img 
-                src="/images/logos/logo-for-white-bg.svg" 
-                alt="Futura and Co." 
-                className="h-8 w-auto"
+              <img
+                src="/images/logos/logo-full.svg"
+                alt="Futura and Co."
+                className="h-8 w-auto brightness-0"
               />
             </Link>
           </div>
 
           {/* Right Side - Links */}
-          <div className="lg:col-span-7 grid grid-cols-3 gap-8 lg:gap-12">
+          <div className="lg:col-span-7 flex flex-col md:flex-row justify-start lg:justify-end gap-8 lg:gap-16">
             {/* Navegação */}
             <div className="space-y-4">
               <h3 className="text-sm font-normal text-gray-500 mb-6">
@@ -117,6 +120,8 @@ export default function Footer() {
           </div>
         </div>
       </Container>
+
+
 
       {/* Back to Top Button */}
       <button

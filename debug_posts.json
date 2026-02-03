@@ -1,0 +1,11 @@
+[
+  {
+    "title": "ola-mundo-da-ia",
+    "excerpt": "Este é o nosso primeiro post sobre Inteligência Artificial na Futurah. Descubra como estamos transformando o mercado.",
+    "coverImage": "/uploads/hello-ai.webp",
+    "category": "inteligencia-artificial",
+    "featured": true,
+    "publishedAt": "2026-01-28",
+    "slug": "ola-mundo-da-ia"
+  }
+]
