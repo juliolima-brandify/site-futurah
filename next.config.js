@@ -39,6 +39,12 @@ const nextConfig = {
     ]
   },
   trailingSlash: false,
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.externals.push('node:fs', 'node:path', 'node:fs/promises');
+    }
+    return config;
+  },
 }
 
 module.exports = nextConfig
