@@ -1,6 +1,11 @@
 import { getPostBySlug, getPosts } from "@/lib/keystatic"
 
-export const runtime = 'edge'
+export async function generateStaticParams() {
+    const posts = await getPosts()
+    return posts.map((post) => ({
+        slug: post.slug,
+    }))
+}
 
 import { notFound } from "next/navigation"
 import Header from "@/components/layout/Header"

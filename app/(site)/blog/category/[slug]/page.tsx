@@ -1,6 +1,11 @@
 import Header from "@/components/layout/Header"
 
-export const runtime = 'edge'
+export async function generateStaticParams() {
+    const categories = await getCategories()
+    return categories.map((category) => ({
+        slug: category.slug,
+    }))
+}
 
 import Footer from "@/components/layout/Footer"
 import PostCard from "@/components/blog/PostCard"
