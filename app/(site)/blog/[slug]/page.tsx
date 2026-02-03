@@ -1,5 +1,7 @@
 import { getPostBySlug, getPosts } from "@/lib/keystatic"
 
+export const dynamic = 'force-static'
+
 export async function generateStaticParams() {
     const posts = await getPosts()
     return posts.map((post: any) => ({
