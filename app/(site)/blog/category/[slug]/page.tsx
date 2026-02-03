@@ -2,7 +2,7 @@ import Header from "@/components/layout/Header"
 
 export async function generateStaticParams() {
     const categories = await getCategories()
-    return categories.map((category) => ({
+    return categories.map((category: any) => ({
         slug: category.slug,
     }))
 }
