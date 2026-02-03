@@ -7,6 +7,8 @@ export async function generateStaticParams() {
     }))
 }
 
+export const dynamicParams = false
+
 import Footer from "@/components/layout/Footer"
 import PostCard from "@/components/blog/PostCard"
 import Newsletter from "@/components/sections/Newsletter"
