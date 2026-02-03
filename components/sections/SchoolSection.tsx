@@ -46,7 +46,7 @@ export const SchoolSection: React.FC = () => {
               </svg>
             </div>
             <p className="text-[15px] leading-relaxed text-[#313131] max-w-[320px]">
-              Chega de "achismos" e testes cegos. Nossas campanhas não contam com a sorte. Analisamos padrões de compra e métricas financeiras para garantir o ROI do seu investimento.
+              Chega de &quot;achismos&quot; e testes cegos. Nossas campanhas não contam com a sorte. Analisamos padrões de compra e métricas financeiras para garantir o ROI do seu investimento.
             </p>
           </div>
 
@@ -55,7 +55,7 @@ export const SchoolSection: React.FC = () => {
               ESTRATÉGIA BOUTIQUE
             </span>
             <p className="text-[15px] leading-relaxed text-[#313131] max-w-[320px]">
-              Fugimos do modelo de "fábrica de posts". Desenvolvemos funis de vendas personalizados e narrativas sofisticadas que respeitam a autoridade da sua marca.
+              Fugimos do modelo de &quot;fábrica de posts&quot;. Desenvolvemos funis de vendas personalizados e narrativas sofisticadas que respeitam a autoridade da sua marca.
             </p>
           </div>
         </div>
