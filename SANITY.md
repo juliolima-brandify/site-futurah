@@ -6,7 +6,8 @@ O projeto pode usar **Sanity** para editar posts e categorias do blog. Por padr�
 
 1. Acesse [sanity.io](https://www.sanity.io) e crie uma conta (ou faça login).
 2. Vá em [sanity.io/manage](https://www.sanity.io/manage) e crie um novo projeto.
-3. Anote o **Project ID** e o **Dataset** (geralmente `production`).
+3. No projeto, crie um **dataset** (ex.: `production`) se ainda não existir: Project settings → Datasets → Create dataset.
+4. Anote o **Project ID** e o nome do **Dataset** (ex.: `production`).
 
 ## 2. Variáveis de ambiente
 
