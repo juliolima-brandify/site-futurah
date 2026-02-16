@@ -25,9 +25,10 @@ Na Vercel (ou outro host), configure as mesmas variáveis no painel do projeto.
 
 ## 3. Sanity Studio (editor de conteúdo)
 
-Com o projeto configurado, o Studio fica em:
+O Studio **não fica embutido no site**. Use o Studio hospedado na Sanity:
 
-**`/studio`** — por exemplo: `https://seu-site.vercel.app/studio`
+1. Acesse [sanity.io/manage](https://www.sanity.io/manage).
+2. Abra o seu projeto e clique em **Open Studio** (ou acesse o link do studio do projeto).
 
 Lá você cria e edita:
 
@@ -41,14 +42,14 @@ Lá você cria e edita:
 
 Os slugs das categorias são usados na URL (`/blog/category/[slug]`). Crie as categorias antes de associá-las aos posts.
 
-## 5. Deploy do Studio (opcional)
+## 5. Build sem Sanity
 
-O Studio em `/studio` roda no mesmo app Next.js. Em produção, proteja com autenticação (por exemplo, Vercel Password Protection ou um login customizado) para que só sua equipe edite o conteúdo.
+Se as variáveis do Sanity não estiverem definidas (por exemplo na Vercel), o build usa **Keystatic** e o site continua funcionando. O client Sanity só é criado quando `NEXT_PUBLIC_SANITY_PROJECT_ID` está configurado.
 
 ## Resumo
 
 | O que              | Onde / Como |
 |--------------------|-------------|
 | Ativar Sanity      | `NEXT_PUBLIC_CMS=sanity` + `NEXT_PUBLIC_SANITY_PROJECT_ID` + `NEXT_PUBLIC_SANITY_DATASET` no `.env` |
-| Editar conteúdo    | Acessar `/studio` no site |
+| Editar conteúdo    | [sanity.io/manage](https://www.sanity.io/manage) → seu projeto → Open Studio |
 | Voltar ao Keystatic | Remover `NEXT_PUBLIC_CMS=sanity` ou não definir as variáveis Sanity |

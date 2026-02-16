@@ -24,8 +24,9 @@
     "next-sanity": "^12.1.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
-    "sanity": "^5.9.0",
-    "sharp": "^0.34.5"
+    "sharp": "^0.34.5",
+    "styled-components": "^6.3.9",
+    "use-effect-event": "^2.0.3"
   },
   "devDependencies": {
     "@cloudflare/next-on-pages": "^1.13.16",

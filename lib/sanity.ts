@@ -1,19 +1,24 @@
-import { createClient } from 'next-sanity'
+import { createClient, type SanityClient } from 'next-sanity'
 import imageUrlBuilder from '@sanity/image-url'
 import { apiVersion, dataset, projectId, useCdn } from '@/sanity/env'
 
-export const client = createClient({
-  projectId,
-  dataset,
-  apiVersion,
-  useCdn,
-})
+let _client: SanityClient | null = null
 
-const builder = imageUrlBuilder(client)
+function getClient(): SanityClient | null {
+  if (!projectId) return null
+  if (!_client) {
+    _client = createClient({ projectId, dataset, apiVersion, useCdn })
+  }
+  return _client
+}
+
+export const client = getClient()
 
 export function urlFor(source: { _type: string; asset?: { _ref: string } } | undefined) {
   if (!source) return ''
-  return builder.image(source).url()
+  const c = getClient()
+  if (!c) return ''
+  return imageUrlBuilder(c).image(source).url()
 }
 
 // Tipos compatíveis com o que o blog já usa
@@ -69,7 +74,9 @@ const postBySlugFields = `
 `
 
 export async function getPostsSanity(): Promise<PostListItem[]> {
-  const posts = await client.fetch<Array<{
+  const c = getClient()
+  if (!c) return []
+  const posts = await c.fetch<Array<{
     slug: string
     title: string
     excerpt: string | null
@@ -92,7 +99,9 @@ export async function getPostsSanity(): Promise<PostListItem[]> {
 }
 
 export async function getCategoriesSanity(): Promise<CategoryItem[]> {
-  const categories = await client.fetch<Array<{
+  const c = getClient()
+  if (!c) return []
+  const categories = await c.fetch<Array<{
     slug: string
     name: string
     description: string | null
@@ -107,7 +116,9 @@ export async function getCategoriesSanity(): Promise<CategoryItem[]> {
 }
 
 export async function getPostBySlugSanity(slug: string): Promise<PostBySlug | null> {
-  const post = await client.fetch<{
+  const c = getClient()
+  if (!c) return null
+  const post = await c.fetch<{
     slug: string
     title: string
     excerpt: string | null
