@@ -4,7 +4,7 @@ import BlogHero from "@/components/blog/BlogHero"
 import PostCard from "@/components/blog/PostCard"
 import BlogList from "@/components/blog/BlogList"
 import Newsletter from "@/components/sections/Newsletter"
-import { getPosts, getCategories } from "@/lib/keystatic"
+import { getPosts, getCategories } from "@/lib/content"
 import { Suspense } from "react"
 
 export default async function BlogPage() {

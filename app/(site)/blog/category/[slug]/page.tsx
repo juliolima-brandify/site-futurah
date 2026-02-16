@@ -1,4 +1,4 @@
-import { getPosts, getCategories } from "@/lib/keystatic"
+import { getPosts, getCategories } from "@/lib/content"
 import Header from "@/components/layout/Header"
 import Footer from "@/components/layout/Footer"
 import PostCard from "@/components/blog/PostCard"
