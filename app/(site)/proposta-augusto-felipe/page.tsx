@@ -41,7 +41,7 @@ export default function PropostaAugustoFelipe() {
 
               <div className="flex flex-wrap items-center gap-4 pt-2">
                 <Button variant="primary" showIcon href="#proposta">
-                  Ver proposta completa
+                  Ver as oportunidades
                 </Button>
                 <a
                   href="#contato"
@@ -127,14 +127,14 @@ export default function PropostaAugustoFelipe() {
               02 · Nossa tese
             </span>
             <h2 className="text-3xl md:text-5xl lg:text-[56px] font-medium leading-[1.1]">
-              A sua audiência não precisa de{" "}
-              <span className="text-brand-highlight">mais um lançamento.</span>{" "}
-              Precisa de um <span className="italic">ecossistema</span> que respeite o motivo dela estar ali.
+              A sua audiência já é o ativo.{" "}
+              <span className="text-brand-highlight">Falta só colocar ela pra trabalhar</span> — sem queimar o que ela gosta em você.
             </h2>
             <p className="text-base md:text-lg text-white/70 font-light leading-relaxed max-w-3xl">
-              A maioria dos criadores do seu porte pula direto pra um curso de R$997 ou uma mentoria genérica — e,
-              no processo, perde a confiança que construiu. A nossa aposta é inversa: entrar pelas bordas,
-              validar com produtos leves, e só depois subir o ticket. Receita previsível, marca preservada.
+              A maioria dos criadores do seu porte pula direto pra um curso genérico e, no processo, perde a
+              confiança que construiu. A nossa aposta é inversa: entrar pelas bordas com produtos leves,
+              validar o que a audiência de fato compra, e só depois subir o ticket. O que você vai ver abaixo
+              é o mapa do que é possível — o formato da parceria a gente desenha junto depois.
             </p>
           </div>
         </section>
@@ -195,9 +195,9 @@ export default function PropostaAugustoFelipe() {
                   zero logística. Servem pra validar demanda antes de qualquer curso mais caro.
                 </p>
                 <ul className="text-sm text-brand-body font-light space-y-2 pt-2 border-t border-brand-title/10">
-                  <li>→ Tabela de precificação editável — R$ 37</li>
-                  <li>→ Pack de stencils/moldes — R$ 27</li>
-                  <li>→ Guia "Vidraceiro que aparece" — R$ 47</li>
+                  <li>→ Tabela de precificação editável</li>
+                  <li>→ Pack de stencils e moldes para espelho</li>
+                  <li>→ Guia "Vidraceiro que aparece nas redes"</li>
                   <li>→ Captura de e-mail em todo ponto de contato</li>
                 </ul>
               </div>
@@ -220,9 +220,9 @@ export default function PropostaAugustoFelipe() {
                 </p>
                 <ul className="text-sm text-white/70 font-light space-y-2 pt-2 border-t border-white/10">
                   <li>→ Lista de espera a partir dos low-tickets</li>
-                  <li>→ Turmas de 20–40 alunos</li>
-                  <li>→ Ticket estimado R$ 1.500–2.500</li>
-                  <li>→ Lançamento previsto: após 90 dias</li>
+                  <li>→ Turmas fechadas e intimistas</li>
+                  <li>→ Metodologia baseada no seu próprio caso</li>
+                  <li>→ Lançamento só depois da validação</li>
                 </ul>
               </div>
             </div>
@@ -348,57 +348,96 @@ export default function PropostaAugustoFelipe() {
           </div>
         </section>
 
-        {/* INVESTIMENTO */}
+        {/* POTENCIAL DE RECEITA */}
         <section className="w-full bg-brand-title text-white px-4 md:px-8 lg:px-12 py-16 lg:py-24">
-          <div className="max-w-5xl mx-auto flex flex-col gap-10">
+          <div className="max-w-6xl mx-auto flex flex-col gap-10">
             <div className="flex flex-col gap-4 max-w-3xl">
               <span className="text-sm font-medium uppercase tracking-wider text-brand-highlight">
-                06 · Investimento
+                06 · O que está na mesa
               </span>
               <h2 className="text-4xl lg:text-[56px] font-medium leading-[1.05]">
-                Transparente, como a gente gosta.
+                Todo dia sem estrutura é dinheiro que passa.
               </h2>
               <p className="text-base md:text-lg text-white/70 font-light leading-relaxed">
-                Um fee mensal cobre a operação e a estratégia. Não cobramos percentual sobre publis nem
-                comissão sobre vendas — o incentivo é simples: seu negócio funcionar.
+                Os números abaixo são ilustrativos, com premissas conservadoras de mercado. Servem só pra dar
+                a ordem de grandeza do que a audiência atual já comporta — antes mesmo de crescer mais.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               <div className="rounded-[28px] border border-white/10 bg-white/5 p-8 flex flex-col gap-4">
                 <span className="text-xs font-medium uppercase tracking-wider text-brand-highlight">
-                  Plano recomendado
+                  Frente 1 · Publi
                 </span>
-                <h3 className="text-3xl font-medium leading-tight">Parceria 90 dias</h3>
+                <h3 className="text-2xl font-medium leading-tight">Patrocínios recorrentes</h3>
                 <p className="text-sm text-white/70 font-light leading-relaxed">
-                  Execução completa das três frentes, reuniões semanais, entregáveis listados acima.
+                  Com media kit e prospecção ativa, um perfil do seu porte sustenta confortavelmente de 2 a 4
+                  publis mensais com ticket médio de mercado na faixa de R$ 3 mil a R$ 8 mil por postagem.
                 </p>
-                <div className="pt-4 border-t border-white/10 flex items-end gap-2">
-                  <span className="text-4xl font-medium">R$ 8.500</span>
-                  <span className="text-sm text-white/60 pb-1">/mês</span>
+                <div className="pt-4 border-t border-white/10">
+                  <span className="text-xs text-white/50 uppercase tracking-wider">Potencial mensal</span>
+                  <p className="text-3xl font-medium mt-1">R$ 10k – R$ 30k</p>
                 </div>
-                <p className="text-xs text-white/50">
-                  Setup inicial incluso · Contrato mínimo de 3 meses
+              </div>
+
+              <div className="rounded-[28px] border border-white/10 bg-white/5 p-8 flex flex-col gap-4">
+                <span className="text-xs font-medium uppercase tracking-wider text-brand-highlight">
+                  Frente 2 · Digitais
+                </span>
+                <h3 className="text-2xl font-medium leading-tight">Produtos low-ticket</h3>
+                <p className="text-sm text-white/70 font-light leading-relaxed">
+                  Margem ~100%, entrega automática. Com uma base engajada do seu tamanho, uma taxa de conversão
+                  de 1% em campanhas pontuais já gera volume relevante — e escala sem custo marginal.
                 </p>
+                <div className="pt-4 border-t border-white/10">
+                  <span className="text-xs text-white/50 uppercase tracking-wider">Potencial mensal</span>
+                  <p className="text-3xl font-medium mt-1">R$ 8k – R$ 20k</p>
+                </div>
               </div>
 
               <div className="rounded-[28px] border border-brand-highlight bg-brand-highlight/10 p-8 flex flex-col gap-4">
                 <span className="text-xs font-medium uppercase tracking-wider text-brand-highlight">
-                  Formato alternativo
+                  Frente 3 · Mentoria
                 </span>
-                <h3 className="text-3xl font-medium leading-tight">Diagnóstico + roadmap</h3>
+                <h3 className="text-2xl font-medium leading-tight">Ticket alto</h3>
                 <p className="text-sm text-white/70 font-light leading-relaxed">
-                  Se preferir validar antes de fechar: um mês de imersão, entrega de plano completo e você
-                  decide se segue com a gente na execução.
+                  Pensada pra rodar 2 a 3 vezes por ano, com turmas enxutas e ticket alto. É a camada que
+                  transforma audiência em negócio de verdade, sem exigir esforço operacional diário.
                 </p>
-                <div className="pt-4 border-t border-white/10 flex items-end gap-2">
-                  <span className="text-4xl font-medium">R$ 3.500</span>
-                  <span className="text-sm text-white/60 pb-1">/único</span>
+                <div className="pt-4 border-t border-white/10">
+                  <span className="text-xs text-white/50 uppercase tracking-wider">Potencial por turma</span>
+                  <p className="text-3xl font-medium mt-1">R$ 40k – R$ 100k</p>
                 </div>
-                <p className="text-xs text-white/50">
-                  Abatido do fee se fechar a parceria depois
+              </div>
+            </div>
+
+            <div className="rounded-[28px] bg-brand-highlight text-brand-title p-8 md:p-10 flex flex-col md:flex-row md:items-end gap-6 md:gap-12">
+              <div className="flex-1">
+                <span className="text-xs font-medium uppercase tracking-wider">
+                  Somando as três frentes em regime
+                </span>
+                <p className="text-4xl md:text-5xl font-medium leading-tight mt-2">
+                  + R$ 300k a R$ 700k/ano
                 </p>
               </div>
+              <p className="text-sm font-light leading-relaxed md:max-w-sm">
+                em receita adicional possível, mantendo a essência do conteúdo. Hoje, boa parte disso é
+                atenção que passa e não volta.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-4 pt-6 border-t border-white/10">
+              <span className="text-xs font-medium uppercase tracking-wider text-brand-highlight">
+                Formatos possíveis de parceria
+              </span>
+              <p className="text-base text-white/80 font-light leading-relaxed max-w-3xl">
+                O modelo a gente desenha juntos conforme o seu apetite: pode ser{" "}
+                <span className="font-bold text-white">fee mensal fixo</span> pela operação, uma{" "}
+                <span className="font-bold text-white">divisão de receita (50/50 ou variável por produto)</span>{" "}
+                nos infoprodutos que lançarmos, ou até uma{" "}
+                <span className="font-bold text-white">sociedade em novos negócios</span> que nasçam dessa
+                audiência. Cada formato tem vantagens — a conversa certa é sobre qual faz sentido pra você neste momento.
+              </p>
             </div>
           </div>
         </section>
@@ -414,20 +453,21 @@ export default function PropostaAugustoFelipe() {
               atenção em <span className="italic">negócio</span>?
             </h2>
             <p className="text-base md:text-lg text-brand-body font-light leading-relaxed max-w-2xl">
-              Se fez sentido, o próximo passo é uma call de 30 minutos pra alinhar expectativas, tirar dúvidas
-              e começar a desenhar o que é prioridade na sua realidade. Sem compromisso.
+              Isto aqui é um mapa, não uma cobrança. O próximo passo é uma conversa de 30 minutos pra você
+              nos contar o que faz sentido pra sua vida hoje — e aí a gente desenha juntos o formato de parceria
+              (fee, divisão de receita, sociedade, o que couber).
             </p>
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <Button variant="primary" showIcon href="/aplicacao">
-                Agendar conversa
+                Marcar a conversa
               </Button>
               <Button variant="secondary" href="mailto:contato@futurah.com.br?subject=Proposta%20Augusto%20Felipe">
                 Responder por e-mail
               </Button>
             </div>
             <p className="text-xs text-brand-body/60 pt-6 border-t border-brand-title/10 w-full">
-              Esta proposta é válida por 30 dias a partir da data de envio. Condições podem ser ajustadas após
-              a primeira conversa, conforme escopo real.
+              Documento de caráter estratégico e ilustrativo. Os números mostrados são referências de mercado
+              para dimensionar o potencial, não uma oferta comercial.
             </p>
           </div>
         </section>
