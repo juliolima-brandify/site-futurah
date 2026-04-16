@@ -1,13 +1,25 @@
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = fileURLToPath(new URL('.', import.meta.url))
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: false,
     images: {
-        domains: ['framerusercontent.com'],
-        remotePatterns: [{ protocol: 'https', hostname: 'framerusercontent.com' }],
+        domains: ['framerusercontent.com', 'cdn.sanity.io'],
+        remotePatterns: [
+            { protocol: 'https', hostname: 'framerusercontent.com' },
+            { protocol: 'https', hostname: 'cdn.sanity.io' },
+        ],
     },
     trailingSlash: false,
-    serverExternalPackages: ['@keystatic/core', '@keystatic/next'],
     webpack: (config, { isServer }) => {
+        config.resolve = config.resolve || {}
+        config.resolve.alias = {
+            ...config.resolve.alias,
+            slate: path.resolve(__dirname, 'node_modules/slate'),
+        }
         if (isServer) {
             config.externals = [
                 ...(Array.isArray(config.externals) ? config.externals : [config.externals].filter(Boolean)),
@@ -17,10 +29,10 @@ const nextConfig = {
                 'node:fs',
                 'node:path',
                 'node:fs/promises',
-            ];
+            ]
         }
-        return config;
+        return config
     },
-};
+}
 
 export default nextConfig;

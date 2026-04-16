@@ -50,14 +50,32 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                                 {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }).replace('.', '').toUpperCase() : ''}
                             </div>
 
-                            {/* Author / Staff Badge */}
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-zinc-200" />
-                                <div className="flex flex-col leading-none">
-                                    <span className="text-[10px] font-bold text-[#1B1B1B] uppercase tracking-wider mb-0.5">HUMAN PICKS</span>
-                                    <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider">STAFF</span>
+                            {/* Author (do CMS) */}
+                            {post.author && (
+                                <div className="flex items-center gap-3">
+                                    {post.author.image ? (
+                                        <Image
+                                            src={post.author.image}
+                                            alt={post.author.name}
+                                            width={32}
+                                            height={32}
+                                            className="rounded-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-8 h-8 rounded-full bg-zinc-200" />
+                                    )}
+                                    <div className="flex flex-col leading-none">
+                                        <span className="text-[10px] font-bold text-[#1B1B1B] uppercase tracking-wider mb-0.5">
+                                            {post.author.name}
+                                        </span>
+                                        {post.author.role && (
+                                            <span className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider">
+                                                {post.author.role}
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
 
                         {/* Featured Image */}
@@ -92,20 +110,19 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                             <hr className="my-8 border-black/10" />
                         </div>
 
-                        {/* Tags */}
+                        {/* Tags (categoria + tags do CMS) */}
                         <div className="mx-auto max-w-[680px] mt-12 mb-16 flex flex-wrap gap-2 justify-center">
                             <span className="px-4 py-1.5 rounded-full bg-[#E1FF00] text-black text-xs font-bold uppercase tracking-wider hover:brightness-95 cursor-pointer transition-all">
                                 {post.category}
                             </span>
-                            <span className="px-4 py-1.5 rounded-full bg-[#E0E7FF] text-[#3730A3] text-xs font-bold uppercase tracking-wider hover:brightness-95 cursor-pointer transition-all">
-                                AI Trends
-                            </span>
-                            <span className="px-4 py-1.5 rounded-full bg-[#DCFCE7] text-[#166534] text-xs font-bold uppercase tracking-wider hover:brightness-95 cursor-pointer transition-all">
-                                Futuro
-                            </span>
-                            <span className="px-4 py-1.5 rounded-full bg-[#F3E8FF] text-[#6B21A8] text-xs font-bold uppercase tracking-wider hover:brightness-95 cursor-pointer transition-all">
-                                Tecnologia
-                            </span>
+                            {post.tags?.map((tag) => (
+                                <span
+                                    key={tag}
+                                    className="px-4 py-1.5 rounded-full bg-zinc-100 text-zinc-700 text-xs font-bold uppercase tracking-wider hover:brightness-95 cursor-pointer transition-all"
+                                >
+                                    {tag}
+                                </span>
+                            ))}
                         </div>
 
                         {/* Footer: Voltar / Share */}

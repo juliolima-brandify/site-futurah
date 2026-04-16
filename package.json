@@ -2,6 +2,7 @@
   "name": "futura-and-co",
   "version": "0.1.0",
   "private": true,
+  "overrides": { "slate": "^0.117.2" },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -14,8 +15,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@keystatic/core": "^0.5.48",
-    "@keystatic/next": "^5.0.4",
     "@portabletext/react": "^6.0.2",
     "@portabletext/types": "^4.0.1",
     "@sanity/image-url": "^2.0.3",
@@ -24,7 +23,9 @@
     "next-sanity": "^12.1.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
+    "sanity": "^3.56.0",
     "sharp": "^0.34.5",
+    "slate": "^0.117.2",
     "styled-components": "^6.3.9",
     "use-effect-event": "^2.0.3"
   },

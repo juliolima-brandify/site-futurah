@@ -22,6 +22,12 @@ export function urlFor(source: { _type: string; asset?: { _ref: string } } | und
 }
 
 // Tipos compatíveis com o que o blog já usa
+export interface PostAuthor {
+  name: string
+  role: string | null
+  image: string | null
+}
+
 export interface PostListItem {
   slug: string
   title: string
@@ -30,6 +36,8 @@ export interface PostListItem {
   category: string
   featured: boolean
   publishedAt: string | null
+  author: PostAuthor | null
+  tags: string[]
 }
 
 export interface CategoryItem {
@@ -46,6 +54,8 @@ export interface PostBySlug {
     coverImage: string | null
     category: string
     publishedAt: string | null
+    author: PostAuthor | null
+    tags: string[]
   }
   content: import('@portabletext/types').PortableTextBlock[] | null
 }
@@ -59,7 +69,9 @@ const postsFields = `
   "category": category->slug.current,
   "categoryName": category->name,
   featured,
-  publishedAt
+  publishedAt,
+  "author": author->{ name, role, image },
+  tags
 `
 
 const postBySlugFields = `
@@ -70,6 +82,8 @@ const postBySlugFields = `
   coverImage,
   "category": category->name,
   publishedAt,
+  "author": author->{ name, role, image },
+  tags,
   content
 `
 
@@ -85,6 +99,8 @@ export async function getPostsSanity(): Promise<PostListItem[]> {
       category: string
       featured: boolean
       publishedAt: string | null
+      author: { name: string; role: string | null; image: unknown } | null
+      tags: string[] | null
     }>>(
       `*[_type == "post"] | order(publishedAt desc) { ${postsFields} }`
     )
@@ -96,6 +112,12 @@ export async function getPostsSanity(): Promise<PostListItem[]> {
       category: p.category || 'Geral',
       featured: !!p.featured,
       publishedAt: p.publishedAt || null,
+      author: p.author ? {
+        name: p.author.name,
+        role: p.author.role || null,
+        image: p.author.image ? urlFor(p.author.image as { _type: string; asset?: { _ref: string } }) : null,
+      } : null,
+      tags: Array.isArray(p.tags) ? p.tags.filter(Boolean) : [],
     }))
   } catch (err) {
     console.error('[Sanity] getPostsSanity failed:', err)
@@ -136,6 +158,8 @@ export async function getPostBySlugSanity(slug: string): Promise<PostBySlug | nu
       coverImage: unknown
       category: string
       publishedAt: string | null
+      author: { name: string; role: string | null; image: unknown } | null
+      tags: string[] | null
       content: import('@portabletext/types').PortableTextBlock[] | null
     } | null>(
       `*[_type == "post" && slug.current == $slug][0] { ${postBySlugFields} }`,
@@ -150,6 +174,12 @@ export async function getPostBySlugSanity(slug: string): Promise<PostBySlug | nu
         coverImage: post.coverImage ? urlFor(post.coverImage as { _type: string; asset?: { _ref: string } }) : null,
         category: post.category || 'Geral',
         publishedAt: post.publishedAt || null,
+        author: post.author ? {
+          name: post.author.name,
+          role: post.author.role || null,
+          image: post.author.image ? urlFor(post.author.image as { _type: string; asset?: { _ref: string } }) : null,
+        } : null,
+        tags: Array.isArray(post.tags) ? post.tags.filter(Boolean) : [],
       },
       content: post.content || null,
     }

@@ -70,6 +70,8 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                                     excerpt={post.excerpt}
                                     coverImage={post.coverImage}
                                     category={category.name}
+                                    publishedAt={post.publishedAt}
+                                    author={post.author}
                                 />
                             ))}
                         </div>

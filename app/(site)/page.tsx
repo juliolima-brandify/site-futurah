@@ -7,8 +7,10 @@ import { BlogSection } from "@/components/sections/BlogSection";
 import { SchoolSection } from "@/components/sections/SchoolSection";
 import { TeamTestimonialSection } from "@/components/sections/TeamTestimonialSection";
 import Footer from "@/components/layout/Footer";
+import { getPosts } from "@/lib/content";
 
-export default function Home() {
+export default async function Home() {
+    const posts = await getPosts();
     return (
         <>
             <Header />
@@ -18,7 +20,7 @@ export default function Home() {
                 <SchoolSection />
                 <Features />
                 <TeamTestimonialSection />
-                <BlogSection />
+                <BlogSection posts={posts} />
                 <Contact />
             </main>
             <Footer />

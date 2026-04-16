@@ -11,6 +11,7 @@ interface Post {
     category: string;
     featured: boolean;
     publishedAt: string | null;
+    author?: { name: string } | null;
 }
 
 interface BlogListProps {
@@ -83,6 +84,7 @@ export default function BlogList({ initialPosts, categories }: BlogListProps) {
                             coverImage={post.coverImage}
                             category={post.category}
                             publishedAt={post.publishedAt || ''}
+                            author={post.author}
                         />
                     ))}
                 </div>
