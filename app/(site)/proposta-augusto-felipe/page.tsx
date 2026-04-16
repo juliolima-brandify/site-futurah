@@ -197,7 +197,7 @@ export default function PropostaAugustoFelipe() {
                 <ul className="text-sm text-brand-body font-light space-y-2 pt-2 border-t border-brand-title/10">
                   <li>→ Tabela de precificação editável</li>
                   <li>→ Pack de stencils e moldes para espelho</li>
-                  <li>→ Guia "Vidraceiro que aparece nas redes"</li>
+                  <li>→ Guia &ldquo;Vidraceiro que aparece nas redes&rdquo;</li>
                   <li>→ Captura de e-mail em todo ponto de contato</li>
                 </ul>
               </div>
