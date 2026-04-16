@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import Button from "@/components/ui/Button";
 
 export const metadata: Metadata = {
-  title: "Proposta Augusto Felipe | Futurah and Co.",
+  title: "Análise · @fidevidraceiro | Futurah and Co.",
   description:
-    "Uma proposta sob medida para transformar a audiência do @fidevidraceiro em um ecossistema de monetização sustentável.",
+    "Uma leitura estratégica do potencial de monetização do perfil @fidevidraceiro — Augusto Felipe.",
   robots: { index: false, follow: false },
 };
 
@@ -16,49 +15,82 @@ export default function PropostaAugustoFelipe() {
       <Header />
       <main className="bg-white">
         {/* HERO */}
-        <section className="relative min-h-[85vh] flex items-end bg-white overflow-hidden pt-28 pb-16 lg:pt-32 lg:pb-20">
+        <section className="relative min-h-[85vh] flex items-center justify-center bg-white overflow-hidden pt-28 pb-20 lg:pt-36 lg:pb-28">
           <div className="relative z-10 w-full px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl space-y-6 lg:space-y-8">
+            <div className="max-w-4xl mx-auto flex flex-col items-center text-center space-y-6 lg:space-y-8">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brand-title/10 bg-brand-background">
                 <span className="w-2 h-2 rounded-full bg-brand-button-hover animate-pulse" />
                 <span className="text-xs font-medium uppercase tracking-wider text-brand-title">
-                  Proposta confidencial · Exclusiva
+                  Análise estratégica · @fidevidraceiro
                 </span>
               </div>
 
               <h1 className="text-4xl md:text-6xl lg:text-[72px] font-normal uppercase text-brand-title leading-[1.05]">
-                Augusto,<br />
-                sua audiência <br />
-                vale <span className="italic font-medium">muito</span> mais <br />
-                do que ela rende hoje.
+                Uma leitura do <br />
+                potencial que o seu <br />
+                perfil carrega <span className="italic font-medium">hoje.</span>
               </h1>
 
               <p className="text-base md:text-lg text-brand-body leading-relaxed max-w-2xl font-light">
-                Você construiu algo raro: uma audiência híbrida — fãs de entretenimento e profissionais do ofício — em volta de um ativo
-                irrepetível, a relação com seu pai. Esta é uma proposta para{" "}
-                <span className="font-bold text-brand-title">monetizar sem queimar essa magia.</span>
+                Augusto, este documento não é uma oferta. É uma conversa em forma de análise, olhando pro
+                seu perfil como profissionais de marketing olhariam — e mapeando o que já está pronto pra
+                virar negócio, sem atropelar o que te trouxe até aqui.
               </p>
 
-              <div className="flex flex-wrap items-center gap-4 pt-2">
-                <Button variant="primary" showIcon href="#proposta">
-                  Ver as oportunidades
-                </Button>
+              <div className="flex flex-col items-center gap-3 pt-2">
                 <a
-                  href="#contato"
-                  className="text-sm font-medium text-brand-title underline underline-offset-4 hover:text-brand-button-hover transition-colors"
+                  href="#leitura"
+                  className="inline-flex items-center gap-2 text-sm font-medium text-brand-title underline underline-offset-4 hover:text-brand-button-hover transition-colors"
                 >
-                  Falar direto com a Futurah
+                  Começar a leitura ↓
                 </a>
+                <span className="text-xs text-brand-body/60">
+                  Preparada pela Futurah and Co. · Abril de 2026
+                </span>
               </div>
             </div>
           </div>
+        </section>
 
-          {/* badge decorativo */}
-          <div className="absolute top-28 right-4 lg:right-12 hidden md:flex flex-col items-end gap-2">
-            <div className="px-5 py-2 rounded-full bg-brand-highlight text-brand-title text-sm font-medium">
-              Preparada por Futurah and Co.
+        {/* RETRATO · DADOS */}
+        <section id="leitura" className="w-full bg-white px-4 md:px-8 lg:px-12 pb-16 lg:pb-24 border-t border-brand-title/5">
+          <div className="max-w-6xl mx-auto pt-16 lg:pt-24 flex flex-col gap-10">
+            <div className="flex flex-col gap-4 max-w-3xl">
+              <span className="text-sm font-medium uppercase tracking-wider text-brand-button-hover">
+                Retrato do perfil
+              </span>
+              <h2 className="text-4xl lg:text-[56px] font-medium text-brand-title leading-[1.05]">
+                Quem é o Augusto, nos números.
+              </h2>
+              <p className="text-base md:text-lg text-brand-body font-light leading-relaxed">
+                Antes de qualquer conversa sobre monetização, o exercício é olhar com calma pro ativo. O que
+                se vê de fora é raro:
+              </p>
             </div>
-            <span className="text-xs text-brand-body/60">Abril de 2026</span>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { num: "23", label: "anos, formado em administração" },
+                { num: "48k+", label: "seguidores iniciais · crescendo todo mês" },
+                { num: "1M", label: "views no vídeo viral do globo de luz" },
+                { num: "2", label: "plataformas ativas · IG + TikTok" },
+              ].map((s) => (
+                <div key={s.label} className="bg-brand-background rounded-[24px] p-6 flex flex-col gap-2">
+                  <span className="text-4xl md:text-5xl font-medium text-brand-title leading-none">
+                    {s.num}
+                  </span>
+                  <span className="text-xs md:text-sm text-brand-body font-light leading-snug">
+                    {s.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-sm text-brand-body/70 font-light max-w-3xl">
+              Mais relevante que o número bruto: a base é <span className="font-medium text-brand-title">engajada, híbrida
+              (fãs + vidraceiros)</span> e foi construída em torno de algo raro — a relação com o seu pai e o bastidor
+              de uma vidraçaria de cidade do interior. Isso não se compra em tráfego pago.
+            </p>
           </div>
         </section>
 
@@ -67,13 +99,13 @@ export default function PropostaAugustoFelipe() {
           <div className="max-w-6xl mx-auto flex flex-col gap-10">
             <div className="flex flex-col gap-4 max-w-3xl">
               <span className="text-sm font-medium uppercase tracking-wider text-brand-button-hover">
-                01 · Diagnóstico
+                Diagnóstico
               </span>
               <h2 className="text-4xl lg:text-[56px] font-medium text-brand-title leading-[1.05]">
-                O que a gente vê no seu perfil.
+                Seis coisas que a gente notou no seu perfil.
               </h2>
               <p className="text-base md:text-lg text-brand-body font-light leading-relaxed">
-                Antes de sugerir qualquer coisa, o exercício é entender o ativo. E o seu é incomum.
+                Leitura de fora pra dentro, como faríamos com qualquer criador antes de pensar em estratégia.
               </p>
             </div>
 
@@ -124,7 +156,7 @@ export default function PropostaAugustoFelipe() {
         <section className="w-full bg-brand-title text-white px-4 md:px-8 lg:px-12 py-16 lg:py-24">
           <div className="max-w-5xl mx-auto flex flex-col gap-8">
             <span className="text-sm font-medium uppercase tracking-wider text-brand-highlight">
-              02 · Nossa tese
+              A tese
             </span>
             <h2 className="text-3xl md:text-5xl lg:text-[56px] font-medium leading-[1.1]">
               A sua audiência já é o ativo.{" "}
@@ -139,18 +171,19 @@ export default function PropostaAugustoFelipe() {
           </div>
         </section>
 
-        {/* PROPOSTA · 3 FRENTES */}
+        {/* FRENTES · 3 CAMINHOS */}
         <section id="proposta" className="w-full bg-white px-4 md:px-8 lg:px-12 py-16 lg:py-24">
           <div className="max-w-6xl mx-auto flex flex-col gap-12">
             <div className="flex flex-col gap-4 max-w-3xl">
               <span className="text-sm font-medium uppercase tracking-wider text-brand-button-hover">
-                03 · A proposta
+                Frentes de monetização
               </span>
               <h2 className="text-4xl lg:text-[56px] font-medium text-brand-title leading-[1.05]">
-                Três frentes. Uma ordem certa.
+                Por onde esse perfil poderia começar a gerar receita.
               </h2>
               <p className="text-base md:text-lg text-brand-body font-light leading-relaxed">
-                Cada frente tem tempo, risco e retorno diferentes. Rodadas em paralelo, se financiam.
+                Três caminhos possíveis, com tempos e riscos diferentes. Nenhum exclui o outro — na prática,
+                rodam em paralelo e um financia o outro.
               </p>
             </div>
 
@@ -235,16 +268,181 @@ export default function PropostaAugustoFelipe() {
           </div>
         </section>
 
+        {/* BANCO DE IDEIAS */}
+        <section className="w-full bg-white px-4 md:px-8 lg:px-12 py-16 lg:py-24 border-t border-brand-title/5">
+          <div className="max-w-6xl mx-auto flex flex-col gap-12">
+            <div className="flex flex-col gap-4 max-w-3xl">
+              <span className="text-sm font-medium uppercase tracking-wider text-brand-button-hover">
+                Banco de ideias
+              </span>
+              <h2 className="text-4xl lg:text-[56px] font-medium text-brand-title leading-[1.05]">
+                Coisas que a gente pensou olhando pro seu perfil.
+              </h2>
+              <p className="text-base md:text-lg text-brand-body font-light leading-relaxed">
+                Essa lista é pra você guardar. Nem tudo aqui faz sentido agora, nem tudo é pra sempre — mas
+                tudo é factível com o que você já tem. A gente jogou isso no papel como quem pensa junto, na
+                mesa de bar, sem compromisso de executar tudo.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Categoria 1 */}
+              <div className="bg-brand-background rounded-[28px] p-8 flex flex-col gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-full bg-brand-title text-brand-highlight flex items-center justify-center text-sm font-medium">
+                    01
+                  </span>
+                  <h3 className="text-xl font-medium text-brand-title">Cursos & mentoria</h3>
+                </div>
+                <ul className="text-sm text-brand-body font-light space-y-2.5 leading-relaxed">
+                  <li>→ Curso &ldquo;Vidraceiro que Vende&rdquo; — como captar clientes pelo Instagram</li>
+                  <li>→ Mini-curso &ldquo;Do zero ao primeiro espelho personalizado&rdquo;</li>
+                  <li>→ Masterclass de precificação para vidraçaria</li>
+                  <li>→ Mentoria em grupo para vidraceiros que querem crescer</li>
+                  <li>→ Workshop gravado &ldquo;Como viralizei sendo vidraceiro&rdquo;</li>
+                  <li>→ Curso &ldquo;Empresa familiar sem brigar com o pai&rdquo; (meta, só seu)</li>
+                </ul>
+              </div>
+
+              {/* Categoria 2 */}
+              <div className="bg-brand-background rounded-[28px] p-8 flex flex-col gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-full bg-brand-title text-brand-highlight flex items-center justify-center text-sm font-medium">
+                    02
+                  </span>
+                  <h3 className="text-xl font-medium text-brand-title">Produtos digitais · baixo ticket</h3>
+                </div>
+                <ul className="text-sm text-brand-body font-light space-y-2.5 leading-relaxed">
+                  <li>→ Tabela de precificação editável (planilha pronta)</li>
+                  <li>→ Pack de stencils/moldes para espelhos</li>
+                  <li>→ E-book &ldquo;Guia de orçamento para vidraçaria&rdquo;</li>
+                  <li>→ Kit de templates de stories e reels</li>
+                  <li>→ Scripts de WhatsApp para atendimento de cliente difícil</li>
+                  <li>→ Checklist de segurança na obra</li>
+                  <li>→ Pack &ldquo;Receitas de conteúdo&rdquo; (roteiros prontos)</li>
+                </ul>
+              </div>
+
+              {/* Categoria 3 */}
+              <div className="bg-brand-background rounded-[28px] p-8 flex flex-col gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-full bg-brand-title text-brand-highlight flex items-center justify-center text-sm font-medium">
+                    03
+                  </span>
+                  <h3 className="text-xl font-medium text-brand-title">Produtos físicos & loja</h3>
+                </div>
+                <ul className="text-sm text-brand-body font-light space-y-2.5 leading-relaxed">
+                  <li>→ Linha de espelhos autorais (capivara, personalizados, minis)</li>
+                  <li>→ Kit &ldquo;Faça você mesmo&rdquo; — cortador + tutorial digital</li>
+                  <li>→ Merch: bonés, camisetas, moletom do canal</li>
+                  <li>→ Adesivos e decalques com arte das peças virais</li>
+                  <li>→ Caixa-presente &ldquo;Presenteie um Vidraceiro&rdquo;</li>
+                  <li>→ Licenciamento da marca pra outras vidraçarias</li>
+                  <li className="text-brand-body/60 pt-1 italic">obs: logística pesada, fica pra fase avançada</li>
+                </ul>
+              </div>
+
+              {/* Categoria 4 */}
+              <div className="bg-brand-background rounded-[28px] p-8 flex flex-col gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-full bg-brand-title text-brand-highlight flex items-center justify-center text-sm font-medium">
+                    04
+                  </span>
+                  <h3 className="text-xl font-medium text-brand-title">Patrocínios & parcerias</h3>
+                </div>
+                <ul className="text-sm text-brand-body font-light space-y-2.5 leading-relaxed">
+                  <li>→ Ferramentas (Tramontina, Vonder, DeWalt, Bosch)</li>
+                  <li>→ EPI e segurança (luvas, óculos, capacetes)</li>
+                  <li>→ Fabricantes de vidro (Cebrace, Guardian, Saint-Gobain)</li>
+                  <li>→ Selantes e adesivos (você já usa a Silvaselantes)</li>
+                  <li>→ Apps de gestão pra MEI (Conta Azul, Nubank PJ)</li>
+                  <li>→ Plataformas de afiliado (Hotmart, Kiwify, Eduzz)</li>
+                  <li>→ Embaixador de longo prazo (anual, não pontual)</li>
+                </ul>
+              </div>
+
+              {/* Categoria 5 */}
+              <div className="bg-brand-background rounded-[28px] p-8 flex flex-col gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-full bg-brand-title text-brand-highlight flex items-center justify-center text-sm font-medium">
+                    05
+                  </span>
+                  <h3 className="text-xl font-medium text-brand-title">Comunidade & recorrência</h3>
+                </div>
+                <ul className="text-sm text-brand-body font-light space-y-2.5 leading-relaxed">
+                  <li>→ &ldquo;Clube do Claudão&rdquo; — membership mensal pros fãs</li>
+                  <li>→ Rede PRO de vidraceiros (networking pago mensal)</li>
+                  <li>→ Newsletter premium com bastidores e dicas</li>
+                  <li>→ Grupo fechado no Telegram/WhatsApp</li>
+                  <li>→ Lives exclusivas com o pai, bastidores, bloopers</li>
+                  <li>→ Programa de indicação entre vidraceiros</li>
+                </ul>
+              </div>
+
+              {/* Categoria 6 */}
+              <div className="bg-brand-background rounded-[28px] p-8 flex flex-col gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-full bg-brand-title text-brand-highlight flex items-center justify-center text-sm font-medium">
+                    06
+                  </span>
+                  <h3 className="text-xl font-medium text-brand-title">IA, bots & automações</h3>
+                </div>
+                <ul className="text-sm text-brand-body font-light space-y-2.5 leading-relaxed">
+                  <li>→ Bot de WhatsApp &ldquo;Orçamento Rápido de Vidraçaria&rdquo;</li>
+                  <li>→ Agente de atendimento automatizado pra vidraçarias</li>
+                  <li>→ Chatbot &ldquo;Calcule seu espelho&rdquo; pro consumidor final</li>
+                  <li>→ Assistente de IA que ajuda no diagnóstico de obra</li>
+                  <li>→ Automação de captura e follow-up de lead</li>
+                  <li>→ App simples de gestão de orçamentos (pago mensal)</li>
+                </ul>
+              </div>
+
+              {/* Categoria 7 · full-width */}
+              <div className="md:col-span-2 bg-brand-title text-white rounded-[28px] p-8 flex flex-col gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-full bg-brand-highlight text-brand-title flex items-center justify-center text-sm font-medium">
+                    07
+                  </span>
+                  <h3 className="text-xl font-medium">
+                    Pra sonhar junto · ideias de longo prazo
+                  </h3>
+                </div>
+                <ul className="text-sm text-white/70 font-light space-y-2.5 leading-relaxed md:columns-2 md:gap-8">
+                  <li>→ Encontro presencial anual de vidraceiros (evento de marca)</li>
+                  <li>→ Livro físico &ldquo;De vidraceiro a criador&rdquo;</li>
+                  <li>→ Podcast semanal com seu pai, sobre ofício e vida</li>
+                  <li>→ Canal no YouTube com conteúdo longo e entrevistas</li>
+                  <li>→ Franquia/licenciamento da marca &ldquo;Fí de Vidraceiro&rdquo;</li>
+                  <li>→ Série documental &ldquo;Bastidores de um ofício&rdquo;</li>
+                  <li>→ Feira de produtos de vidraçarias independentes</li>
+                  <li>→ Plataforma de cursos própria pra profissionais do ofício</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="rounded-[24px] bg-brand-background px-6 py-5 text-sm text-brand-body font-light leading-relaxed max-w-3xl">
+              <span className="font-medium text-brand-title">Sobre essa lista:</span> não é pra fazer tudo,
+              nem é pra fazer agora. É pra você ter em mãos quando bater aquela dúvida de &ldquo;o que dá
+              pra fazer com isso aqui?&rdquo;. A gente pensou como parceiro pensa — sem agenda, sem
+              cronograma, só jogando ideia em cima da mesa.
+            </div>
+          </div>
+        </section>
+
         {/* FASES / TIMELINE */}
         <section className="w-full bg-brand-background px-4 md:px-8 lg:px-12 py-16 lg:py-24">
           <div className="max-w-6xl mx-auto flex flex-col gap-12">
             <div className="flex flex-col gap-4 max-w-3xl">
               <span className="text-sm font-medium uppercase tracking-wider text-brand-button-hover">
-                04 · Como a gente executa
+                Como isso poderia rodar
               </span>
               <h2 className="text-4xl lg:text-[56px] font-medium text-brand-title leading-[1.05]">
-                90 dias, três fases.
+                Um exercício de imaginação: 90 dias em três fases.
               </h2>
+              <p className="text-base md:text-lg text-brand-body font-light leading-relaxed">
+                Não é um cronograma fechado. É só um jeito de mostrar a ordem natural das coisas —
+                o que viria primeiro, o que financiaria o quê.
+              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -309,16 +507,19 @@ export default function PropostaAugustoFelipe() {
           </div>
         </section>
 
-        {/* O QUE ENTREGAMOS */}
+        {/* O QUE A FUTURAH FARIA */}
         <section className="w-full bg-white px-4 md:px-8 lg:px-12 py-16 lg:py-24">
           <div className="max-w-6xl mx-auto flex flex-col gap-10">
             <div className="flex flex-col gap-4 max-w-3xl">
               <span className="text-sm font-medium uppercase tracking-wider text-brand-button-hover">
-                05 · O que entra no pacote
+                O que a Futurah faria
               </span>
               <h2 className="text-4xl lg:text-[56px] font-medium text-brand-title leading-[1.05]">
-                Tudo feito com a gente. Nada terceirizado pra fora.
+                Tudo que envolve estratégia, execução e acompanhamento.
               </h2>
+              <p className="text-base md:text-lg text-brand-body font-light leading-relaxed">
+                Caso você decida envolver a gente nessa jornada, o escopo natural de trabalho seria:
+              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -329,7 +530,7 @@ export default function PropostaAugustoFelipe() {
                 "Funis de e-mail e automações",
                 "Prospecção e negociação de publis",
                 "Copy de lançamento e roteiros de reels",
-                "Dashboards com métricas reais, não 'vaidade'",
+                "Dashboards com métricas reais, não de vaidade",
                 "Acompanhamento semanal com você",
               ].map((item) => (
                 <div
@@ -348,19 +549,19 @@ export default function PropostaAugustoFelipe() {
           </div>
         </section>
 
-        {/* POTENCIAL DE RECEITA */}
+        {/* POTENCIAL / ORDEM DE GRANDEZA */}
         <section className="w-full bg-brand-title text-white px-4 md:px-8 lg:px-12 py-16 lg:py-24">
           <div className="max-w-6xl mx-auto flex flex-col gap-10">
             <div className="flex flex-col gap-4 max-w-3xl">
               <span className="text-sm font-medium uppercase tracking-wider text-brand-highlight">
-                06 · O que está na mesa
+                Ordem de grandeza
               </span>
               <h2 className="text-4xl lg:text-[56px] font-medium leading-[1.05]">
-                Todo dia sem estrutura é dinheiro que passa.
+                Pra você dimensionar o tamanho do que já é possível hoje.
               </h2>
               <p className="text-base md:text-lg text-white/70 font-light leading-relaxed">
-                Os números abaixo são ilustrativos, com premissas conservadoras de mercado. Servem só pra dar
-                a ordem de grandeza do que a audiência atual já comporta — antes mesmo de crescer mais.
+                As faixas abaixo são referências de mercado, não promessas. Servem pra mostrar a escala do
+                que uma audiência do seu porte comporta — antes mesmo dela crescer mais.
               </p>
             </div>
 
@@ -411,18 +612,14 @@ export default function PropostaAugustoFelipe() {
               </div>
             </div>
 
-            <div className="rounded-[28px] bg-brand-highlight text-brand-title p-8 md:p-10 flex flex-col md:flex-row md:items-end gap-6 md:gap-12">
-              <div className="flex-1">
-                <span className="text-xs font-medium uppercase tracking-wider">
-                  Somando as três frentes em regime
-                </span>
-                <p className="text-4xl md:text-5xl font-medium leading-tight mt-2">
-                  + R$ 300k a R$ 700k/ano
-                </p>
-              </div>
-              <p className="text-sm font-light leading-relaxed md:max-w-sm">
-                em receita adicional possível, mantendo a essência do conteúdo. Hoje, boa parte disso é
-                atenção que passa e não volta.
+            <div className="rounded-[28px] border border-white/10 bg-white/[0.03] p-8 md:p-10 flex flex-col gap-3">
+              <span className="text-xs font-medium uppercase tracking-wider text-brand-highlight">
+                Sobre os números acima
+              </span>
+              <p className="text-sm md:text-base text-white/70 font-light leading-relaxed max-w-3xl">
+                São faixas de mercado, não promessas. Servem apenas pra dimensionar a ordem de grandeza do
+                que uma audiência como a sua já comporta — hoje, boa parte disso é atenção que passa e não
+                volta em forma de negócio.
               </p>
             </div>
 
@@ -442,32 +639,31 @@ export default function PropostaAugustoFelipe() {
           </div>
         </section>
 
-        {/* CTA FINAL */}
+        {/* ENCERRAMENTO */}
         <section id="contato" className="w-full bg-brand-background px-4 md:px-8 lg:px-12 py-20 lg:py-28">
-          <div className="max-w-4xl mx-auto flex flex-col items-start gap-8">
+          <div className="max-w-3xl mx-auto flex flex-col items-center text-center gap-8">
             <span className="text-sm font-medium uppercase tracking-wider text-brand-button-hover">
-              07 · Próximo passo
+              Encerrando a leitura
             </span>
-            <h2 className="text-4xl md:text-6xl lg:text-[72px] font-medium text-brand-title leading-[1.05]">
-              Bora transformar <br />
-              atenção em <span className="italic">negócio</span>?
+            <h2 className="text-3xl md:text-5xl lg:text-[56px] font-medium text-brand-title leading-[1.1]">
+              Se fez sentido, <span className="italic">a gente conversa.</span>
             </h2>
-            <p className="text-base md:text-lg text-brand-body font-light leading-relaxed max-w-2xl">
-              Isto aqui é um mapa, não uma cobrança. O próximo passo é uma conversa de 30 minutos pra você
-              nos contar o que faz sentido pra sua vida hoje — e aí a gente desenha juntos o formato de parceria
-              (fee, divisão de receita, sociedade, o que couber).
+            <p className="text-base md:text-lg text-brand-body font-light leading-relaxed">
+              Este documento existe só pra abrir o diálogo. Nenhuma proposta comercial, nenhum compromisso.
+              Se alguma das ideias aqui mexer com você, a gente senta, escuta o que você quer da sua vida
+              hoje — e só então discute formato de trabalho, se houver interesse de parte a parte.
             </p>
-            <div className="flex flex-wrap items-center gap-4 pt-2">
-              <Button variant="primary" showIcon href="/aplicacao">
-                Marcar a conversa
-              </Button>
-              <Button variant="secondary" href="mailto:contato@futurah.com.br?subject=Proposta%20Augusto%20Felipe">
-                Responder por e-mail
-              </Button>
+            <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+              <a
+                href="mailto:contato@futurah.com.br?subject=Conversa%20sobre%20a%20análise%20do%20%40fidevidraceiro"
+                className="text-sm font-medium text-brand-title underline underline-offset-4 hover:text-brand-button-hover transition-colors"
+              >
+                contato@futurah.com.br
+              </a>
             </div>
-            <p className="text-xs text-brand-body/60 pt-6 border-t border-brand-title/10 w-full">
-              Documento de caráter estratégico e ilustrativo. Os números mostrados são referências de mercado
-              para dimensionar o potencial, não uma oferta comercial.
+            <p className="text-xs text-brand-body/60 pt-10 border-t border-brand-title/10 w-full max-w-2xl">
+              Documento de caráter analítico. Os números usados são referências públicas de mercado ou dados
+              de matérias sobre o @fidevidraceiro. Não constitui oferta comercial.
             </p>
           </div>
         </section>
