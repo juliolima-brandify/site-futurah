@@ -191,7 +191,7 @@ export default function PropostaAugustoFelipe() {
               {/* Frente 1 */}
               <div className="bg-brand-background rounded-[28px] p-8 flex flex-col gap-5 hover:bg-white hover:shadow-xl transition-all duration-300 border border-transparent hover:border-brand-title/5">
                 <div className="flex items-start justify-between">
-                  <span className="text-5xl font-medium text-brand-title/20">01</span>
+                  <span className="text-5xl font-medium text-brand-title/30">01</span>
                   <span className="px-3 py-1 rounded-full bg-brand-highlight text-xs font-medium text-brand-title uppercase tracking-wider">
                     Caixa rápido
                   </span>
@@ -215,7 +215,7 @@ export default function PropostaAugustoFelipe() {
               {/* Frente 2 */}
               <div className="bg-brand-background rounded-[28px] p-8 flex flex-col gap-5 hover:bg-white hover:shadow-xl transition-all duration-300 border border-transparent hover:border-brand-title/5">
                 <div className="flex items-start justify-between">
-                  <span className="text-5xl font-medium text-brand-title/20">02</span>
+                  <span className="text-5xl font-medium text-brand-title/30">02</span>
                   <span className="px-3 py-1 rounded-full bg-brand-title text-xs font-medium text-white uppercase tracking-wider">
                     Baixo risco
                   </span>
@@ -238,7 +238,7 @@ export default function PropostaAugustoFelipe() {
               {/* Frente 3 */}
               <div className="bg-brand-title text-white rounded-[28px] p-8 flex flex-col gap-5 hover:shadow-2xl transition-all duration-300">
                 <div className="flex items-start justify-between">
-                  <span className="text-5xl font-medium text-white/20">03</span>
+                  <span className="text-5xl font-medium text-white/30">03</span>
                   <span className="px-3 py-1 rounded-full bg-brand-highlight text-xs font-medium text-brand-title uppercase tracking-wider">
                     Ticket alto
                   </span>
@@ -566,57 +566,57 @@ export default function PropostaAugustoFelipe() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              <div className="rounded-[28px] border border-white/10 bg-white/5 p-8 flex flex-col gap-4">
+              <div className="rounded-[28px] border border-white/20 bg-white/[0.08] p-8 flex flex-col gap-4">
                 <span className="text-xs font-medium uppercase tracking-wider text-brand-highlight">
                   Frente 1 · Publi
                 </span>
-                <h3 className="text-2xl font-medium leading-tight">Patrocínios recorrentes</h3>
-                <p className="text-sm text-white/70 font-light leading-relaxed">
+                <h3 className="text-2xl font-medium leading-tight text-white">Patrocínios recorrentes</h3>
+                <p className="text-sm text-white/80 font-light leading-relaxed">
                   Com media kit e prospecção ativa, um perfil do seu porte sustenta confortavelmente de 2 a 4
                   publis mensais com ticket médio de mercado na faixa de R$ 3 mil a R$ 8 mil por postagem.
                 </p>
-                <div className="pt-4 border-t border-white/10">
-                  <span className="text-xs text-white/50 uppercase tracking-wider">Potencial mensal</span>
-                  <p className="text-3xl font-medium mt-1">R$ 10k – R$ 30k</p>
+                <div className="pt-4 border-t border-white/15">
+                  <span className="text-xs text-white/60 uppercase tracking-wider">Potencial mensal</span>
+                  <p className="text-3xl font-medium mt-1 text-white">R$ 10k – R$ 30k</p>
                 </div>
               </div>
 
-              <div className="rounded-[28px] border border-white/10 bg-white/5 p-8 flex flex-col gap-4">
+              <div className="rounded-[28px] border border-white/20 bg-white/[0.08] p-8 flex flex-col gap-4">
                 <span className="text-xs font-medium uppercase tracking-wider text-brand-highlight">
                   Frente 2 · Digitais
                 </span>
-                <h3 className="text-2xl font-medium leading-tight">Produtos low-ticket</h3>
-                <p className="text-sm text-white/70 font-light leading-relaxed">
+                <h3 className="text-2xl font-medium leading-tight text-white">Produtos low-ticket</h3>
+                <p className="text-sm text-white/80 font-light leading-relaxed">
                   Margem ~100%, entrega automática. Com uma base engajada do seu tamanho, uma taxa de conversão
                   de 1% em campanhas pontuais já gera volume relevante — e escala sem custo marginal.
                 </p>
-                <div className="pt-4 border-t border-white/10">
-                  <span className="text-xs text-white/50 uppercase tracking-wider">Potencial mensal</span>
-                  <p className="text-3xl font-medium mt-1">R$ 8k – R$ 20k</p>
+                <div className="pt-4 border-t border-white/15">
+                  <span className="text-xs text-white/60 uppercase tracking-wider">Potencial mensal</span>
+                  <p className="text-3xl font-medium mt-1 text-white">R$ 8k – R$ 20k</p>
                 </div>
               </div>
 
-              <div className="rounded-[28px] border border-brand-highlight bg-brand-highlight/10 p-8 flex flex-col gap-4">
-                <span className="text-xs font-medium uppercase tracking-wider text-brand-highlight">
+              <div className="rounded-[28px] border-2 border-brand-highlight bg-brand-highlight p-8 flex flex-col gap-4">
+                <span className="text-xs font-medium uppercase tracking-wider text-brand-title">
                   Frente 3 · Mentoria
                 </span>
-                <h3 className="text-2xl font-medium leading-tight">Ticket alto</h3>
-                <p className="text-sm text-white/70 font-light leading-relaxed">
+                <h3 className="text-2xl font-medium leading-tight text-brand-title">Ticket alto</h3>
+                <p className="text-sm text-brand-title/80 font-light leading-relaxed">
                   Pensada pra rodar 2 a 3 vezes por ano, com turmas enxutas e ticket alto. É a camada que
                   transforma audiência em negócio de verdade, sem exigir esforço operacional diário.
                 </p>
-                <div className="pt-4 border-t border-white/10">
-                  <span className="text-xs text-white/50 uppercase tracking-wider">Potencial por turma</span>
-                  <p className="text-3xl font-medium mt-1">R$ 40k – R$ 100k</p>
+                <div className="pt-4 border-t border-brand-title/20">
+                  <span className="text-xs text-brand-title/70 uppercase tracking-wider">Potencial por turma</span>
+                  <p className="text-3xl font-medium mt-1 text-brand-title">R$ 40k – R$ 100k</p>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-[28px] border border-white/10 bg-white/[0.03] p-8 md:p-10 flex flex-col gap-3">
+            <div className="rounded-[28px] border border-white/15 bg-white/[0.06] p-8 md:p-10 flex flex-col gap-3">
               <span className="text-xs font-medium uppercase tracking-wider text-brand-highlight">
                 Sobre os números acima
               </span>
-              <p className="text-sm md:text-base text-white/70 font-light leading-relaxed max-w-3xl">
+              <p className="text-sm md:text-base text-white/80 font-light leading-relaxed max-w-3xl">
                 São faixas de mercado, não promessas. Servem apenas pra dimensionar a ordem de grandeza do
                 que uma audiência como a sua já comporta — hoje, boa parte disso é atenção que passa e não
                 volta em forma de negócio.
