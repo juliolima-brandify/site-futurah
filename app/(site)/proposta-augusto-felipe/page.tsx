@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
@@ -71,18 +72,17 @@ export default function PropostaAugustoFelipe() {
             {/* MOCK · Instagram bio */}
             <div className="bg-black rounded-[24px] p-6 md:p-10 lg:p-12 text-white border border-white/10 shadow-2xl">
               <div className="flex flex-col sm:flex-row items-start gap-6 md:gap-10 lg:gap-14">
-                {/* Avatar — gradiente orange remetendo à foto dele */}
+                {/* Avatar — foto real */}
                 <div className="flex-shrink-0">
-                  <div
-                    className="w-24 h-24 md:w-36 md:h-36 lg:w-44 lg:h-44 rounded-full flex items-center justify-center text-2xl md:text-4xl font-light text-white/95 shadow-xl ring-1 ring-white/10 select-none"
-                    style={{
-                      background:
-                        "radial-gradient(circle at 50% 38%, #ffa362 0%, #ff7a2c 30%, #c2410c 65%, #5a1d08 100%)",
-                      textShadow: "0 2px 8px rgba(0,0,0,0.4)",
-                    }}
-                    aria-label="Avatar Augusto Felipe"
-                  >
-                    AF
+                  <div className="w-24 h-24 md:w-36 md:h-36 lg:w-44 lg:h-44 rounded-full overflow-hidden ring-1 ring-white/10 shadow-xl">
+                    <Image
+                      src="/proposta-augusto/augusto.jpg"
+                      alt="Augusto Felipe"
+                      width={176}
+                      height={176}
+                      className="w-full h-full object-cover"
+                      priority
+                    />
                   </div>
                 </div>
 
@@ -252,7 +252,7 @@ export default function PropostaAugustoFelipe() {
             <span className="text-sm font-medium uppercase tracking-wider text-brand-highlight">
               A tese
             </span>
-            <h2 className="text-3xl md:text-5xl lg:text-[56px] font-medium leading-[1.1]">
+            <h2 className="text-3xl md:text-5xl lg:text-[56px] font-medium leading-[1.1] text-white">
               A sua audiência já é o ativo.{" "}
               <span className="text-brand-highlight">Falta só colocar ela pra trabalhar</span> — sem queimar o que ela gosta em você.
             </h2>
@@ -337,15 +337,15 @@ export default function PropostaAugustoFelipe() {
                     Ticket alto
                   </span>
                 </div>
-                <h3 className="text-2xl font-medium leading-tight">
+                <h3 className="text-2xl font-medium leading-tight text-white">
                   Mentoria em grupo — fase 2
                 </h3>
-                <p className="text-sm text-white/70 font-light leading-relaxed">
+                <p className="text-sm text-white/85 font-light leading-relaxed">
                   Só depois que os low-tickets validarem a disposição de pagar, construímos uma mentoria focada
                   em vidraceiros que querem crescer pelo digital. Ticket mais alto, turmas fechadas, preserva
                   seu tempo e sua marca.
                 </p>
-                <ul className="text-sm text-white/70 font-light space-y-2 pt-2 border-t border-white/10">
+                <ul className="text-sm text-white/85 font-light space-y-2 pt-2 border-t border-white/15">
                   <li>→ Lista de espera a partir dos low-tickets</li>
                   <li>→ Turmas fechadas e intimistas</li>
                   <li>→ Metodologia baseada no seu próprio caso</li>
@@ -497,11 +497,11 @@ export default function PropostaAugustoFelipe() {
                   <span className="w-10 h-10 rounded-full bg-brand-highlight text-brand-title flex items-center justify-center text-sm font-medium">
                     07
                   </span>
-                  <h3 className="text-xl font-medium">
+                  <h3 className="text-xl font-medium text-white">
                     Pra sonhar junto · ideias de longo prazo
                   </h3>
                 </div>
-                <ul className="text-sm text-white/70 font-light space-y-2.5 leading-relaxed md:columns-2 md:gap-8">
+                <ul className="text-sm text-white/85 font-light space-y-2.5 leading-relaxed md:columns-2 md:gap-8">
                   <li>→ Encontro presencial anual de vidraceiros (evento de marca)</li>
                   <li>→ Livro físico &ldquo;De vidraceiro a criador&rdquo;</li>
                   <li>→ Podcast semanal com seu pai, sobre ofício e vida</li>
@@ -650,7 +650,7 @@ export default function PropostaAugustoFelipe() {
               <span className="text-sm font-medium uppercase tracking-wider text-brand-highlight">
                 Ordem de grandeza
               </span>
-              <h2 className="text-4xl lg:text-[56px] font-medium leading-[1.05]">
+              <h2 className="text-4xl lg:text-[56px] font-medium leading-[1.05] text-white">
                 Pra você dimensionar o tamanho do que já é possível hoje.
               </h2>
               <p className="text-base md:text-lg text-white/70 font-light leading-relaxed">
