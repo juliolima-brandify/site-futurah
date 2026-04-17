@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  ...studioViewport,
+  ...(studioViewport as Viewport),
 }
 
 export default function AdminLayout({
