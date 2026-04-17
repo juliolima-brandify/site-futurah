@@ -11,7 +11,7 @@ export default function AdminPage() {
       import('next-sanity/studio').then((mod) => mod.NextStudio),
       import('@/sanity/sanity.config').then((mod) => mod.default),
     ]).then(([NextStudio, config]) => {
-      setStudio(() => () => <NextStudio config={config} />)
+      setStudio(() => function Studio() { return <NextStudio config={config} /> })
     })
   }, [])
 
