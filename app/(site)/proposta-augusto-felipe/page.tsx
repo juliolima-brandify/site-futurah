@@ -60,23 +60,117 @@ export default function PropostaAugustoFelipe() {
                 Retrato do perfil
               </span>
               <h2 className="text-4xl lg:text-[56px] font-medium text-brand-title leading-[1.05]">
-                Quem é o Augusto, nos números.
+                Quem é o Augusto, em números reais.
               </h2>
               <p className="text-base md:text-lg text-brand-body font-light leading-relaxed">
-                Antes de qualquer conversa sobre monetização, o exercício é olhar com calma pro ativo. O que
-                se vê de fora é raro:
+                Antes de qualquer conversa sobre monetização, o exercício é olhar com calma pro ativo. E
+                o que se vê de fora é raro:
               </p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {/* MOCK · Instagram bio */}
+            <div className="bg-black rounded-[24px] p-6 md:p-10 lg:p-12 text-white border border-white/10 shadow-2xl">
+              <div className="flex flex-col sm:flex-row items-start gap-6 md:gap-10 lg:gap-14">
+                {/* Avatar — gradiente orange remetendo à foto dele */}
+                <div className="flex-shrink-0">
+                  <div
+                    className="w-24 h-24 md:w-36 md:h-36 lg:w-44 lg:h-44 rounded-full flex items-center justify-center text-2xl md:text-4xl font-light text-white/95 shadow-xl ring-1 ring-white/10 select-none"
+                    style={{
+                      background:
+                        "radial-gradient(circle at 50% 38%, #ffa362 0%, #ff7a2c 30%, #c2410c 65%, #5a1d08 100%)",
+                      textShadow: "0 2px 8px rgba(0,0,0,0.4)",
+                    }}
+                    aria-label="Avatar Augusto Felipe"
+                  >
+                    AF
+                  </div>
+                </div>
+
+                {/* Bio info */}
+                <div className="flex-1 w-full min-w-0">
+                  {/* username + verified */}
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <h3 className="text-xl md:text-2xl lg:text-[28px] font-normal text-white">
+                      fidevidraceiro
+                    </h3>
+                    <svg
+                      className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0"
+                      viewBox="0 0 40 40"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M19.998 3.094 14.638 0l-2.972 5.15H5.432v6.354L0 14.64 3.094 20 0 25.359l5.432 3.137v6.354h6.234L14.638 40l5.36-3.094L25.358 40l2.972-5.15h6.234v-6.354L40 25.359 36.905 20 40 14.641l-5.432-3.137V5.15h-6.234L25.358 0l-5.36 3.094Z"
+                        fill="#0095f6"
+                      />
+                      <path
+                        d="m11 20.5 5.5 5.5 12.5-12.5"
+                        stroke="#fff"
+                        strokeWidth="3.5"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    <span className="text-white/40 text-xl leading-none ml-1">···</span>
+                  </div>
+
+                  {/* display name */}
+                  <p className="text-sm text-white/70 mb-4">Augusto Felipe</p>
+
+                  {/* stats */}
+                  <div className="flex flex-wrap gap-x-5 gap-y-2 mb-5 text-sm md:text-[15px]">
+                    <span>
+                      <strong className="font-semibold text-white">594</strong>{" "}
+                      <span className="text-white/70">posts</span>
+                    </span>
+                    <span>
+                      <strong className="font-semibold text-white">739 mil</strong>{" "}
+                      <span className="text-white/70">seguidores</span>
+                    </span>
+                    <span>
+                      <strong className="font-semibold text-white">3.029</strong>{" "}
+                      <span className="text-white/70">seguindo</span>
+                    </span>
+                  </div>
+
+                  {/* bio text */}
+                  <div className="text-sm leading-relaxed space-y-0.5">
+                    <p className="text-white/60">Criador(a) de conteúdo digital</p>
+                    <p className="font-medium text-white">
+                      Toda semana transformo ideias malucas em arte{" "}
+                      <span aria-hidden>🖼️</span>
+                    </p>
+                    <p className="text-white/85 flex items-center gap-1.5">
+                      <span aria-hidden>🎨</span>
+                      <span>@fidevidraceiro.art</span>
+                    </p>
+                    <p className="text-white/85 flex items-center gap-1.5">
+                      <span aria-hidden>📩</span>
+                      <span>fidevidraceiro@outlook.com</span>
+                    </p>
+                    <p className="text-[#0095f6] font-medium flex items-center gap-1.5 pt-0.5">
+                      <span aria-hidden>🔗</span>
+                      <span>linktr.ee/fidevidraceiro</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* rodapé sutil */}
+              <p className="text-[11px] text-white/30 mt-8 pt-4 border-t border-white/5">
+                Mock visual baseado no perfil público @fidevidraceiro · Instagram
+              </p>
+            </div>
+
+            {/* Stats complementares */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
-                { num: "23", label: "anos, formado em administração" },
-                { num: "48k+", label: "seguidores iniciais · crescendo todo mês" },
-                { num: "1M", label: "views no vídeo viral do globo de luz" },
-                { num: "2", label: "plataformas ativas · IG + TikTok" },
+                { num: "23", label: "anos · formado em administração" },
+                { num: "1M+", label: "views no vídeo viral do globo de luz" },
+                { num: "IG + TikTok", label: "presença ativa nas duas plataformas" },
               ].map((s) => (
                 <div key={s.label} className="bg-brand-background rounded-[24px] p-6 flex flex-col gap-2">
-                  <span className="text-4xl md:text-5xl font-medium text-brand-title leading-none">
+                  <span className="text-3xl md:text-4xl font-medium text-brand-title leading-none">
                     {s.num}
                   </span>
                   <span className="text-xs md:text-sm text-brand-body font-light leading-snug">
@@ -88,8 +182,8 @@ export default function PropostaAugustoFelipe() {
 
             <p className="text-sm text-brand-body/70 font-light max-w-3xl">
               Mais relevante que o número bruto: a base é <span className="font-medium text-brand-title">engajada, híbrida
-              (fãs + vidraceiros)</span> e foi construída em torno de algo raro — a relação com o seu pai e o bastidor
-              de uma vidraçaria de cidade do interior. Isso não se compra em tráfego pago.
+              (fãs + vidraceiros)</span>, com perfil verificado, e foi construída em torno de algo raro — a relação
+              com o seu pai e o bastidor de uma vidraçaria de cidade do interior. Isso não se compra em tráfego pago.
             </p>
           </div>
         </section>
