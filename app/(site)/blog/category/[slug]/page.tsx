@@ -1,4 +1,4 @@
-import { getPosts, getCategories } from "@/lib/keystatic"
+import { getPosts, getCategories } from "@/lib/content"
 import Header from "@/components/layout/Header"
 import Footer from "@/components/layout/Footer"
 import PostCard from "@/components/blog/PostCard"
@@ -6,6 +6,8 @@ import Newsletter from "@/components/sections/Newsletter"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
+
+export const dynamic = 'force-static'
 
 export async function generateStaticParams() {
     const categories = await getCategories()
@@ -68,6 +70,8 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                                     excerpt={post.excerpt}
                                     coverImage={post.coverImage}
                                     category={category.name}
+                                    publishedAt={post.publishedAt}
+                                    author={post.author}
                                 />
                             ))}
                         </div>

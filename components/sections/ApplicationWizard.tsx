@@ -121,12 +121,11 @@ export default function ApplicationWizard() {
     return () => clearTimeout(timer);
   }, [isAnalyzing]);
 
+  const nameFromUrl = searchParams?.get('name') || '';
+
   useEffect(() => {
     const social = searchParams?.get('social') || '';
-    if (social) {
-      setSiteName(social);
-      setIsAnalyzing(true);
-    }
+    if (social) setSiteName(social);
   }, [searchParams]);
 
   const startAnalysis = () => {
@@ -191,6 +190,11 @@ export default function ApplicationWizard() {
             {stepIndex === 0 ? (
               <div className="space-y-8">
                 <div className="space-y-2">
+                  {nameFromUrl ? (
+                    <p className="text-[15px] text-black/60">
+                      Olá, <span className="font-semibold text-black">{nameFromUrl}</span>. Recebemos sua solicitação.
+                    </p>
+                  ) : null}
                   <h2 className="text-[26px] md:text-[32px] font-medium tracking-tight leading-[1.2] text-[#111]">
                     Mapeando sua presença digital...
                   </h2>

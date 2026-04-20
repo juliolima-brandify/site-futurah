@@ -1,0 +1,190 @@
+import { createClient, type SanityClient } from 'next-sanity'
+import imageUrlBuilder from '@sanity/image-url'
+import { apiVersion, dataset, projectId, useCdn } from '@/sanity/env'
+
+let _client: SanityClient | null = null
+
+function getClient(): SanityClient | null {
+  if (!projectId) return null
+  if (!_client) {
+    _client = createClient({ projectId, dataset, apiVersion, useCdn })
+  }
+  return _client
+}
+
+export const client = getClient()
+
+export function urlFor(source: { _type: string; asset?: { _ref: string } } | undefined) {
+  if (!source) return ''
+  const c = getClient()
+  if (!c) return ''
+  return imageUrlBuilder(c).image(source).url()
+}
+
+// Tipos compatíveis com o que o blog já usa
+export interface PostAuthor {
+  name: string
+  role: string | null
+  image: string | null
+}
+
+export interface PostListItem {
+  slug: string
+  title: string
+  excerpt: string
+  coverImage: string | null
+  category: string
+  featured: boolean
+  publishedAt: string | null
+  author: PostAuthor | null
+  tags: string[]
+}
+
+export interface CategoryItem {
+  slug: string
+  name: string
+  description: string
+}
+
+export interface PostBySlug {
+  metadata: {
+    slug: string
+    title: string
+    excerpt: string
+    coverImage: string | null
+    category: string
+    publishedAt: string | null
+    author: PostAuthor | null
+    tags: string[]
+  }
+  content: import('@portabletext/types').PortableTextBlock[] | null
+}
+
+const postsFields = `
+  _id,
+  "slug": slug.current,
+  title,
+  excerpt,
+  coverImage,
+  "category": category->slug.current,
+  "categoryName": category->name,
+  featured,
+  publishedAt,
+  "author": author->{ name, role, image },
+  tags
+`
+
+const postBySlugFields = `
+  _id,
+  "slug": slug.current,
+  title,
+  excerpt,
+  coverImage,
+  "category": category->name,
+  publishedAt,
+  "author": author->{ name, role, image },
+  tags,
+  content
+`
+
+export async function getPostsSanity(): Promise<PostListItem[]> {
+  const c = getClient()
+  if (!c) return []
+  try {
+    const posts = await c.fetch<Array<{
+      slug: string
+      title: string
+      excerpt: string | null
+      coverImage: unknown
+      category: string
+      featured: boolean
+      publishedAt: string | null
+      author: { name: string; role: string | null; image: unknown } | null
+      tags: string[] | null
+    }>>(
+      `*[_type == "post"] | order(publishedAt desc) { ${postsFields} }`
+    )
+    return posts.map((p) => ({
+      slug: p.slug,
+      title: p.title,
+      excerpt: p.excerpt || '',
+      coverImage: p.coverImage ? urlFor(p.coverImage as { _type: string; asset?: { _ref: string } }) : null,
+      category: p.category || 'Geral',
+      featured: !!p.featured,
+      publishedAt: p.publishedAt || null,
+      author: p.author ? {
+        name: p.author.name,
+        role: p.author.role || null,
+        image: p.author.image ? urlFor(p.author.image as { _type: string; asset?: { _ref: string } }) : null,
+      } : null,
+      tags: Array.isArray(p.tags) ? p.tags.filter(Boolean) : [],
+    }))
+  } catch (err) {
+    console.error('[Sanity] getPostsSanity failed:', err)
+    return []
+  }
+}
+
+export async function getCategoriesSanity(): Promise<CategoryItem[]> {
+  const c = getClient()
+  if (!c) return []
+  try {
+    const categories = await c.fetch<Array<{
+      slug: string
+      name: string
+      description: string | null
+    }>>(
+      `*[_type == "category"] | order(name asc) { "slug": slug.current, name, description }`
+    )
+    return categories.map((cat) => ({
+      slug: cat.slug,
+      name: cat.name,
+      description: cat.description || '',
+    }))
+  } catch (err) {
+    console.error('[Sanity] getCategoriesSanity failed:', err)
+    return []
+  }
+}
+
+export async function getPostBySlugSanity(slug: string): Promise<PostBySlug | null> {
+  const c = getClient()
+  if (!c) return null
+  try {
+    const post = await c.fetch<{
+      slug: string
+      title: string
+      excerpt: string | null
+      coverImage: unknown
+      category: string
+      publishedAt: string | null
+      author: { name: string; role: string | null; image: unknown } | null
+      tags: string[] | null
+      content: import('@portabletext/types').PortableTextBlock[] | null
+    } | null>(
+      `*[_type == "post" && slug.current == $slug][0] { ${postBySlugFields} }`,
+      { slug }
+    )
+    if (!post) return null
+    return {
+      metadata: {
+        slug: post.slug,
+        title: post.title,
+        excerpt: post.excerpt || '',
+        coverImage: post.coverImage ? urlFor(post.coverImage as { _type: string; asset?: { _ref: string } }) : null,
+        category: post.category || 'Geral',
+        publishedAt: post.publishedAt || null,
+        author: post.author ? {
+          name: post.author.name,
+          role: post.author.role || null,
+          image: post.author.image ? urlFor(post.author.image as { _type: string; asset?: { _ref: string } }) : null,
+        } : null,
+        tags: Array.isArray(post.tags) ? post.tags.filter(Boolean) : [],
+      },
+      content: post.content || null,
+    }
+  } catch (err) {
+    console.error('[Sanity] getPostBySlugSanity failed:', err)
+    return null
+  }
+}

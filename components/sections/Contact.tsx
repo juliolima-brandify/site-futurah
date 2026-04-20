@@ -97,17 +97,43 @@ export default function Contact() {
   });
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.social) {
+    if (!formData.name?.trim() || !formData.email?.trim()) {
+      setSubmitError('Preencha nome e e-mail.');
       return;
     }
-    const params = new URLSearchParams({
-      name: formData.name,
-      email: formData.email,
-      social: formData.social,
-    });
-    router.push(`/aplicacao?${params.toString()}`);
+    setSubmitError(null);
+    setIsSubmitting(true);
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          social: formData.social?.trim() || '',
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setSubmitError(data.error || 'Erro ao enviar. Tente de novo.');
+        return;
+      }
+      const params = new URLSearchParams({
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        social: (formData.social || '').trim(),
+      });
+      router.push(`/aplicacao?${params.toString()}`);
+    } catch {
+      setSubmitError('Erro de conexão. Tente de novo.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -165,11 +191,15 @@ export default function Contact() {
                     className="w-full px-5 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 transition-colors text-sm"
                   />
 
+                  {submitError && (
+                    <p className="text-sm text-red-300">{submitError}</p>
+                  )}
                   <button
                     type="submit"
-                    className="w-full bg-white text-brand-title px-6 py-3 rounded-2xl font-medium hover:bg-gray-100 transition-all duration-200 flex items-center justify-center gap-2"
+                    disabled={isSubmitting}
+                    className="w-full bg-white text-brand-title px-6 py-3 rounded-2xl font-medium hover:bg-gray-100 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    QUERO RECEBER ANÁLISE
+                    {isSubmitting ? 'Enviando...' : 'QUERO RECEBER ANÁLISE'}
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </form>

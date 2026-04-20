@@ -11,9 +11,10 @@ interface PostCardProps {
     coverImage: string | null
     category: string
     publishedAt?: string
+    author?: { name: string } | null
 }
 
-export default function PostCard({ title, slug, excerpt, coverImage, category, publishedAt }: PostCardProps) {
+export default function PostCard({ title, slug, excerpt, coverImage, category, publishedAt, author }: PostCardProps) {
     // Format date to DD/MM/YYYY
     const formattedDate = publishedAt ? new Date(publishedAt).toLocaleDateString('pt-BR', {
         day: '2-digit',
@@ -61,12 +62,16 @@ export default function PostCard({ title, slug, excerpt, coverImage, category, p
 
             {/* Content */}
             <div className="flex flex-col gap-2 px-1 mt-1">
-                {/* Date */}
-                {formattedDate && (
-                    <span className="text-[14px] font-normal text-zinc-500 tracking-tight">
-                        {formattedDate}
-                    </span>
-                )}
+                {/* Date / Author */}
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-0 text-[14px] text-zinc-500 tracking-tight">
+                    {formattedDate && <span>{formattedDate}</span>}
+                    {author?.name && (
+                        <>
+                            {formattedDate && <span>·</span>}
+                            <span>Por {author.name}</span>
+                        </>
+                    )}
+                </div>
 
                 {/* Title */}
                 <h3 className="text-[22px] font-normal leading-[1.15] text-[#1B1B1B] -tracking-[0.03em] group-hover:text-[#0B2FFF] transition-colors line-clamp-3">
