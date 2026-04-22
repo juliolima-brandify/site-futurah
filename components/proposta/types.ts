@@ -4,6 +4,7 @@
  */
 
 export type VarianteAnalise = "criador" | "empresa" | "infoprodutor";
+export type ModeloProposta = "coproducao" | "cash_on_delivery";
 
 export interface HeroData {
   /** Tag pequena acima do título (ex: "Análise estratégica · @handle") */
@@ -144,6 +145,8 @@ export interface EncerramentoData {
  * Estrutura completa da análise — tudo que a PageProposta precisa pra renderizar.
  */
 export interface AnaliseData {
+  /** Modelo comercial usado na proposta. */
+  modelo?: ModeloProposta;
   variante: VarianteAnalise;
   /** Metadata de página (title, description) */
   meta: {

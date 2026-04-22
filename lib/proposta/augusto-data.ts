@@ -1,6 +1,7 @@
 import type { AnaliseData } from "@/components/proposta/types";
 
 export const augustoData: AnaliseData = {
+  modelo: "coproducao",
   variante: "criador",
   meta: {
     title: "Proposta de Coprodução · @fidevidraceiro | Futurah and Co.",

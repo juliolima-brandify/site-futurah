@@ -1,6 +1,7 @@
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import type { AnaliseData } from "./types";
+import { resolveModeloProposta } from "@/lib/proposta/modelos";
 import { HeroSection } from "./sections/HeroSection";
 import { RetratoSection } from "./sections/RetratoSection";
 import { DiagnosticoSection } from "./sections/DiagnosticoSection";
@@ -17,10 +18,12 @@ interface Props {
 }
 
 export function PageProposta({ data }: Props) {
+  const modelo = resolveModeloProposta(data.modelo);
+
   return (
     <>
       <Header />
-      <main className="bg-white">
+      <main className="bg-white" data-proposta-modelo={modelo}>
         <HeroSection data={data.hero} />
         <RetratoSection data={data.retrato} />
         <DiagnosticoSection data={data.diagnostico} />
