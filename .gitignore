@@ -38,3 +38,6 @@ build_err*.log
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# claude code (local agent state: worktrees, tool results, launch config)
+.claude/
