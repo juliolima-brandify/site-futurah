@@ -41,15 +41,28 @@ Schema em `lib/db/schema.ts`. Quatro tabelas:
 Conexão via `lib/db/` e Supabase client em `lib/supabase.ts`.
 
 ### Sistema de Propostas
-Propostas comerciais são páginas estáticas em `app/(site)/proposta-[cliente]/`. Toda a lógica de apresentação fica em `components/proposta/`, alimentada por um data file em `lib/proposta/[cliente]-data.ts`.
+Propostas comerciais são páginas estáticas em `app/(site)/proposta-[cliente]/`. Toda a lógica de apresentação fica em `components/proposta/`, alimentada por um data file em `lib/proposta/[cliente]-data.ts`. Orquestração central em `components/proposta/PageProposta.tsx`.
 
 **Para criar uma nova proposta:**
 1. Criar `lib/proposta/[cliente]-data.ts` implementando `AnaliseData` (`components/proposta/types.ts`)
 2. Criar `app/(site)/proposta-[cliente]/page.tsx` usando `<PageProposta data={...} />`
-3. As seções disponíveis estão em `components/proposta/sections/`
+3. Assets (foto de perfil etc.) vão em `public/proposta-[cliente]/`
+4. As seções disponíveis estão em `components/proposta/sections/`
 
-O tipo `AnaliseData` define todas as seções: `hero`, `retrato`, `diagnostico`, `tese`, `frentes`, `bancoIdeias`, `fases`, `escopo`, `potencial`, `encerramento`. O campo `variante` (`"criador" | "empresa" | "infoprodutor"`) pode ser usado pelas seções para variações visuais.
-Também existe o campo `modelo` para o tipo comercial da proposta: `"coproducao"` (atual) e `"cash_on_delivery"` (novo).
+**Estrutura de `AnaliseData`:**
+- Obrigatórias: `hero`, `retrato`, `diagnostico`, `tese`, `frentes`, `bancoIdeias`, `fases`, `escopo`, `potencial`, `encerramento`
+- Opcionais: `miniFaq` (se presente, renderiza `MiniFaqSection` ao final)
+- `variante` (`"criador" | "empresa" | "infoprodutor"`) — variações visuais por seção
+- `modelo` — tipo comercial: `"coproducao"` ou `"cash_on_delivery"`
+
+**Lógica por modelo (em `PageProposta.tsx`):**
+- `coproducao`: `FrentesSection` aparece após `TeseSection` (cedo, é a proposta); `EscopoSection` é renderizada normalmente.
+- `cash_on_delivery`: `FrentesSection` vai para o final (depois de `PotencialSection`), funcionando como fechamento de oferta; `EscopoSection` é escondida (o valor comercial está em `frentes`).
+- `TeamTestimonialSection` (quem somos) e `MiniFaqSection` (se o data tiver `miniFaq`) renderizam em toda proposta, independente do modelo.
+
+**Layouts de `FrentesSection`:**
+- `layout: "stack"` (default para cash_on_delivery) — cards empilhados verticalmente em 2 colunas internas (esquerda: pill + valor + título; direita: descrição + checklist).
+- Sem `layout` ou `layout: "grid"` — grid 3 colunas com cards compactos (usado em coprodução).
 
 ### Design System
 Tokens de cor em `tailwind.config.ts`:
