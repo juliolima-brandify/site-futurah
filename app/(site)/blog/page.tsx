@@ -7,6 +7,8 @@ import Newsletter from "@/components/sections/Newsletter"
 import { getPosts, getCategories } from "@/lib/content"
 import { Suspense } from "react"
 
+export const revalidate = 60
+
 export default async function BlogPage() {
     const allPosts = await getPosts()
     const categories = await getCategories()

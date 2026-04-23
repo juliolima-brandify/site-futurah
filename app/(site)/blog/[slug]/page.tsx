@@ -8,14 +8,7 @@ import PostCard from "@/components/blog/PostCard"
 import { Tag } from "lucide-react"
 import Link from "next/link"
 import PortableText from "@/components/blog/PortableText"
-import type { PortableTextBlock } from "@portabletext/types"
-
-export const dynamic = 'force-static'
-
-export async function generateStaticParams() {
-    const posts = await getPosts()
-    return posts.map((post) => ({ slug: post.slug }))
-}
+export const revalidate = 60
 
 export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params
@@ -28,7 +21,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         .filter((p) => p.slug !== slug)
         .slice(0, 2)
 
-    const isPortableText = Array.isArray(content) && content.length > 0
+    const hasContent = content != null
 
     return (
         <div className="min-h-screen bg-white text-[#1B1B1B]">
@@ -95,8 +88,8 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
                         {/* Article Content */}
                         <div className="prose prose-lg prose-zinc mx-auto max-w-[680px] prose-headings:font-medium prose-headings:text-[#1B1B1B] prose-p:text-zinc-600 prose-p:leading-relaxed prose-a:text-[#0B2FFF] prose-strong:font-semibold">
                             <p className="lead">{post.excerpt}</p>
-                            {isPortableText ? (
-                                <PortableText value={content as PortableTextBlock[]} />
+                            {hasContent ? (
+                                <PortableText value={content} />
                             ) : (
                                 <>
                                     <p>

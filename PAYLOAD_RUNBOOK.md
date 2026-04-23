@@ -1,6 +1,16 @@
 # Runbook — Migração Payload 3 + Multi-tenant (Fases 0-3)
 
+> **Status (2026-04-23):** Fases 0-3 **implementadas e validadas por QA** (build verde, admin acessível, schema populado). Fases 4-5 pendentes. O histórico abaixo fica como referência das decisões; para o estado operacional atual, ver `CLAUDE.md` → seção "Painel admin — Payload 3". As correções aplicadas durante o QA estão consolidadas na seção **Lições aprendidas** ao final deste arquivo.
+
 **Stack-alvo confirmado (via `npm view` em 2026-04-23):** `payload@3.84.1`, `@payloadcms/next@3.84.1`, `@payloadcms/db-postgres@3.84.1`, `@payloadcms/richtext-lexical@3.84.1`, `@payloadcms/plugin-multi-tenant@3.84.1`, `@payloadcms/storage-vercel-blob@3.84.1`. Peer deps de `@payloadcms/next@3.84.1` declaram suporte explícito a `next >=15.4.11 <15.5.0` — bate exato com `next@15.4.11` do projeto.
+
+**Decisões resolvidas** (originalmente em §4 do `PAYLOAD_MIGRATION.md`):
+- **4.1** Fallback PoC: N/A (PoC passou na primeira tentativa).
+- **4.2** Análises: **ainda em Drizzle** — Fase 4 não iniciada.
+- **4.3** Migração Sanity: **skipped** — dataset vazio, conteúdo legado em MDs locais foi descartado.
+- **4.4** Tenant resolution: **Opção C** — site público usa `futurah` via fallback; `/api/contact` resolve por `Host` header com fallback pro mesmo tenant.
+- **4.5** Escopo: Leads **tenant-scoped**, Newsletter **global** (confirmado).
+- **4.6** Users: sem seed por script. Primeiro superadmin é criado pelo wizard do `/admin` na primeira visita.
 
 ## Pré-requisitos
 
@@ -1833,6 +1843,172 @@ pg_restore "$DATABASE_URL" --clean --schema=payload backup-payload.sql
    }
    ```
    e usar `npm run payload generate:importmap`.
+5. **Passo 2.7** — o pacote `@payloadcms/richtext-lexical/react` exporta `RichText`; caminho exato pode ser `@payloadcms/richtext-lexical/react` (confirmado) ou subpath `.../react/client` em versões futuras. Testar import no dev logo no Passo 2.3.
+
+---
+
+## Lições aprendidas durante implementação/QA (2026-04-23)
+
+Correções efetivas ao plano original. Se for reexecutar o runbook do zero, aplicar estes ajustes em cada passo referenciado.
+
+### 1. `payload.config.ts` — imports sem extensão, CLI via invocação ESM-direta
+**Passos afetados:** 0.5, 1.7.
+
+O runbook não especificou o estilo de import. Três variantes testadas:
+
+| Estilo | Next build | Payload CLI (`npx payload …`) | CLI via `node --import tsx/esm …` |
+|---|---|---|---|
+| `'./collections/Authors'` (sem ext) | ✅ | ❌ `ERR_MODULE_NOT_FOUND` | ✅ |
+| `'./collections/Authors.ts'` | ❌ (Next typecheck) | ✅ | ✅ |
+| `'./collections/Authors.js'` | ❌ (webpack) | ✅ | ✅ |
+
+**Escolha final: sem extensão.** Requer invocar CLI via:
+```bash
+node --import tsx/esm ./node_modules/payload/dist/bin/index.js generate:importmap
+node --import tsx/esm ./node_modules/payload/dist/bin/index.js generate:types
+```
+O wrapper padrão `npx payload …` usa `require()` síncrono e quebra em `ERR_REQUIRE_ASYNC_MODULE` por conta do top-level-await no `lexical` package.
+
+### 2. `next/cache` em hooks de Collection — dynamic import obrigatório
+**Passo afetado:** 2.2 (hooks `afterChange`/`afterDelete` de `Posts`).
+
+Runbook mostrava `import { revalidateTag } from 'next/cache'` no topo. Quebra o CLI do Payload (`next/cache` não existe fora de runtime Next). Corrigido para:
+```ts
+afterChange: [
+  async ({ doc }) => {
+    const { revalidateTag } = await import('next/cache')
+    revalidateTag('posts')
+    revalidateTag(`post:${doc.slug}`)
+    return doc
+  },
+],
+```
+
+### 3. `PAYLOAD_SECRET` — throw se ausente, sem fallback
+**Passo afetado:** 0.5.
+
+Runbook tinha `secret: process.env.PAYLOAD_SECRET || ''`. Trocamos por throw no topo do `payload.config.ts`:
+```ts
+const payloadSecret = process.env.PAYLOAD_SECRET
+if (!payloadSecret) throw new Error('PAYLOAD_SECRET nao definido.')
+```
+Build quebra explícito se a env var faltar em prod — preferível a assinar JWTs com fallback público.
+
+### 4. `lib/content.ts` — não silenciar erros com try/catch
+**Passo afetado:** 2.6.
+
+Implementação inicial embrulhava cada função em `try { … } catch { return null }`. Isso escondeu um erro real de conexão DB durante o build, gerando blog vazio sem alerta. Removido — erros sobem para o handler de erro do Next.
+
+### 5. Região do Supabase Pooler não é `us-east-1` por padrão
+**Passo afetado:** Pré-requisitos.
+
+Este projeto usa `aws-0-us-west-2.pooler.supabase.com`. A região correta está em Supabase Dashboard → Settings → Database → Connection string. Se não souber, probar via script:
+```js
+import pg from 'pg'
+for (const r of ['sa-east-1','us-east-1','us-east-2','us-west-1','us-west-2','eu-central-1','eu-west-1','ap-southeast-1']) {
+  const url = `postgresql://postgres.<ref>:<pwd>@aws-0-${r}.pooler.supabase.com:5432/postgres`
+  const pool = new pg.Pool({ connectionString: url, connectionTimeoutMillis: 5000 })
+  try { const c = await pool.connect(); console.log('OK', r); c.release(); await pool.end(); break }
+  catch (e) { console.log('FAIL', r, e.message); await pool.end().catch(() => {}) }
+}
+```
+
+### 6. Setup do DB novo (sequência validada)
+**Passo afetado:** novo — runbook não documentava setup do DB destinatário assumindo DB virgem.
+
+```bash
+# 1. Criar schema payload (se não existir)
+psql "$DATABASE_URL" -c "CREATE SCHEMA IF NOT EXISTS payload;"
+
+# 2. Aplicar migrations Drizzle (cria analises, analise_eventos em public)
+npx drizzle-kit migrate
+
+# 3. Payload faz push automático do schema no primeiro boot em dev.
+#    Abrir dev server e tocar /admin uma vez:
+npm run dev
+# em outra shell, depois de "Ready in ...":
+curl -s -o /dev/null -w "%{http_code}\n" http://localhost:3000/admin
+
+# 4. Criar primeiro superadmin via wizard em http://localhost:3000/admin
+
+# 5. Criar tenant 'futurah' em /admin/collections/tenants
+```
+
+Se o DB destinatário tiver lixo de tentativa anterior de Payload em `public.*` (tabelas `users`, `posts`, `media`, `payload_*` etc.), **dropar todas antes** do passo 2:
+```sql
+DROP TABLE IF EXISTS
+  public.payload_locked_documents_rels, public.payload_locked_documents,
+  public.payload_preferences_rels, public.payload_preferences,
+  public.payload_migrations, public.payload_kv,
+  public.users_sessions, public.users, public.posts, public.media, public.faq
+CASCADE;
+DROP SCHEMA IF EXISTS drizzle CASCADE;
+```
+
+### 7. `importMap.js` precisa estar populado — senão `/admin` crasha em runtime
+Com `importMap` vazio (`export const importMap = {}`), o `/admin` responde mas o SSR joga:
+> `TypeError: Cannot read properties of undefined (reading 'call')` em `webpack-runtime.js:25`
+
+Causa: o plugin multi-tenant e o Lexical registram seus componentes via path (`@payloadcms/plugin-multi-tenant/rsc#TenantSelectionProvider`, `@payloadcms/richtext-lexical/client#BoldFeatureClient`, etc.) — o runtime tenta consumir do importMap e recebe `undefined` → webpack explode.
+
+**Fix**: rodar `npm run dev` uma vez. O dev server **regenera** `app/(payload)/admin/importMap.js` sozinho no boot com as ~30 entries necessárias (6 do plugin multi-tenant, ~20 do Lexical, 1 do Vercel Blob client, CollectionCards, etc.).
+
+**Anti-pattern**: o CLI `generate:importmap` invocado standalone (mesmo via `node --import tsx/esm ./node_modules/payload/dist/bin/index.js generate:importmap`) sai exit 0 mas **não escreve nada** — confiar no `npm run dev` para essa geração.
+
+Se depois de mexer em `payload.config.ts` ou em collections o importMap ficar stale, limpar `.next/` e rerodar `npm run dev` pra forçar regeneração.
+
+### 8. Layout split — root `app/layout.tsx` não pode contaminar o admin
+**Passo afetado:** novo (não previsto no plano).
+
+O runbook assumiu que root layout + route group do Payload iriam coexistir sem interferência. **Não é o caso**: qualquer `import 'globals.css'`, `className` ou `style` no `<body>` do root layout vaza pro admin do Payload — Tailwind `@tailwind base` reseta `padding/margin` de `*`, `body { color, background }` força cores do site nos inputs, e a UI do admin fica ilegível (inputs pretos em fundo claro, labels invisíveis).
+
+**Fix aplicado:**
+- `app/layout.tsx` (root) fica minimalista:
+  ```tsx
+  export default function RootLayout({ children }: { children: React.ReactNode }) {
+    return <html lang="pt-BR"><body>{children}</body></html>
+  }
+  ```
+- `app/(site)/layout.tsx` importa `./globals.css`, aplica `inter.variable` + `fontFamily` num `<div>` wrapper ao redor de `children`. Todo CSS/font do site fica contido no route group `(site)`.
+- `app/(payload)/layout.tsx` (auto-gerado) importa `@payloadcms/next/css` — admin isolado.
+
+### 9. Access control — defesa em profundidade contra vazamento cross-tenant
+**Passo afetado:** passos 1.5-1.8 e 3.3-3.4 (definição de access em Collections).
+
+Descoberto em QA independente: o plugin multi-tenant **só** injeta filtro `where: { tenant: { equals: <user.tenant> } }` quando `req.user` existe. Em requests REST anônimos (sem token de auth), o filtro **não** é aplicado — `GET /api/posts` retorna posts de **todos** os tenants.
+
+Impacto: benigno com 1 tenant (Futurah), **crítico** quando entrar o 2º cliente.
+
+**Fix aplicado em `Posts`/`Categories`/`Authors`/`Leads`**:
+```ts
+access: {
+  read: ({ req }) => !!req.user,
+  create: ({ req }) => !!req.user,   // Posts/Categories/Authors
+  // Leads + NewsletterSubscribers:
+  create: () => false,  // só via /api/contact e /api/newsletter com overrideAccess:true
+  update: ({ req }) => !!req.user,
+  delete: ({ req }) => !!req.user,  // ou 'superadmin' para Leads/Newsletter
+},
+```
+
+**Contrapartida**: `lib/content.ts` (server-side, sem `req.user`) precisa passar `overrideAccess: true` em TODAS as chamadas `payload.find` — senão o blog público para de renderizar. APIs `/api/contact` e `/api/newsletter` já usam `overrideAccess:true` em `payload.create`.
+
+Também adicionado hook `beforeValidate` em Posts/Categories/Authors enforçando **slug único por tenant** (checa colisão via `payload.find`+`overrideAccess`).
+
+---
+
+## Flags de placeholder (verificar docs antes de executar)
+
+1. **Passo 2.5** — `portableTextToLexical` tem placeholder que só converte parágrafos simples. Imagens, listas, links, marks custom do Sanity precisam de implementação adicional. Se o dataset Sanity tiver conteúdo rico, alocar 1 dia extra pra expandir a função com os node types que aparecem (lista via `https://www.sanity.io/docs/presenting-block-text`; Lexical schema via `@payloadcms/richtext-lexical/lexical`).
+2. **Passo 1.7** — `userHasAccessToAllTenants` usa `user?.role === 'superadmin'`. Se a estrutura de role do Payload não for visível no callback (tipos gerados antes de adicionar o field), rodar `generate:types` primeiro e ajustar.
+3. **Passo 2.2** — `access.read` retorna filtro `{ _status: { equals: 'published' } }` mas a sintaxe exata de filtro em access control callback de Payload 3 pode ser `{ _status: { equals: 'published' } }` ou função async. [verificar docs — placeholder se não casar].
+4. **Passo 1.9 / 2.3 / 3.5** — `npx payload generate:importmap` e `generate:types` precisam do binário `payload` disponível. Se o `postinstall` não criou o bin em `node_modules/.bin`, adicionar script no `package.json`:
+   ```json
+   "scripts": {
+     "payload": "payload"
+   }
+   ```
+   e usar `npm run payload generate:importmap`. **Nota**: na prática isso quebra com TLA do Lexical — preferir o workaround da Lição 1.
 5. **Passo 2.7** — o pacote `@payloadcms/richtext-lexical/react` exporta `RichText`; caminho exato pode ser `@payloadcms/richtext-lexical/react` (confirmado) ou subpath `.../react/client` em versões futuras. Testar import no dev logo no Passo 2.3.
 
 Sources:

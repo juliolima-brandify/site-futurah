@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import OrbitIcon from '../ui/OrbitIcon';
-import type { PostListItem } from '@/lib/sanity';
+import type { PostListItem } from '@/lib/content';
 
 const Badge: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="blog-badge flex items-center gap-2 px-3 py-1 rounded-full">

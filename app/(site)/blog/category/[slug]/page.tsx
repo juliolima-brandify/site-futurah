@@ -7,18 +7,7 @@ import { notFound } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 
-export const dynamic = 'force-static'
-
-export async function generateStaticParams() {
-    const categories = await getCategories()
-    return categories.map((category: any) => ({
-        slug: category.slug,
-    }))
-}
-
-export const dynamicParams = false
-
-
+export const revalidate = 60
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params

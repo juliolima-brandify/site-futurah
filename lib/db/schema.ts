@@ -61,40 +61,6 @@ export const analises = pgTable(
 );
 
 /**
- * Leads do form de Contact (homepage).
- */
-export const leads = pgTable(
-  "leads",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    nome: text("nome").notNull(),
-    email: text("email").notNull(),
-    social: text("social"),
-    origem: text("origem").default("contact_form"),
-    receivedAt: timestamp("received_at", { withTimezone: true }).notNull().defaultNow(),
-  },
-  (table) => ({
-    emailIdx: index("leads_email_idx").on(table.email),
-  })
-);
-
-/**
- * Newsletter subscribers.
- */
-export const newsletterSubscribers = pgTable(
-  "newsletter_subscribers",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    email: text("email").notNull().unique(),
-    subscribedAt: timestamp("subscribed_at", { withTimezone: true }).notNull().defaultNow(),
-    unsubscribedAt: timestamp("unsubscribed_at", { withTimezone: true }),
-  },
-  (table) => ({
-    emailIdx: index("newsletter_email_idx").on(table.email),
-  })
-);
-
-/**
  * Eventos de tracking de uma análise (open, scroll, click).
  */
 export const analiseEventos = pgTable(
@@ -115,7 +81,3 @@ export const analiseEventos = pgTable(
 
 export type Analise = typeof analises.$inferSelect;
 export type NewAnalise = typeof analises.$inferInsert;
-export type Lead = typeof leads.$inferSelect;
-export type NewLead = typeof leads.$inferInsert;
-export type NewsletterSubscriber = typeof newsletterSubscribers.$inferSelect;
-export type NewNewsletterSubscriber = typeof newsletterSubscribers.$inferInsert;

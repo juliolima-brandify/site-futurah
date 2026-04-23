@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import { inter } from "@/lib/fonts";
+import "./globals.css";
 
 export const metadata: Metadata = {
     title: "Futura and Co. - Marketing do Futuro com Impacto no Presente",
@@ -36,5 +38,12 @@ export default function Layout({
 }: {
     children: React.ReactNode;
 }) {
-    return <>{children}</>;
+    return (
+        <div
+            className={`${inter.variable} ${inter.className}`}
+            style={{ fontFamily: 'var(--font-neue-haas)' }}
+        >
+            {children}
+        </div>
+    );
 }

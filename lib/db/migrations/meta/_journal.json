@@ -8,6 +8,13 @@
       "when": 1776389966438,
       "tag": "0000_conscious_firedrake",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1776966294505,
+      "tag": "0001_aberrant_black_bolt",
+      "breakpoints": true
     }
   ]
 }
