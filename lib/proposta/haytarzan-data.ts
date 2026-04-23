@@ -14,7 +14,7 @@ export const haytarzanData: AnaliseData = {
     titulo:
       "1,1 milhão de seguidores. <br />Agenda travada pelo gargalo humano. <br /><span class='italic font-medium'>Agentes de IA rodando 24 horas por dia.</span>",
     subtitulo:
-      "João Pedro, essa proposta substitui o trabalho operacional que custaria um time completo de atendimento e pré-venda por uma estrutura de agentes dedicados — respondendo DM, qualificando leads, agendando e fazendo follow-up 24 horas por dia, por uma fração do custo de contratar o equivalente humano.",
+      "João Pedro, essa proposta substitui o trabalho operacional que custaria um time completo de atendimento, pré-venda e mídia paga por uma estrutura de agentes dedicados + gestão contínua de tráfego — respondendo DM, qualificando leads, agendando, fazendo follow-up e captando demanda nova 24 horas por dia, por uma fração do custo de contratar o equivalente humano.",
     ctaAncora: "Ver a proposta ↓",
     rodape: "Preparada pela Futurah and Co. · Abril de 2026",
   },
@@ -104,7 +104,7 @@ export const haytarzanData: AnaliseData = {
           "Identidade visual aplicada aos principais pontos de contato",
           "4 agentes configurados, treinados e integrados (DM, WhatsApp, calendar, CRM)",
           "Funil de captação com pré-qualificação por questionário",
-          "Estrutura inicial de mídia em Facebook e Google",
+          "Estrutura inicial de tráfego pago: pixel, eventos de conversão e primeiras campanhas em Meta Ads e Google Ads",
         ],
       },
       {
@@ -115,10 +115,11 @@ export const haytarzanData: AnaliseData = {
         body: "Equivale a cerca de 60% do que custaria manter atendente + SDR em CLT (R$9-10k/mês com encargos). A diferença é que os agentes não dormem, não tiram férias e não perdem lead fora do horário comercial.",
         bullets: [
           "Agentes no ar 24 horas por dia, 7 dias por semana",
-          "Gestão contínua de tráfego e otimizações semanais",
+          "Especialista humano do time Futurah auditando e gerenciando os 4 agentes — revisando conversas, ajustando scripts e garantindo qualidade",
+          "Gestão completa de tráfego pago em Meta Ads e Google Ads — criativos, públicos, lances, otimização semanal",
           "Ajustes de scripts, funil e regras de qualificação",
           "Criação e postagem de conteúdo recorrente",
-          "Relatório mensal com métricas dos agentes (DMs, conversão, agendamentos)",
+          "Relatório mensal com métricas dos agentes e do tráfego (CPL, CPA, ROAS, agendamentos)",
         ],
       },
       {
@@ -188,7 +189,7 @@ export const haytarzanData: AnaliseData = {
       },
     ],
     fechamento:
-      "Os 4 agentes conversam entre si e operam de forma integrada. Um lead que entra pelo agente de atendimento, é qualificado, agendado e acompanhado no follow-up sem precisar de intervenção humana no meio.",
+      "Os 4 agentes conversam entre si e operam de forma integrada. Um lead que entra pelo agente de atendimento, é qualificado, agendado e acompanhado no follow-up sem precisar de intervenção humana no meio. <span class=\"font-medium text-brand-title\">Por trás dos agentes existe um especialista humano do time Futurah</span> auditando conversas, ajustando scripts e garantindo que a operação mantenha qualidade — não é IA solta no ar.",
   },
 
   fases: {
@@ -246,9 +247,10 @@ export const haytarzanData: AnaliseData = {
       "Landing de agendamento com foco em conversão",
       "Aplicação de identidade visual nos ativos principais",
       "Configuração e treinamento dos 4 agentes dedicados",
+      "Especialista humano do time Futurah auditando conversas e gerenciando a operação dos agentes",
       "Integração com Google Calendar, CRM, WhatsApp e Instagram",
       "Scripts dos agentes personalizados por tom de voz e regras de negócio",
-      "Configuração de campanhas em Meta Ads e Google Ads",
+      "Configuração e gestão contínua de campanhas em Meta Ads e Google Ads (criativos, públicos, otimização semanal)",
       "Questionário de qualificação com lógica de priorização",
       "Automação de follow-up pós-consulta e recompra",
       "Dashboard com volume de DMs, conversão, agendamentos e ticket médio",
@@ -314,12 +316,12 @@ export const haytarzanData: AnaliseData = {
       {
         pergunta: "O que entra na operação mensal (R$5k-6k)?",
         resposta:
-          "Os 4 agentes rodando 24h, gestão contínua de tráfego, ajustes de scripts e funil com base em conversas reais, criação e postagem de conteúdo recorrente e relatório mensal de métricas. Para referência: um atendente + SDR em CLT custaria cerca de R$9-10k/mês incluindo encargos, com cobertura de 8h por dia.",
+          "Os 4 agentes rodando 24h, gestão completa de tráfego pago em Meta Ads e Google Ads (criativos, públicos, lances e otimização semanal), ajustes de scripts e funil com base em conversas reais, criação e postagem de conteúdo recorrente e relatório mensal de métricas dos agentes e do tráfego (CPL, CPA, ROAS, agendamentos). Importante: a verba de mídia paga pros anúncios é separada da mensalidade e fica com você — a Futurah opera, otimiza e reporta, mas não cobra a mídia em cima.",
       },
       {
         pergunta: "Como os agentes comparam com contratar uma pessoa?",
         resposta:
-          "Custam cerca de 60% do valor, cobrem 24 horas (vs 8h humano), não tiram férias, escalam sob demanda em pico viral e não geram passivo trabalhista. Onde humano ainda vence: decisões subjetivas, relacionamento quente e casos de exceção — por isso a operação sempre prevê handoff humano quando faz sentido.",
+          "Custam cerca de 60% do valor, cobrem 24 horas (vs 8h humano), não tiram férias, escalam sob demanda em pico viral e não geram passivo trabalhista. E não rodam sozinhos: todo agente é auditado e gerenciado por um especialista humano do time Futurah, que revisa conversas, ajusta scripts e mantém a qualidade da operação. Onde humano de fora ainda vence: decisões subjetivas, relacionamento quente e casos de exceção — por isso a operação sempre prevê handoff pra você ou seu time quando faz sentido.",
       },
       {
         pergunta: "Em quanto tempo os agentes estão no ar?",
