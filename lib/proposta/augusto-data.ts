@@ -309,4 +309,31 @@ export const augustoData: AnaliseData = {
     disclaimer:
       "Proposta de caráter comercial. Os números de audiência são dados reais do perfil @fidevidraceiro (período 18 mar – 16 abr 2026). As faixas de receita são estimativas baseadas em benchmarks de mercado e não constituem garantia de resultado.",
   },
+
+  miniFaq: {
+    eyebrow: "FAQ",
+    titulo: "Perguntas frequentes antes de avançarmos.",
+    itens: [
+      {
+        pergunta: "Como funciona a divisão de receita na coprodução?",
+        resposta:
+          "A Futurah entra como sócia operacional: tudo que é gerado pelos produtos e ações operadas entra em uma divisão de receita acordada em contrato. Não existe fee mensal, setup ou mensalidade — só ganhamos quando a operação gera caixa.",
+      },
+      {
+        pergunta: "Qual é a minha dedicação durante a parceria?",
+        resposta:
+          "Você continua gravando como já grava e aprova decisões estratégicas. A operação — produto, funil, tráfego, mídia, logística e vendas — fica com a Futurah. O tempo que antes ia para operar, agora volta para o que só você pode fazer: o conteúdo.",
+      },
+      {
+        pergunta: "Em quanto tempo começa a entrar caixa?",
+        resposta:
+          "Patrocínios podem rodar já nas primeiras semanas. Produto digital low-ticket e drop físico costumam atingir as primeiras vendas entre 30 e 60 dias. O curso perpétuo leva um pouco mais: a partir do mês 4, quando o funil evergreen estiver calibrado, passa a gerar receita automática.",
+      },
+      {
+        pergunta: "De quem é a audiência, os produtos e a marca no final?",
+        resposta:
+          "Sempre seus. A Futurah atua como sócia operacional com divisão de receita — sem propriedade intelectual, sem exclusividade de longo prazo e com cláusula de saída clara em contrato. Se a parceria terminar, produto e audiência seguem com você.",
+      },
+    ],
+  },
 };

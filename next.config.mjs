@@ -7,10 +7,11 @@ const __dirname = fileURLToPath(new URL('.', import.meta.url))
 const nextConfig = {
     reactStrictMode: false,
     images: {
-        domains: ['framerusercontent.com', 'cdn.sanity.io'],
+        domains: ['framerusercontent.com', 'cdn.sanity.io', 'unavatar.io'],
         remotePatterns: [
             { protocol: 'https', hostname: 'framerusercontent.com' },
             { protocol: 'https', hostname: 'cdn.sanity.io' },
+            { protocol: 'https', hostname: 'unavatar.io' },
         ],
     },
     trailingSlash: false,

@@ -17,7 +17,8 @@ export function HeroSection({ data }: Props) {
           </div>
 
           <h1
-            className="text-2xl sm:text-4xl md:text-5xl lg:text-[64px] font-normal uppercase text-brand-title leading-[1.1]"
+            className="font-normal uppercase text-brand-title"
+            style={{ fontSize: "56px", lineHeight: "1.15" }}
             dangerouslySetInnerHTML={{ __html: data.titulo }}
           />
 

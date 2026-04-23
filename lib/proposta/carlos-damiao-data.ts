@@ -12,56 +12,70 @@ export const carlosDamiaoData: AnaliseData = {
   hero: {
     badge: "Proposta Cash on Delivery · @carlossdamiao",
     titulo:
-      "Estruturar base digital, gerar demanda qualificada <br />e transformar isso em agenda comercial consistente.",
+      "Estruturar o personal online, ativar a consultoria <br />e transformar cada seguidor em aluno dentro do MFit.",
     subtitulo:
-      "Carlos, esta proposta foi desenhada para construir sua estrutura do zero ao operacional: site, identidade, captação por tráfego pago, funil com questionário e automações para qualificar e acelerar o contato com quem já tem intenção real de avançar.",
+      "Carlos, esta proposta foi desenhada para levar seu trabalho de personal e consultoria pro digital: site posicionado em saúde e performance, captação via tráfego pago, funil com questionário de anamnese e o MFit Personal posicionado como ativo central de entrega — transformando atenção em aluno ativo dentro do app.",
     ctaAncora: "Ver proposta ↓",
     rodape: "Preparada pela Futurah and Co. · Abril de 2026",
   },
 
   retrato: {
     eyebrow: "Ponto de partida",
-    titulo: "O cenário atual pede estrutura + rotina de aquisição.",
+    titulo: "Treino online e consultoria — falta a estrutura de captação.",
     subtitulo:
-      "Objetivo inicial: criar um ecossistema simples, profissional e escalável para geração contínua de oportunidades.",
+      "O MFit já resolve a entrega. Falta o que vem antes: presença digital, captação de aluno qualificado e rotina de vendas consistente.",
+    instagramMock: {
+      handle: "carlossdamiao",
+      displayName: "Carlos Damiao",
+      avatarUrl: "/proposta-carlos-damiao/carlos.jpg",
+      verified: false,
+      stats: { posts: "145", seguidores: "1.976", seguindo: "3.318" },
+      bio: [
+        "Movimente-se! Seu corpo e sua alma agradecem.",
+        "Saúde e qualidade de vida!",
+        "♈🕉",
+        "+55 034",
+      ],
+      linkExterno: "cl.mfitpersonal.com.br/index?share=MTI2NDA3LzAvOS8w",
+    },
     stats: [
       { num: "R$10k-15k", label: "faixa de implementação inicial" },
       { num: "R$5k-6k/mês", label: "faixa de manutenção operacional mensal" },
       { num: "90 dias", label: "janela para validação do primeiro funil completo" },
     ],
     fechamento:
-      "A prioridade no início não é complexidade, é previsibilidade: construir presença profissional, colocar tráfego para rodar, captar leads por formulário inteligente e transformar interesse em conversa comercial.",
+      "A prioridade no início não é complexidade, é previsibilidade: construir presença profissional de personal, colocar tráfego rodando em torno de treino e consultoria, captar aluno por questionário de anamnese e encaminhar direto pro onboarding no MFit — sem gargalo no meio.",
   },
 
   diagnostico: {
     eyebrow: "Diagnóstico de operação",
-    titulo: "Seis focos para sair do improviso e ganhar tração.",
+    titulo: "Seis focos para transformar seguidor em aluno ativo.",
     subtitulo:
-      "Leitura baseada na necessidade de estruturação comercial com captação digital.",
+      "Leitura baseada na realidade de quem trabalha com personal online e consultoria via MFit.",
     cards: [
       {
-        titulo: "Presença digital sem ativo central",
-        body: "Sem site estruturado e posicionamento visual consistente, o tráfego pago perde eficiência e confiança na etapa de consideração.",
+        titulo: "Perfil ainda sem posicionamento de personal",
+        body: "O Instagram fala em saúde e qualidade de vida de forma genérica. Pra vender treino online e consultoria, o perfil precisa deixar claro nos primeiros 3 segundos: pra quem é, qual o resultado e como é a entrega no MFit.",
       },
       {
-        titulo: "Captação sem qualificação",
-        body: "Leads não qualificados ocupam tempo comercial. O funil precisa filtrar perfil, urgência e contexto antes do contato humano.",
+        titulo: "Sem captação recorrente de aluno",
+        body: "Hoje, aluno chega por indicação e timing. Pra crescer com previsibilidade, falta tráfego pago rodando em campanhas de personal online e consultoria — com landing e funil desenhados pra converter em anamnese.",
       },
       {
-        titulo: "Dependência de ações pontuais",
-        body: "Quando não existe rotina de mídia e conteúdo, os resultados oscilam demais e não há base para previsibilidade de agenda.",
+        titulo: "Falta de qualificação pré-contato",
+        body: "Sem questionário de anamnese antes do contato humano, você gasta tempo explicando o básico. Um filtro inteligente separa quem tá pronto pra fechar plano de quem só quer informação.",
       },
       {
-        titulo: "Baixo aproveitamento de intenção",
-        body: "Pessoas interessadas chegam, mas sem fluxo claro de atendimento e automação o interesse esfria antes da conversão.",
+        titulo: "MFit é o ativo — mas fica invisível fora",
+        body: "O app resolve a entrega, mas não aparece como diferencial nem no site, nem no funil. O aluno precisa ver o MFit antes de fechar: é o que faz a consultoria parecer profissional e escalável.",
       },
       {
-        titulo: "Falta de integração de canais",
-        body: "Facebook, Google, IA e WhatsApp precisam conversar entre si para reduzir ruído e acelerar tomada de decisão.",
+        titulo: "Sem rotina de conteúdo que vende",
+        body: "Conteúdo de movimento e saúde atrai — mas não converte sozinho. Falta um plano de pauta que alterne autoridade, quebra de objeção, prova social de alunos e chamada pra ação estruturada.",
       },
       {
-        titulo: "Escala exige processo",
-        body: "Para aumentar volume sem perder qualidade, a operação precisa de funil, roteiro de contato e rotina de conteúdo recorrente.",
+        titulo: "Operação manual trava escala",
+        body: "Atendimento no WhatsApp, agendamento de anamnese e cobrança de mensalidade feitos no manual limitam o volume. Automação do primeiro contato até o onboarding no MFit libera tempo pra treinar e gerar conteúdo.",
       },
     ],
   },
@@ -69,45 +83,46 @@ export const carlosDamiaoData: AnaliseData = {
   tese: {
     eyebrow: "Tese da proposta",
     titulo:
-      "Primeiro estruturamos o sistema. {{highlight}}Depois escalamos com controle.{{/highlight}}",
-    body: "O modelo Cash on Delivery aqui significa operação orientada à entrega validada: construir os ativos certos, colocar a máquina para rodar e manter melhoria contínua com base em dados de captação, qualificação e fechamento.",
+      "Posicionar o personal online. {{highlight}}MFit como ativo central de entrega.{{/highlight}}",
+    body: "A proposta é estruturar o que vem antes do MFit: presença de personal reconhecível, captação rodando em torno de treino e consultoria, funil de anamnese qualificando aluno e handoff automático pro app. O MFit deixa de ser bastidor e passa a ser o diferencial visível da oferta — é o que faz parecer profissional, recorrente e escalável.",
   },
 
   frentes: {
-    eyebrow: "Modelo Cash on Delivery",
-    titulo: "Implementação inicial + operação mensal orientada a resultado.",
+    layout: "stack",
+    eyebrow: "Sua oferta em stack",
+    titulo: "Uma oferta empilhada para começar certo e escalar com controle.",
     subtitulo:
-      "Escopo dividido em bloco de estruturação e bloco de sustentação comercial recorrente.",
+      "Você entra com um bloco de implementação, soma a operação mensal e ativa uma camada de governança orientada a entrega.",
     cards: [
       {
         numero: "R$10k-15k",
-        pillLabel: "Implementação",
+        pillLabel: "Stack 1 · Implementação",
         pillTone: "lime",
-        titulo: "Fundação digital e funil inicial.",
-        body: "Projeto de entrada para tirar a operação do zero e colocar uma base comercial funcional no ar.",
+        titulo: "Posicionamento, captação e integração com MFit.",
+        body: "Projeto de entrada pra colocar o personal online no ar com funil de aluno funcional, pronto pra encaminhar fechamento direto pro onboarding no MFit.",
         bullets: [
-          "Site institucional com foco em conversão",
-          "Identidade visual aplicada aos principais pontos de contato",
-          "Estrutura inicial de mídia em Facebook e Google",
-          "Fluxo de captação com formulário/questionário de qualificação",
+          "Site de personal e consultoria com foco em conversão de aluno",
+          "Identidade visual aplicada ao Instagram, site e materiais de venda",
+          "Estrutura inicial de mídia em Meta Ads e Google Ads",
+          "Funil com questionário de anamnese e handoff integrado ao MFit",
         ],
       },
       {
         numero: "R$5k-6k/mês",
-        pillLabel: "Manutenção",
+        pillLabel: "Stack 2 · Mensalidade",
         pillTone: "dark",
-        titulo: "Operação contínua de aquisição e conteúdo.",
-        body: "Depois da implementação, a sustentação mensal mantém crescimento, otimização e rotina comercial ativa.",
+        titulo: "Operação contínua de captação e conteúdo.",
+        body: "Depois da implementação, a sustentação mensal mantém tráfego rodando, funil otimizando e conteúdo alimentando autoridade de personal.",
         bullets: [
-          "Gestão de tráfego e otimizações semanais",
-          "Ajustes contínuos de funil e qualificação",
-          "Apoio em IA e automações de atendimento",
-          "Criação e postagem de conteúdo recorrente",
+          "Gestão de tráfego focada em aluno de personal online e consultoria",
+          "Ajustes contínuos de funil, questionário e taxa de fechamento",
+          "Automações de WhatsApp para agendamento de anamnese e onboarding",
+          "Criação e postagem de conteúdo recorrente de treino, saúde e alunos",
         ],
       },
       {
         numero: "COD",
-        pillLabel: "Diretriz",
+        pillLabel: "Stack 3 · Garantia operacional",
         pillTone: "lime",
         destaque: true,
         titulo: "Entrega clara, medição contínua e decisão por dados.",
@@ -121,91 +136,96 @@ export const carlosDamiaoData: AnaliseData = {
       },
     ],
     observacao:
-      "Os valores apresentados nesta proposta são faixas de referência comercial para este escopo: implementação entre R$10k e R$15k, e operação mensal entre R$5k e R$6k.",
+      "Resumo da oferta: implementação entre R$10k e R$15k + operação mensal entre R$5k e R$6k, com marcos de entrega e revisão contínua da performance.",
   },
 
   bancoIdeias: {
-    eyebrow: "Funil inicial sugerido",
-    titulo: "Entrada simples, qualificação rápida, contato assertivo.",
+    eyebrow: "Funil inicial de aluno",
+    titulo: "De seguidor a aluno ativo no MFit em quatro passos.",
     subtitulo:
-      "Estrutura pensada para reduzir fricção e aumentar qualidade de lead já no primeiro ciclo.",
+      "Fluxo pensado pra reduzir fricção entre o primeiro contato e o onboarding no app, já no primeiro ciclo.",
     categorias: [
       {
         numero: "01",
-        titulo: "Captação com criativos estáticos",
+        titulo: "Captação de aluno de personal online",
         itens: [
-          "Campanhas de entrada para dores e oportunidades do público",
-          "Variações de criativo para Facebook e Google",
-          "Teste inicial de mensagens por intenção de busca",
+          "Campanhas focadas em treino online, consultoria e resultado real",
+          "Criativos estáticos e vídeos curtos com prova social de alunos",
+          "Segmentação por interesse em saúde, performance e condicionamento",
         ],
       },
       {
         numero: "02",
-        titulo: "Questionário de qualificação",
+        titulo: "Questionário de anamnese digital",
         itens: [
-          "Perguntas objetivas para filtrar perfil e momento de compra",
-          "Pontuação de lead para priorização comercial",
-          "Entrega de contato qualificado para abordagem direta",
+          "Perguntas objetivas sobre objetivo, rotina e histórico de treino",
+          "Pontuação pra priorizar quem tá pronto pra fechar plano",
+          "Pré-qualificação antes do contato humano ou do envio pro MFit",
         ],
       },
       {
         numero: "03",
-        titulo: "Automação e handoff comercial",
+        titulo: "Handoff pro MFit + automação de onboarding",
         itens: [
-          "Fluxo automatizado de confirmação e pré-atendimento",
-          "Registro dos leads para histórico e follow-up",
-          "Roteiro de contato para acelerar decisão",
+          "Fluxo automatizado de boas-vindas e orientação pro app",
+          "Agendamento de consulta inicial/anamnese com lembrete",
+          "Integração do cadastro com o MFit pra ativação imediata do aluno",
         ],
       },
       {
         numero: "04",
-        titulo: "Conteúdo de sustentação",
+        titulo: "Conteúdo de autoridade e conversão",
         itens: [
-          "Planejamento de pauta alinhado ao funil",
-          "Criação de conteúdo e apoio em postagem recorrente",
-          "Reaproveitamento de conteúdo para mídia e orgânico",
+          "Pauta alinhada às objeções de quem considera contratar personal online",
+          "Reaproveitamento de conteúdo para Reels, carrossel e anúncio",
+          "Prova social recorrente: evolução, rotina e depoimento de aluno",
         ],
-        fullWidth: true,
       },
     ],
     fechamento:
-      "Meta dos primeiros 90 dias: validar aquisição, melhorar taxa de qualificação e estabelecer rotina comercial previsível com base em dados reais.",
+      "Meta dos primeiros 90 dias: captar aluno qualificado de forma recorrente, aumentar taxa de fechamento pós-anamnese e estabilizar onboarding no MFit com o mínimo de fricção manual.",
   },
 
   fases: {
-    eyebrow: "Cronograma inicial",
-    titulo: "Execução em 3 blocos para sair do zero à operação contínua.",
+    eyebrow: "Cronograma",
+    titulo: "Três blocos: estrutura, ativação, otimização.",
     subtitulo:
-      "Ritmo focado em velocidade de implementação com margem para otimização desde o começo.",
+      "Escopo distribuído em etapas, com captação de aluno entrando no ar já na fase de ativação.",
     fases: [
       {
         phase: "Semanas 1 a 3",
         weeks: "Estruturação",
-        title: "Base digital e identidade",
+        title: "Posicionamento, site e integração com MFit",
         bullets: [
-          "Kickoff, alinhamento e proposta visual",
-          "Desenvolvimento do site e páginas de captação",
-          "Definição de funil e questionário inicial",
+          "Kickoff, alinhamento de posicionamento de personal e consultoria",
+          "Site de personal com foco em conversão de aluno",
+          "Funil com questionário de anamnese definido",
+          "Identidade visual aplicada a Instagram, site e materiais",
+          "Integração técnica com MFit (cadastro, onboarding, rastreio)",
         ],
       },
       {
         phase: "Semanas 4 a 6",
         weeks: "Ativação",
-        title: "Tráfego, automações e operação comercial",
+        title: "Tráfego pago, anamnese digital e onboarding automatizado",
         bullets: [
-          "Subida de campanhas em Facebook e Google",
-          "Ativação de automações e coleta de leads",
-          "Primeiro ciclo de qualificação e contato",
+          "Subida de campanhas em Meta Ads e Google Ads focadas em aluno",
+          "Anamnese digital no ar e coleta de leads ativa",
+          "Primeiro ciclo de qualificação e contato comercial",
+          "Automação de WhatsApp pra agendamento e onboarding",
+          "Handoff automático do aluno aprovado pro MFit",
         ],
       },
       {
         phase: "Semanas 7 a 12",
         weeks: "Otimização",
-        title: "Melhoria de conversão e rotina recorrente",
+        title: "Conversão, conteúdo e rotina recorrente",
         bullets: [
-          "Ajuste de criativos e públicos por desempenho",
-          "Refino de formulário e etapas de atendimento",
-          "Cadência de conteúdo com foco em geração de demanda",
+          "Ajuste de criativos e públicos por desempenho de fechamento",
+          "Refino de questionário, automações e jornada de onboarding",
+          "Cadência de conteúdo com prova social de alunos reais",
+          "Planejamento mensal de conteúdo e apoio em postagem",
+          "Rotina quinzenal de revisão com foco em taxa de aluno ativo",
         ],
       },
     ],
@@ -213,64 +233,92 @@ export const carlosDamiaoData: AnaliseData = {
 
   escopo: {
     eyebrow: "Escopo operacional",
-    titulo: "Entrega integrada de estrutura, mídia e conteúdo.",
+    titulo: "Entrega integrada de estrutura, captação e MFit.",
     subtitulo:
-      "Pacote pensado para resolver base, aquisição e manutenção com governança simples.",
+      "Pacote pensado pra resolver posicionamento, aquisição de aluno e onboarding via MFit com governança simples.",
     itens: [
-      "Diagnóstico inicial e desenho do funil de captação",
-      "Site institucional com foco em conversão",
-      "Aplicação de identidade visual nos ativos principais",
+      "Diagnóstico inicial e desenho do funil de aluno",
+      "Site de personal e consultoria com foco em conversão",
+      "Identidade visual aplicada ao Instagram e materiais de venda",
       "Configuração de campanhas em Meta Ads e Google Ads",
-      "Questionário de qualificação com lógica de priorização",
-      "Automação inicial de atendimento e organização de leads",
-      "Roteiro comercial para abordagem dos contatos qualificados",
-      "Planejamento de conteúdo mensal",
-      "Criação de conteúdo e apoio em postagem",
-      "Rotina de acompanhamento e ajustes quinzenais",
+      "Questionário de anamnese digital com lógica de priorização",
+      "Integração técnica com MFit (cadastro, onboarding e rastreio)",
+      "Automação de WhatsApp pra agendamento e handoff pro app",
+      "Roteiro comercial para abordagem de aluno qualificado",
+      "Planejamento mensal de conteúdo e prova social",
+      "Criação de conteúdo e apoio em postagem recorrente",
+      "Rotina quinzenal de acompanhamento e ajustes",
     ],
   },
 
   potencial: {
     eyebrow: "Potencial operacional",
-    titulo: "Três cenários para evolução da máquina comercial.",
+    titulo: "Três cenários de crescimento do personal online.",
     subtitulo:
-      "Os cenários abaixo são de maturidade de operação, não promessa de faturamento.",
+      "Cenários de maturidade da operação, não promessa de faturamento. Todos assumem MFit como ativo central de entrega e funil de anamnese rodando.",
     cards: [
       {
         eyebrow: "Cenário 1",
         titulo: "Validação inicial",
-        body: "Funil rodando com primeiros leads qualificados e processo comercial organizado.",
+        body: "Funil de aluno rodando, primeiros leads qualificados entrando no MFit de forma recorrente.",
         potencialLabel: "Objetivo principal",
-        potencialValor: "Tirar operação do zero com previsibilidade mínima",
+        potencialValor: "Sair da indicação pontual pra captação previsível de aluno",
       },
       {
         eyebrow: "Cenário 2",
         titulo: "Tração consistente",
-        body: "Melhoria de captação por otimização de campanha, criativo e questionário.",
+        body: "Volume crescente de anamnese por mês, taxa de fechamento e onboarding no MFit otimizados.",
         potencialLabel: "Objetivo principal",
-        potencialValor: "Aumentar volume com qualidade controlada",
+        potencialValor: "Aumentar alunos ativos com qualidade controlada",
       },
       {
         eyebrow: "Cenário 3",
-        titulo: "Escala orientada a dados",
-        body: "Operação integrada de mídia, automação e conteúdo sustentando crescimento contínuo.",
+        titulo: "Escala de personal online",
+        body: "Conteúdo recorrente, funil calibrado e prova social de alunos sustentando crescimento contínuo da base no MFit.",
         potencialLabel: "Objetivo principal",
-        potencialValor: "Escalar sem perder eficiência comercial",
+        potencialValor: "Escalar sem perder personalização do atendimento",
         destaque: true,
       },
     ],
     observacao:
-      "Resultados variam por mercado, oferta, velocidade de resposta comercial e qualidade de execução conjunta.",
+      "Resultados variam por oferta, ticket de consultoria, velocidade de resposta comercial e qualidade de execução conjunta.",
     formatosParceria:
-      'Modelo de trabalho em duas camadas: <span class="font-bold text-white">implementação inicial</span> para ativação da estrutura e <span class="font-bold text-white">manutenção mensal</span> para evolução contínua.',
+      'Modelo de trabalho em duas camadas: <span class="font-bold text-white">implementação inicial</span> pra ativação da estrutura e integração com MFit, e <span class="font-bold text-white">manutenção mensal</span> pra evolução contínua da captação.',
   },
 
   encerramento: {
     eyebrow: "Fechamento",
     titulo: "Se fizer sentido, {{italic}}iniciamos a implantação.{{/italic}}",
-    body: "A proposta foi desenhada para resolver o que mais trava crescimento no começo: falta de estrutura, falta de funil e falta de rotina operacional. Com implementação bem feita e manutenção consistente, a operação deixa de depender de esforço pontual e passa a gerar oportunidade com método.",
+    body: "A proposta foi desenhada pra resolver o que mais trava o crescimento de personal online no começo: falta de posicionamento, funil de aluno e integração visível com MFit. Com implementação bem feita e manutenção consistente, a operação deixa de depender de indicação e passa a captar aluno com método e previsibilidade.",
     emailContato: "contato@futurah.com.br",
     disclaimer:
       "Proposta de caráter comercial. Valores em faixa de referência conforme escopo apresentado. Entregas e investimentos finais podem ser ajustados em contrato após alinhamento técnico.",
+  },
+
+  miniFaq: {
+    eyebrow: "FAQ",
+    titulo: "Perguntas frequentes antes de avançarmos.",
+    itens: [
+      {
+        pergunta: "O que entra na implementação inicial (R$10k-15k)?",
+        resposta:
+          "Entra a fundação da operação: site de personal, identidade aplicada aos principais ativos, estrutura de captação (Meta/Google), anamnese digital com lógica de qualificação, integração técnica com MFit e setup de automações pra onboarding do aluno.",
+      },
+      {
+        pergunta: "O que entra na operação mensal (R$5k-6k)?",
+        resposta:
+          "Gestão contínua de tráfego pago focado em aluno de personal online e consultoria, otimizações de funil e anamnese, ajustes nas automações de WhatsApp e rotina de conteúdo/postagem pra manter captação e prova social rodando.",
+      },
+      {
+        pergunta: "Como o MFit entra na operação?",
+        resposta:
+          "O MFit fica como ativo central de entrega: o aluno que passa pela anamnese é encaminhado direto pro app, com onboarding automatizado. Tudo o que vem antes (captação, qualificação, fechamento) é estruturado pra alimentar o MFit sem fricção manual.",
+      },
+      {
+        pergunta: "Em quanto tempo começamos a ver os primeiros sinais?",
+        resposta:
+          "Nos primeiros 30 dias já temos leads entrando via anamnese digital. Entre 60 e 90 dias, leitura mais sólida de taxa de fechamento, custo por aluno e ajustes de escala.",
+      },
+    ],
   },
 };

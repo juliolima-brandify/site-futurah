@@ -73,6 +73,8 @@ export interface FrentesData {
   eyebrow: string;
   titulo: string;
   subtitulo: string;
+  /** Layout da seção: grade (padrão) ou oferta empilhada. */
+  layout?: "grid" | "stack";
   cards: FrenteCard[];
   /** Observação em caixa lime no rodapé (opcional) */
   observacao?: string;
@@ -141,6 +143,17 @@ export interface EncerramentoData {
   disclaimer?: string;
 }
 
+export interface MiniFaqItem {
+  pergunta: string;
+  resposta: string;
+}
+
+export interface MiniFaqData {
+  eyebrow: string;
+  titulo: string;
+  itens: MiniFaqItem[];
+}
+
 /**
  * Estrutura completa da análise — tudo que a PageProposta precisa pra renderizar.
  */
@@ -163,4 +176,5 @@ export interface AnaliseData {
   escopo: EscopoData;
   potencial: PotencialData;
   encerramento: EncerramentoData;
+  miniFaq?: MiniFaqData;
 }
