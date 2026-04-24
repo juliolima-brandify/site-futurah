@@ -8,17 +8,14 @@ type StepKey =
   | 'momento'
   | 'gargalo'
   | 'velocidade'
-  | 'operacao'
-  | 'agendamento';
-
-const steps: { key: StepKey; label: string }[] = [
-  { key: 'analise', label: 'Análise de Mercado' },
-  { key: 'momento', label: 'Momento do Negócio' },
-  { key: 'gargalo', label: 'Gargalo de Lucro' },
-  { key: 'velocidade', label: 'Velocidade' },
-  { key: 'operacao', label: 'Sua Operação Hoje' },
-  { key: 'agendamento', label: 'Agendamento' },
-];
+  | 'headcount'
+  | 'cargos'
+  | 'custo-funcionario'
+  | 'plataformas'
+  | 'custo-plataformas'
+  | 'nome'
+  | 'email'
+  | 'whatsapp';
 
 const optionsMomento = [
   {
@@ -159,17 +156,6 @@ const optionsCustoPlataformas = [
   { value: '8k+', label: 'Acima de R$ 8.000' },
 ];
 
-const StepBadge: React.FC<{ active?: boolean; done?: boolean }> = ({
-  active,
-  done,
-}) => (
-  <div
-    className={`h-2.5 w-2.5 rounded-full ${
-      done ? 'bg-brand-highlight' : active ? 'bg-brand-highlight' : 'bg-black/10'
-    }`}
-  />
-);
-
 const OptionCard: React.FC<{
   title: string;
   description?: string;
@@ -212,11 +198,26 @@ const ChipOption: React.FC<{
   </button>
 );
 
+const QuestionTitle: React.FC<{ children: React.ReactNode; eyebrow?: string }> = ({
+  children,
+  eyebrow,
+}) => (
+  <div className="space-y-3 text-center">
+    {eyebrow ? (
+      <div className="text-[11px] tracking-[0.2em] font-bold text-black/40 uppercase">
+        {eyebrow}
+      </div>
+    ) : null}
+    <h2 className="text-[26px] md:text-[34px] font-medium tracking-tight leading-[1.2] text-[#111] max-w-[620px] mx-auto">
+      {children}
+    </h2>
+  </div>
+);
+
 export default function ApplicationWizard() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [stepIndex, setStepIndex] = useState(0);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
   const [siteName, setSiteName] = useState('');
   const [momento, setMomento] = useState('');
   const [gargalo, setGargalo] = useState('');
@@ -228,36 +229,12 @@ export default function ApplicationWizard() {
   const [plataformas, setPlataformas] = useState<string[]>([]);
   const [plataformasOutras, setPlataformasOutras] = useState('');
   const [custoPlataformas, setCustoPlataformas] = useState('');
-  const [whatsapp, setWhatsapp] = useState('');
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
+  const [whatsapp, setWhatsapp] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-
-  const toggleCargo = (value: string) => {
-    setCargos((prev) =>
-      prev.includes(value) ? prev.filter((c) => c !== value) : [...prev, value],
-    );
-  };
-
-  const togglePlataforma = (value: string) => {
-    setPlataformas((prev) =>
-      prev.includes(value) ? prev.filter((p) => p !== value) : [...prev, value],
-    );
-  };
-
-  const progress = useMemo(() => {
-    return Math.round(((stepIndex + 1) / steps.length) * 100);
-  }, [stepIndex]);
-
-  useEffect(() => {
-    if (!isAnalyzing) return;
-    const timer = setTimeout(() => {
-      setStepIndex(1);
-      setIsAnalyzing(false);
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, [isAnalyzing]);
 
   const nameFromUrl = searchParams?.get('name') || '';
   const emailFromUrl = searchParams?.get('email') || '';
@@ -271,33 +248,120 @@ export default function ApplicationWizard() {
     if (emailQ) setEmail(emailQ);
   }, [searchParams]);
 
+  const stepKeys: StepKey[] = useMemo(() => {
+    const base: StepKey[] = [
+      'analise',
+      'momento',
+      'gargalo',
+      'velocidade',
+      'headcount',
+      'cargos',
+      'custo-funcionario',
+      'plataformas',
+      'custo-plataformas',
+    ];
+    const contato: StepKey[] = [];
+    if (!nameFromUrl) contato.push('nome');
+    if (!emailFromUrl) contato.push('email');
+    contato.push('whatsapp');
+    return [...base, ...contato];
+  }, [nameFromUrl, emailFromUrl]);
+
+  const [stepIndex, setStepIndex] = useState(0);
+  const currentStep = stepKeys[stepIndex];
+  const isLastStep = stepIndex === stepKeys.length - 1;
+  const progress = useMemo(
+    () => Math.round(((stepIndex + 1) / stepKeys.length) * 100),
+    [stepIndex, stepKeys.length],
+  );
+
+  const canAdvance = useMemo(() => {
+    switch (currentStep) {
+      case 'analise':
+        return siteName.trim().length > 0;
+      case 'momento':
+        return momento !== '';
+      case 'gargalo':
+        return gargalo !== '';
+      case 'velocidade':
+        return velocidade !== '';
+      case 'headcount':
+        return headcount !== '';
+      case 'cargos':
+        return cargos.length > 0 || cargosOutros.trim().length > 0;
+      case 'custo-funcionario':
+        return custoFuncionario !== '';
+      case 'plataformas':
+        return plataformas.length > 0 || plataformasOutras.trim().length > 0;
+      case 'custo-plataformas':
+        return custoPlataformas !== '';
+      case 'nome':
+        return nome.trim().length > 0;
+      case 'email':
+        return /\S+@\S+\.\S+/.test(email.trim());
+      case 'whatsapp':
+        return whatsapp.trim().length >= 8;
+      default:
+        return false;
+    }
+  }, [
+    currentStep,
+    siteName,
+    momento,
+    gargalo,
+    velocidade,
+    headcount,
+    cargos,
+    cargosOutros,
+    custoFuncionario,
+    plataformas,
+    plataformasOutras,
+    custoPlataformas,
+    nome,
+    email,
+    whatsapp,
+  ]);
+
+  useEffect(() => {
+    if (!isAnalyzing) return;
+    const timer = setTimeout(() => {
+      setIsAnalyzing(false);
+      setStepIndex((idx) => Math.min(idx + 1, stepKeys.length - 1));
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [isAnalyzing, stepKeys.length]);
+
   const startAnalysis = () => {
     if (isAnalyzing) return;
-    setStepIndex(0);
+    if (!siteName.trim()) return;
     setIsAnalyzing(true);
   };
 
-  const goNext = () => setStepIndex((prev) => Math.min(prev + 1, 5));
-  const goBack = () => setStepIndex((prev) => Math.max(prev - 1, 1));
+  const goNext = () => {
+    if (!canAdvance) return;
+    setStepIndex((idx) => Math.min(idx + 1, stepKeys.length - 1));
+  };
+
+  const goBack = () => setStepIndex((idx) => Math.max(idx - 1, 0));
+
+  const toggleCargo = (value: string) => {
+    setCargos((prev) =>
+      prev.includes(value) ? prev.filter((c) => c !== value) : [...prev, value],
+    );
+  };
+
+  const togglePlataforma = (value: string) => {
+    setPlataformas((prev) =>
+      prev.includes(value) ? prev.filter((p) => p !== value) : [...prev, value],
+    );
+  };
 
   const submitAplicacao = async () => {
     if (submitting) return;
     setSubmitError(null);
 
-    if (!siteName.trim()) {
-      setSubmitError('Informe seu site ou @instagram.');
-      return;
-    }
-    if (!email.trim()) {
-      setSubmitError('Informe um e-mail para contato.');
-      return;
-    }
-    if (!whatsapp.trim()) {
-      setSubmitError('Informe um WhatsApp para contato.');
-      return;
-    }
-    if (!momento || !gargalo || !velocidade) {
-      setSubmitError('Responda todas as etapas antes de enviar.');
+    if (!canAdvance) {
+      setSubmitError('Preencha o campo antes de enviar.');
       return;
     }
 
@@ -309,14 +373,15 @@ export default function ApplicationWizard() {
       momento,
       gargalo,
       velocidade,
-      equipe: headcount && custoFuncionario
-        ? {
-            headcount,
-            cargos,
-            cargosOutros: cargosOutros.trim() || undefined,
-            custoMedioFaixa: custoFuncionario,
-          }
-        : undefined,
+      equipe:
+        headcount && custoFuncionario
+          ? {
+              headcount,
+              cargos,
+              cargosOutros: cargosOutros.trim() || undefined,
+              custoMedioFaixa: custoFuncionario,
+            }
+          : undefined,
       plataformas: custoPlataformas
         ? {
             items: plataformas,
@@ -346,462 +411,373 @@ export default function ApplicationWizard() {
     }
   };
 
-  return (
-    <section className="w-full min-h-screen py-16 lg:py-24">
-      <div className="w-full bg-white border border-black/5 rounded-[32px] shadow-[0_30px_80px_rgba(0,0,0,0.08)] overflow-hidden">
-        <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr]">
-          <aside className="hidden lg:flex flex-col gap-6 border-r border-black/10 px-8 py-10 bg-[#2C2C2C]">
-            <div className="text-[11px] tracking-[0.2em] font-bold text-white/60 uppercase">
-              Etapas
-            </div>
-            <div className="flex flex-col gap-4">
-              {steps.map((step, idx) => {
-                const done = idx < stepIndex;
-                const active = idx === stepIndex || (stepIndex === 0 && idx === 0);
-                return (
-                  <div key={step.key} className="flex items-center gap-3">
-                    <StepBadge active={active} done={done} />
-                    <span
-                      className={`text-sm ${
-                        active
-                          ? 'text-white'
-                          : done
-                          ? 'text-white/70'
-                          : 'text-white/40'
-                      }`}
-                    >
-                      {step.label}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-            <img
-              src="/images/logos/logo-minor.svg"
-              alt="Futurah"
-              className="mt-auto h-6 w-auto opacity-90 self-start"
-            />
-          </aside>
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key !== 'Enter') return;
+    // não avança quando estiver num textarea ou em step com input livre múltiplo
+    if (event.target instanceof HTMLTextAreaElement) return;
+    if (currentStep === 'analise') {
+      event.preventDefault();
+      startAnalysis();
+      return;
+    }
+    if (isLastStep) {
+      event.preventDefault();
+      void submitAplicacao();
+      return;
+    }
+    if (canAdvance) {
+      event.preventDefault();
+      goNext();
+    }
+  };
 
-          <div className="px-6 md:px-10 lg:px-16 py-10 md:py-12">
-            <div className="flex items-center justify-between mb-10">
-              <div className="text-[11px] tracking-[0.2em] font-bold text-black/40 uppercase">
-                {stepIndex === 0 ? 'A TRANSIÇÃO' : `ETAPA ${stepIndex + 1}`}
+  return (
+    <section
+      className="min-h-screen flex items-center justify-center px-4 py-10 md:py-16"
+      onKeyDown={handleKeyDown}
+    >
+      <div className="w-full max-w-2xl">
+        <div className="mb-10 md:mb-14">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[11px] tracking-[0.2em] font-bold text-black/40 uppercase">
+              Etapa {stepIndex + 1} de {stepKeys.length}
+            </span>
+            <span className="text-[11px] text-black/40">{progress}%</span>
+          </div>
+          <div className="h-1 w-full rounded-full bg-black/5 overflow-hidden">
+            <div
+              className="h-full bg-brand-highlight transition-all"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+
+        <div className="space-y-8">
+          {currentStep === 'analise' && (
+            <div className="space-y-8">
+              <QuestionTitle eyebrow="A transição">
+                {nomeFromUrlFallback(nameFromUrl)}
+                Mapeando sua presença digital
+              </QuestionTitle>
+              <p className="text-black/60 text-[15px] text-center max-w-[520px] mx-auto">
+                Cole o site ou @instagram do seu negócio. Vamos cruzar com os
+                sinais de mercado antes das próximas perguntas.
+              </p>
+
+              <div className="flex flex-col gap-3 max-w-[480px] mx-auto">
+                <input
+                  type="text"
+                  value={siteName}
+                  onChange={(event) => setSiteName(event.target.value)}
+                  placeholder="Cole o site ou @instagram"
+                  autoFocus
+                  className="w-full px-4 py-4 rounded-xl border border-black/10 focus:outline-none focus:ring-2 focus:ring-[#0B2FFF]/30 text-[16px]"
+                />
+                <button
+                  type="button"
+                  onClick={startAnalysis}
+                  disabled={isAnalyzing || !siteName.trim()}
+                  className="w-full px-6 py-4 rounded-xl bg-[#111] text-white font-medium hover:bg-[#0B2FFF] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {isAnalyzing ? 'Analisando...' : 'Iniciar análise'}
+                </button>
               </div>
-              <div className="h-2 w-40 rounded-full bg-black/5 overflow-hidden">
-                <div
-                  className="h-full bg-brand-highlight transition-all"
-                  style={{ width: `${progress}%` }}
+
+              {isAnalyzing ? (
+                <div className="flex items-center justify-center gap-3 text-black/50 text-sm">
+                  <div className="w-4 h-4 border-2 border-black/20 border-t-[#0B2FFF] rounded-full animate-spin" />
+                  Analisando sinais de mercado e posicionamento...
+                </div>
+              ) : null}
+            </div>
+          )}
+
+          {currentStep === 'momento' && (
+            <div className="space-y-6">
+              <QuestionTitle eyebrow="Pergunta 1">
+                Em qual fase sua empresa se encontra hoje?
+              </QuestionTitle>
+              <div className="grid gap-3 max-w-[560px] mx-auto w-full">
+                {optionsMomento.map((option) => (
+                  <OptionCard
+                    key={option.value}
+                    title={`${option.range} — ${option.label}`}
+                    description={option.note}
+                    selected={momento === option.value}
+                    onClick={() => setMomento(option.value)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {currentStep === 'gargalo' && (
+            <div className="space-y-6">
+              <QuestionTitle eyebrow="Pergunta 2">
+                O que está impedindo sua empresa de dobrar o lucro hoje?
+              </QuestionTitle>
+              <div className="grid gap-3 max-w-[560px] mx-auto w-full">
+                {optionsGargalo.map((option) => (
+                  <OptionCard
+                    key={option.value}
+                    title={option.label}
+                    description={option.note}
+                    selected={gargalo === option.value}
+                    onClick={() => setGargalo(option.value)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {currentStep === 'velocidade' && (
+            <div className="space-y-6">
+              <QuestionTitle eyebrow="Pergunta 3">
+                Se desenharmos um Plano de Aceleração para os próximos 90 dias,
+                você estaria pronto para começar?
+              </QuestionTitle>
+              <div className="grid gap-3 max-w-[560px] mx-auto w-full">
+                {optionsVelocidade.map((option) => (
+                  <OptionCard
+                    key={option.value}
+                    title={option.label}
+                    selected={velocidade === option.value}
+                    onClick={() => setVelocidade(option.value)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {currentStep === 'headcount' && (
+            <div className="space-y-6">
+              <QuestionTitle eyebrow="Operação · 1/5">
+                Quantas pessoas trabalham na sua empresa?
+              </QuestionTitle>
+              <div className="grid gap-3 grid-cols-1 md:grid-cols-2 max-w-[560px] mx-auto w-full">
+                {optionsHeadcount.map((opt) => (
+                  <OptionCard
+                    key={opt.value}
+                    title={opt.label}
+                    selected={headcount === opt.value}
+                    onClick={() => setHeadcount(opt.value)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {currentStep === 'cargos' && (
+            <div className="space-y-6">
+              <QuestionTitle eyebrow="Operação · 2/5">
+                Quais cargos existem na sua equipe hoje?
+              </QuestionTitle>
+              <p className="text-[13px] text-black/50 text-center">
+                Marque todos que se aplicam. Use o campo abaixo pra cargos que
+                não estão na lista.
+              </p>
+              <div className="flex flex-wrap gap-2 justify-center max-w-[620px] mx-auto">
+                {cargosDisponiveis.map((cargo) => (
+                  <ChipOption
+                    key={cargo.value}
+                    label={cargo.label}
+                    selected={cargos.includes(cargo.value)}
+                    onClick={() => toggleCargo(cargo.value)}
+                  />
+                ))}
+              </div>
+              <div className="max-w-[480px] mx-auto">
+                <input
+                  type="text"
+                  value={cargosOutros}
+                  onChange={(e) => setCargosOutros(e.target.value)}
+                  placeholder="Outros cargos (separe por vírgula)"
+                  className="w-full px-4 py-3 rounded-xl border border-black/10 focus:outline-none focus:ring-2 focus:ring-[#0B2FFF]/30 text-sm"
                 />
               </div>
             </div>
+          )}
 
-            {stepIndex === 0 ? (
-              <div className="space-y-8">
-                <div className="space-y-2">
-                  {nameFromUrl ? (
-                    <p className="text-[15px] text-black/60">
-                      Olá, <span className="font-semibold text-black">{nameFromUrl}</span>. Recebemos sua solicitação.
-                    </p>
-                  ) : null}
-                  <h2 className="text-[26px] md:text-[32px] font-medium tracking-tight leading-[1.2] text-[#111]">
-                    Mapeando sua presença digital...
-                  </h2>
-                  <p className="text-black/60 text-[15px]">
-                    Acessando dados públicos de{' '}
-                    <span className="font-semibold text-black">
-                      {siteName || 'seu site/Instagram'}
-                    </span>
-                    .
-                  </p>
-                  <p className="text-black/60 text-[15px] max-w-[560px]">
-                    Para entregar um plano comercial viável, precisamos entender
-                    o estágio atual do seu negócio.
-                  </p>
-                </div>
-
-                <div className="flex flex-col md:flex-row gap-4">
-                  <input
-                    type="text"
-                    value={siteName}
-                    onChange={(event) => setSiteName(event.target.value)}
-                    placeholder="Cole o site ou @instagram"
-                    className="w-full md:max-w-[360px] px-4 py-3 rounded-xl border border-black/10 focus:outline-none focus:ring-2 focus:ring-[#0B2FFF]/30"
+          {currentStep === 'custo-funcionario' && (
+            <div className="space-y-6">
+              <QuestionTitle eyebrow="Operação · 3/5">
+                Qual o custo médio mensal por funcionário?
+              </QuestionTitle>
+              <div className="grid gap-3 grid-cols-1 md:grid-cols-2 max-w-[560px] mx-auto w-full">
+                {optionsCustoFuncionario.map((opt) => (
+                  <OptionCard
+                    key={opt.value}
+                    title={opt.label}
+                    selected={custoFuncionario === opt.value}
+                    onClick={() => setCustoFuncionario(opt.value)}
                   />
-                  <button
-                    type="button"
-                    onClick={startAnalysis}
-                    disabled={isAnalyzing}
-                    className="px-6 py-3 rounded-xl bg-[#111] text-white font-medium hover:bg-[#0B2FFF] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                  >
-                    {isAnalyzing ? 'Analisando...' : 'Iniciar análise'}
-                  </button>
-                </div>
-
-                {isAnalyzing ? (
-                  <div className="flex items-center gap-3 text-black/50 text-sm">
-                    <div className="w-4 h-4 border-2 border-black/20 border-t-[#0B2FFF] rounded-full animate-spin" />
-                    Analisando sinais de mercado e posicionamento...
-                  </div>
-                ) : null}
+                ))}
               </div>
-            ) : null}
+            </div>
+          )}
 
-            {stepIndex === 1 ? (
-              <div className="space-y-8">
-                <div className="space-y-2">
-                  <h2 className="text-[26px] md:text-[32px] font-medium tracking-tight leading-[1.2] text-[#111]">
-                    Para alinhar a estratégia ao seu orçamento: Em qual fase sua
-                    empresa se encontra hoje?
-                  </h2>
-                </div>
-                <div className="grid gap-4">
-                  {optionsMomento.map((option) => (
-                    <OptionCard
-                      key={option.value}
-                      title={`${option.range} — ${option.label}`}
-                      description={option.note}
-                      selected={momento === option.value}
-                      onClick={() => setMomento(option.value)}
-                    />
-                  ))}
-                </div>
-                <div className="flex items-center justify-between pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setStepIndex(0)}
-                    className="text-sm text-black/50 hover:text-black"
-                  >
-                    Voltar
-                  </button>
-                  <button
-                    type="button"
-                    onClick={goNext}
-                    className="px-6 py-3 rounded-xl bg-[#111] text-white font-medium hover:bg-[#0B2FFF] transition-colors"
-                  >
-                    Continuar
-                  </button>
-                </div>
-              </div>
-            ) : null}
-
-            {stepIndex === 2 ? (
-              <div className="space-y-8">
-                <div className="space-y-2">
-                  <h2 className="text-[26px] md:text-[32px] font-medium tracking-tight leading-[1.2] text-[#111]">
-                    O que está impedindo sua empresa de dobrar o lucro hoje?
-                  </h2>
-                </div>
-                <div className="grid gap-4">
-                  {optionsGargalo.map((option) => (
-                    <OptionCard
-                      key={option.value}
-                      title={option.label}
-                      description={option.note}
-                      selected={gargalo === option.value}
-                      onClick={() => setGargalo(option.value)}
-                    />
-                  ))}
-                </div>
-                <div className="flex items-center justify-between pt-4">
-                  <button
-                    type="button"
-                    onClick={goBack}
-                    className="text-sm text-black/50 hover:text-black"
-                  >
-                    Voltar
-                  </button>
-                  <button
-                    type="button"
-                    onClick={goNext}
-                    className="px-6 py-3 rounded-xl bg-[#111] text-white font-medium hover:bg-[#0B2FFF] transition-colors"
-                  >
-                    Continuar
-                  </button>
-                </div>
-              </div>
-            ) : null}
-
-            {stepIndex === 3 ? (
-              <div className="space-y-8">
-                <div className="space-y-2">
-                  <h2 className="text-[26px] md:text-[32px] font-medium tracking-tight leading-[1.2] text-[#111]">
-                    Se desenharmos um Plano de Aceleração para os próximos 90
-                    dias, você estaria pronto para começar?
-                  </h2>
-                </div>
-                <div className="grid gap-4">
-                  {optionsVelocidade.map((option) => (
-                    <OptionCard
-                      key={option.value}
-                      title={option.label}
-                      selected={velocidade === option.value}
-                      onClick={() => setVelocidade(option.value)}
-                    />
-                  ))}
-                </div>
-                <div className="flex items-center justify-between pt-4">
-                  <button
-                    type="button"
-                    onClick={goBack}
-                    className="text-sm text-black/50 hover:text-black"
-                  >
-                    Voltar
-                  </button>
-                  <button
-                    type="button"
-                    onClick={goNext}
-                    className="px-6 py-3 rounded-xl bg-[#111] text-white font-medium hover:bg-[#0B2FFF] transition-colors"
-                  >
-                    Continuar
-                  </button>
-                </div>
-              </div>
-            ) : null}
-
-            {stepIndex === 4 ? (
-              <div className="space-y-10">
-                <div className="space-y-2">
-                  <h2 className="text-[26px] md:text-[32px] font-medium tracking-tight leading-[1.2] text-[#111]">
-                    Como está sua operação hoje?
-                  </h2>
-                  <p className="text-black/60 text-[15px] max-w-[620px]">
-                    Esses dados ajudam a IA a mapear onde agentes podem
-                    substituir funções humanas ou plataformas pagas — e quanto
-                    isso pode economizar.
-                  </p>
-                </div>
-
-                <div className="space-y-5">
-                  <div className="text-[11px] tracking-[0.2em] font-bold text-black/40 uppercase">
-                    Equipe
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="text-sm font-medium text-black">
-                      Quantas pessoas trabalham na empresa?
-                    </label>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                      {optionsHeadcount.map((opt) => (
-                        <OptionCard
-                          key={opt.value}
-                          title={opt.label}
-                          selected={headcount === opt.value}
-                          onClick={() => setHeadcount(opt.value)}
-                        />
-                      ))}
+          {currentStep === 'plataformas' && (
+            <div className="space-y-6">
+              <QuestionTitle eyebrow="Operação · 4/5">
+                Quais plataformas sua empresa paga hoje?
+              </QuestionTitle>
+              <p className="text-[13px] text-black/50 text-center">
+                Marque todas que usa — agrupadas por tipo.
+              </p>
+              <div className="space-y-5 max-w-[620px] mx-auto">
+                {plataformasDisponiveis.map((grupo) => (
+                  <div key={grupo.grupo} className="space-y-2">
+                    <div className="text-[11px] font-semibold uppercase tracking-wider text-black/50 text-center">
+                      {grupo.grupo}
                     </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="text-sm font-medium text-black">
-                      Quais cargos existem na equipe?{' '}
-                      <span className="text-black/40 font-normal">
-                        (marque todos que se aplicam)
-                      </span>
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {cargosDisponiveis.map((cargo) => (
+                    <div className="flex flex-wrap gap-2 justify-center">
+                      {grupo.itens.map((item) => (
                         <ChipOption
-                          key={cargo.value}
-                          label={cargo.label}
-                          selected={cargos.includes(cargo.value)}
-                          onClick={() => toggleCargo(cargo.value)}
-                        />
-                      ))}
-                    </div>
-                    <input
-                      type="text"
-                      value={cargosOutros}
-                      onChange={(e) => setCargosOutros(e.target.value)}
-                      placeholder="Outros cargos (separe por vírgula)"
-                      className="w-full px-4 py-3 rounded-xl border border-black/10 focus:outline-none focus:ring-2 focus:ring-[#0B2FFF]/30 text-sm"
-                    />
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="text-sm font-medium text-black">
-                      Custo médio mensal por funcionário
-                    </label>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                      {optionsCustoFuncionario.map((opt) => (
-                        <OptionCard
-                          key={opt.value}
-                          title={opt.label}
-                          selected={custoFuncionario === opt.value}
-                          onClick={() => setCustoFuncionario(opt.value)}
+                          key={item.value}
+                          label={item.label}
+                          selected={plataformas.includes(item.value)}
+                          onClick={() => togglePlataforma(item.value)}
                         />
                       ))}
                     </div>
                   </div>
-                </div>
-
-                <div className="space-y-5 pt-4 border-t border-black/10">
-                  <div className="text-[11px] tracking-[0.2em] font-bold text-black/40 uppercase">
-                    Plataformas pagas
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="text-sm font-medium text-black">
-                      Quais plataformas/SaaS sua empresa paga hoje?{' '}
-                      <span className="text-black/40 font-normal">
-                        (marque todas que usa)
-                      </span>
-                    </label>
-                    <div className="space-y-4">
-                      {plataformasDisponiveis.map((grupo) => (
-                        <div key={grupo.grupo} className="space-y-2">
-                          <div className="text-[11px] font-semibold uppercase tracking-wider text-black/50">
-                            {grupo.grupo}
-                          </div>
-                          <div className="flex flex-wrap gap-2">
-                            {grupo.itens.map((item) => (
-                              <ChipOption
-                                key={item.value}
-                                label={item.label}
-                                selected={plataformas.includes(item.value)}
-                                onClick={() => togglePlataforma(item.value)}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <input
-                      type="text"
-                      value={plataformasOutras}
-                      onChange={(e) => setPlataformasOutras(e.target.value)}
-                      placeholder="Outras plataformas (separe por vírgula)"
-                      className="w-full px-4 py-3 rounded-xl border border-black/10 focus:outline-none focus:ring-2 focus:ring-[#0B2FFF]/30 text-sm"
-                    />
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="text-sm font-medium text-black">
-                      Quanto paga por mês no total em plataformas?
-                    </label>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                      {optionsCustoPlataformas.map((opt) => (
-                        <OptionCard
-                          key={opt.value}
-                          title={opt.label}
-                          selected={custoPlataformas === opt.value}
-                          onClick={() => setCustoPlataformas(opt.value)}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between pt-4">
-                  <button
-                    type="button"
-                    onClick={goBack}
-                    className="text-sm text-black/50 hover:text-black"
-                  >
-                    Voltar
-                  </button>
-                  <button
-                    type="button"
-                    onClick={goNext}
-                    className="px-6 py-3 rounded-xl bg-[#111] text-white font-medium hover:bg-[#0B2FFF] transition-colors"
-                  >
-                    Continuar
-                  </button>
-                </div>
+                ))}
               </div>
-            ) : null}
-
-            {stepIndex === 5 ? (
-              <div className="space-y-8">
-                <div className="space-y-2">
-                  <h2 className="text-[28px] md:text-[34px] font-medium tracking-tight leading-[1.2] text-[#111]">
-                    Perfil Pré-Aprovado.
-                  </h2>
-                  <p className="text-black/60 text-[16px]">
-                    Identificamos 3 alavancas de crescimento imediato para o
-                    seu cenário.
-                  </p>
-                </div>
-
-                <div className="space-y-4 max-w-[480px]">
-                  {!nameFromUrl && (
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-black">
-                        Como prefere ser chamado?
-                      </label>
-                      <input
-                        type="text"
-                        value={nome}
-                        onChange={(event) => setNome(event.target.value)}
-                        placeholder="Seu nome"
-                        className="w-full px-4 py-3 rounded-xl border border-black/10 focus:outline-none focus:ring-2 focus:ring-[#0B2FFF]/30"
-                      />
-                    </div>
-                  )}
-
-                  {!emailFromUrl && (
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-black">
-                        Melhor e-mail:
-                      </label>
-                      <input
-                        type="email"
-                        value={email}
-                        onChange={(event) => setEmail(event.target.value)}
-                        placeholder="nome@empresa.com"
-                        className="w-full px-4 py-3 rounded-xl border border-black/10 focus:outline-none focus:ring-2 focus:ring-[#0B2FFF]/30"
-                      />
-                      <p className="text-[13px] text-black/50">
-                        Enviaremos sua análise estratégica neste e-mail.
-                      </p>
-                    </div>
-                  )}
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-black">
-                      WhatsApp (DDD + Número):
-                    </label>
-                    <input
-                      type="tel"
-                      value={whatsapp}
-                      onChange={(event) => setWhatsapp(event.target.value)}
-                      placeholder="(11) 99999-9999"
-                      className="w-full px-4 py-3 rounded-xl border border-black/10 focus:outline-none focus:ring-2 focus:ring-[#0B2FFF]/30"
-                    />
-                    <p className="text-[13px] text-black/50">
-                      Para qual número nosso Consultor deve enviar os detalhes
-                      da Sessão Estratégica?
-                    </p>
-                  </div>
-                </div>
-
-                {submitError && (
-                  <p className="text-sm text-red-500">{submitError}</p>
-                )}
-
-                <div className="flex items-center justify-between pt-4">
-                  <button
-                    type="button"
-                    onClick={goBack}
-                    className="text-sm text-black/50 hover:text-black"
-                  >
-                    Voltar
-                  </button>
-                  <button
-                    type="button"
-                    onClick={submitAplicacao}
-                    disabled={submitting}
-                    className="px-6 py-3 rounded-xl bg-[#111] text-white font-medium hover:bg-[#0B2FFF] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                  >
-                    {submitting ? 'Enviando...' : 'SOLICITAR HORÁRIO NA AGENDA ➔'}
-                  </button>
-                </div>
+              <div className="max-w-[480px] mx-auto">
+                <input
+                  type="text"
+                  value={plataformasOutras}
+                  onChange={(e) => setPlataformasOutras(e.target.value)}
+                  placeholder="Outras plataformas (separe por vírgula)"
+                  className="w-full px-4 py-3 rounded-xl border border-black/10 focus:outline-none focus:ring-2 focus:ring-[#0B2FFF]/30 text-sm"
+                />
               </div>
-            ) : null}
-          </div>
+            </div>
+          )}
+
+          {currentStep === 'custo-plataformas' && (
+            <div className="space-y-6">
+              <QuestionTitle eyebrow="Operação · 5/5">
+                Quanto você paga por mês no total em plataformas?
+              </QuestionTitle>
+              <div className="grid gap-3 grid-cols-1 md:grid-cols-2 max-w-[560px] mx-auto w-full">
+                {optionsCustoPlataformas.map((opt) => (
+                  <OptionCard
+                    key={opt.value}
+                    title={opt.label}
+                    selected={custoPlataformas === opt.value}
+                    onClick={() => setCustoPlataformas(opt.value)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {currentStep === 'nome' && (
+            <div className="space-y-6">
+              <QuestionTitle eyebrow="Contato">
+                Como prefere ser chamado?
+              </QuestionTitle>
+              <div className="max-w-[420px] mx-auto">
+                <input
+                  type="text"
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
+                  placeholder="Seu nome"
+                  autoFocus
+                  className="w-full px-4 py-4 rounded-xl border border-black/10 focus:outline-none focus:ring-2 focus:ring-[#0B2FFF]/30 text-[16px] text-center"
+                />
+              </div>
+            </div>
+          )}
+
+          {currentStep === 'email' && (
+            <div className="space-y-6">
+              <QuestionTitle eyebrow="Contato">
+                Qual o melhor e-mail pra te enviar a análise?
+              </QuestionTitle>
+              <div className="max-w-[420px] mx-auto">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="nome@empresa.com"
+                  autoFocus
+                  className="w-full px-4 py-4 rounded-xl border border-black/10 focus:outline-none focus:ring-2 focus:ring-[#0B2FFF]/30 text-[16px] text-center"
+                />
+              </div>
+            </div>
+          )}
+
+          {currentStep === 'whatsapp' && (
+            <div className="space-y-6">
+              <QuestionTitle eyebrow="Última etapa · Perfil pré-aprovado">
+                Pra qual WhatsApp nosso consultor deve enviar os detalhes?
+              </QuestionTitle>
+              <div className="max-w-[420px] mx-auto space-y-3">
+                <input
+                  type="tel"
+                  value={whatsapp}
+                  onChange={(e) => setWhatsapp(e.target.value)}
+                  placeholder="(11) 99999-9999"
+                  autoFocus
+                  className="w-full px-4 py-4 rounded-xl border border-black/10 focus:outline-none focus:ring-2 focus:ring-[#0B2FFF]/30 text-[16px] text-center"
+                />
+                <p className="text-[13px] text-black/50 text-center">
+                  Usado apenas para entregar sua análise e agendar a Sessão
+                  Estratégica.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {submitError && (
+            <p className="text-sm text-red-500 text-center">{submitError}</p>
+          )}
         </div>
+
+        {currentStep !== 'analise' && (
+          <div className="flex items-center justify-between pt-10 md:pt-14">
+            <button
+              type="button"
+              onClick={goBack}
+              disabled={stepIndex === 0}
+              className="text-sm text-black/50 hover:text-black disabled:opacity-0 transition-opacity"
+            >
+              ← Voltar
+            </button>
+            {!isLastStep ? (
+              <button
+                type="button"
+                onClick={goNext}
+                disabled={!canAdvance}
+                className="px-6 py-3 rounded-xl bg-[#111] text-white font-medium hover:bg-[#0B2FFF] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Continuar
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={submitAplicacao}
+                disabled={!canAdvance || submitting}
+                className="px-6 py-3 rounded-xl bg-[#111] text-white font-medium hover:bg-[#0B2FFF] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {submitting ? 'Enviando...' : 'Enviar ➔'}
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </section>
+  );
+}
+
+function nomeFromUrlFallback(nameFromUrl: string): React.ReactNode {
+  if (!nameFromUrl) return null;
+  return (
+    <div className="text-[13px] text-black/50 mb-1">
+      Olá,{' '}
+      <span className="font-semibold text-black/80">{nameFromUrl}</span>.
+    </div>
   );
 }

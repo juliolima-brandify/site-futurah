@@ -3,14 +3,10 @@ import { Suspense } from 'react';
 
 export default function AplicacaoPage() {
   return (
-    <>
-      <main className="bg-[#F5F5F5]">
-        <div className="max-w-[1200px] mx-auto px-4 md:px-8 lg:px-12">
-          <Suspense fallback={<div>Carregando...</div>}>
-            <ApplicationWizard />
-          </Suspense>
-        </div>
-      </main>
-    </>
+    <main className="bg-[#F5F5F5] min-h-screen">
+      <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Carregando...</div>}>
+        <ApplicationWizard />
+      </Suspense>
+    </main>
   );
 }
