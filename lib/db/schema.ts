@@ -32,9 +32,18 @@ export const analises = pgTable(
     email: text("email").notNull(),
     nome: text("nome"),
     whatsapp: text("whatsapp"),
+    // campos antigos (deprecated, mantidos para não quebrar migrations)
     objetivo: text("objetivo"),
     monetizaHoje: text("monetiza_hoje"),
     tempoDisponivel: text("tempo_disponivel"),
+    // campos atuais do wizard
+    momento: text("momento"),
+    gargalo: text("gargalo"),
+    velocidade: text("velocidade"),
+
+    // qualificação operacional (step 5 do wizard)
+    equipe: jsonb("equipe"),
+    plataformas: jsonb("plataformas"),
 
     // dados externos / gerados
     dadosScraped: jsonb("dados_scraped"),
@@ -81,3 +90,31 @@ export const analiseEventos = pgTable(
 
 export type Analise = typeof analises.$inferSelect;
 export type NewAnalise = typeof analises.$inferInsert;
+
+export type HeadcountFaixa = "solo" | "2-5" | "6-10" | "11-25" | "26-50" | "50+";
+export type CustoFuncionarioFaixa =
+  | "ate-2k"
+  | "2-3.5k"
+  | "3.5-5.5k"
+  | "5.5-9k"
+  | "9-15k"
+  | "15k+";
+export type CustoPlataformasFaixa =
+  | "ate-500"
+  | "500-1.5k"
+  | "1.5-3k"
+  | "3-8k"
+  | "8k+";
+
+export interface EquipeAnalise {
+  headcount: HeadcountFaixa;
+  cargos: string[];
+  cargosOutros?: string;
+  custoMedioFaixa: CustoFuncionarioFaixa;
+}
+
+export interface PlataformasAnalise {
+  items: string[];
+  outras?: string;
+  custoTotalFaixa: CustoPlataformasFaixa;
+}

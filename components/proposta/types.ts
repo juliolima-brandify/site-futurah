@@ -154,6 +154,45 @@ export interface MiniFaqData {
   itens: MiniFaqItem[];
 }
 
+export interface EconomiaFuncionario {
+  cargo: string;
+  custoAtualEstimado: number;
+  substituivel: boolean;
+  como: string;
+}
+
+export interface EconomiaPlataforma {
+  nome: string;
+  custoAtualEstimado: number;
+  substituivel: boolean;
+  alternativa: string;
+}
+
+export interface EconomiaTotais {
+  custoAtualMensal: number;
+  custoProjetadoMensal: number;
+  economiaMensal: number;
+  economiaAnual: number;
+}
+
+export interface EconomiaCta {
+  titulo: string;
+  subtitulo?: string;
+  botao: string;
+  href?: string;
+}
+
+export interface EconomiaPrevistaData {
+  eyebrow: string;
+  titulo: string;
+  subtitulo: string;
+  funcionarios: EconomiaFuncionario[];
+  plataformas: EconomiaPlataforma[];
+  totais: EconomiaTotais;
+  observacao?: string;
+  cta: EconomiaCta;
+}
+
 /**
  * Estrutura completa da análise — tudo que a PageProposta precisa pra renderizar.
  */
@@ -175,6 +214,7 @@ export interface AnaliseData {
   fases: FasesData;
   escopo: EscopoData;
   potencial: PotencialData;
+  economiaPrevista?: EconomiaPrevistaData;
   encerramento: EncerramentoData;
   miniFaq?: MiniFaqData;
 }

@@ -11,6 +11,7 @@ import { BancoIdeiasSection } from "./sections/BancoIdeiasSection";
 import { FasesSection } from "./sections/FasesSection";
 import { EscopoSection } from "./sections/EscopoSection";
 import { PotencialSection } from "./sections/PotencialSection";
+import { EconomiaSection } from "./sections/EconomiaSection";
 import { EncerramentoSection } from "./sections/EncerramentoSection";
 import { TeamTestimonialSection } from "@/components/sections/TeamTestimonialSection";
 import { MiniFaqSection } from "./sections/MiniFaqSection";
@@ -38,6 +39,7 @@ export function PageProposta({ data }: Props) {
         {!esconderEscopo && <EscopoSection data={data.escopo} />}
         <PotencialSection data={data.potencial} />
         {ofertaNoFinal && <FrentesSection data={data.frentes} />}
+        {data.economiaPrevista && <EconomiaSection data={data.economiaPrevista} />}
         <EncerramentoSection data={data.encerramento} />
         <TeamTestimonialSection />
         {data.miniFaq && <MiniFaqSection data={data.miniFaq} />}

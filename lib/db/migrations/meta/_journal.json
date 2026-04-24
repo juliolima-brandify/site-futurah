@@ -15,6 +15,20 @@
       "when": 1776966294505,
       "tag": "0001_aberrant_black_bolt",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1777035192623,
+      "tag": "0002_petite_wasp",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1777036680171,
+      "tag": "0003_supreme_frog_thor",
+      "breakpoints": true
     }
   ]
 }

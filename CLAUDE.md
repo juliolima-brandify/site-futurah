@@ -112,6 +112,8 @@ Fonte padrão: **Neue Haas Grotesk Display** (carregada localmente via `lib/font
 ### Fluxo de Análise (pipeline interno)
 `app/(site)/aplicacao/` → formulário (`ApplicationWizard`) → API → cria registro em `analises` com `status: pendente_dados` → pipeline externo faz scraping e geração via IA → status vai para `publicada` → análise disponível em `app/(site)/analise/[slug]/`.
 
+> ⚠ **Estado atual (2026-04-24):** wizard (6 steps) → `POST /api/aplicacao` → geração OpenAI (`lib/ai/`) → `/analise/[slug]` funcionando **end-to-end**. Publica direto (sem revisão humana — TODO quando admin Fase 4 existir). Geração roda em fire-and-forget (`gerarAnaliseEmBackground`), com cálculo programático de `economiaPrevista` em cima do catálogo de substituição (`lib/ai/catalogo.ts`). **Ainda ausente**: scraping real do Instagram, admin de revisão humana, Stripe (só `express` implementado), rate-limit, tracking `analise_eventos`, troca pro `after()` do Next (risco de corte em serverless). Ver [`ANALISE_PLAN.md`](./ANALISE_PLAN.md) para auditoria completa e plano original.
+
 ## Painel admin — Payload 3 + multi-tenant
 
 **Status (2026-04-23):** Fases 0-3 implementadas e validadas (build verde, 13/13 static pages). Fases 4-5 pendentes.
