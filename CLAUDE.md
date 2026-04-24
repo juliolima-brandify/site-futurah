@@ -27,6 +27,8 @@ node --import tsx/esm ./node_modules/payload/dist/bin/index.js generate:importma
 - `DATABASE_URL` — conn string do Postgres com permissão `CREATE SCHEMA`. Região do Supabase Pooler está em Dashboard → Settings → Database (esta instalação usa `us-west-2`).
 - `PAYLOAD_SECRET` — hex 64-char (`node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`). Build quebra com throw se ausente.
 - `BLOB_READ_WRITE_TOKEN` — token do Vercel Blob Store (uploads de `media`). Vercel injeta automaticamente quando o Blob é conectado ao projeto.
+- `OPENAI_API_KEY` — chave OpenAI usada pelo pipeline de geração da análise (`lib/ai/`). Sem ela, `POST /api/aplicacao` aceita a submissão mas a geração falha em runtime e a análise termina em `status='falhou'`. Lazy-loaded (só exige no 1º uso).
+- `OPENAI_MODEL` — opcional. Default `gpt-4.1-mini`. Troca pra `gpt-4.1`/`gpt-4o` se quiser qualidade maior (custo/latência sobem).
 
 ## Arquitetura
 
@@ -37,6 +39,7 @@ O projeto é deployado na **Vercel**, team `Brandify Hub` (`team_BSOkCBupLNa1JZK
 - `DATABASE_URL` — Supabase pooler us-west-2
 - `PAYLOAD_SECRET` — hex 64-char (mesmo valor do `.env.local`; **não regenerar sem coordenar**, invalida sessões)
 - `BLOB_READ_WRITE_TOKEN` — injetado automaticamente pelo Vercel Blob Store `site-futurah-media` (region iad1), conectado via integration em 2026-04-23
+- `OPENAI_API_KEY` — adicionar manualmente em Settings → Environment Variables. Rotacionar direto pela OpenAI Dashboard; editar a var e **fazer Redeploy** (env só pega no próximo build).
 
 > Os arquivos `wrangler.jsonc`, `open-next.config.ts` e os scripts `cf:build`/`deploy` no `package.json` são resquícios de uma migração anterior para Cloudflare e podem ser ignorados.
 
@@ -47,7 +50,10 @@ O projeto é deployado na **Vercel**, team `Brandify Hub` (`team_BSOkCBupLNa1JZK
 - `app/(payload)/layout.tsx` — layout do admin Payload (importa `@payloadcms/next/css`).
 - `app/(payload)/admin/` — painel admin do Payload 3 (`/admin`). Arquivos auto-gerados — não editar à mão.
 - `app/(payload)/api/` — endpoints REST e GraphQL do Payload (`/api/[...slug]`, `/api/graphql`).
-- `app/api/` — rotas de API custom do site (`/api/contact`, `/api/newsletter`).
+- `app/api/` — rotas de API custom do site:
+  - `/api/contact`, `/api/newsletter` — ingestão Payload (Leads, NewsletterSubscribers).
+  - `/api/aplicacao` (POST) — ingestão do wizard de análise + dispara geração em background.
+  - `/api/aplicacao/[slug]/status` (GET) — polling consumido por `/aplicacao/recebido/[slug]`.
 
 ### Banco de Dados — dois schemas Postgres no mesmo Supabase
 
@@ -59,8 +65,8 @@ O projeto é deployado na **Vercel**, team `Brandify Hub` (`team_BSOkCBupLNa1JZK
 - Internas: `payload_migrations`, `payload_preferences`, `payload_locked_documents`, `payload_kv`.
 
 **Schema `public.*`** (gerenciado por Drizzle — `lib/db/schema.ts`):
-- `analises` — análises geradas por leads (pipeline: `pendente_dados → scraping → gerando → pendente_revisao → publicada`).
-- `analise_eventos` — tracking de leitura (open, scroll, click) de cada análise.
+- `analises` — análises geradas por leads (pipeline: `pendente_dados → scraping → gerando → pendente_revisao → publicada`). Colunas do wizard: `instagram_handle`, `email`, `nome`, `whatsapp`, `momento`, `gargalo`, `velocidade`, `equipe` (jsonb), `plataformas` (jsonb). Colunas geradas: `dados_scraped` (jsonb), `conteudo` (jsonb, shape `AnaliseData`).
+- `analise_eventos` — tracking de leitura (open, scroll, click) de cada análise. **Ainda não populada** — tabela existe, endpoint de tracking (`H4` do gap plan) está TODO.
 
 > `leads` e `newsletter_subscribers` foram migrados de Drizzle pra Payload — **não estão mais em `public`**. Migrations 0000 (cria) + 0001 (drop) já commitadas.
 
@@ -110,9 +116,83 @@ Tokens de cor em `tailwind.config.ts`:
 Fonte padrão: **Neue Haas Grotesk Display** (carregada localmente via `lib/fonts.ts`).
 
 ### Fluxo de Análise (pipeline interno)
-`app/(site)/aplicacao/` → formulário (`ApplicationWizard`) → API → cria registro em `analises` com `status: pendente_dados` → pipeline externo faz scraping e geração via IA → status vai para `publicada` → análise disponível em `app/(site)/analise/[slug]/`.
 
-> ⚠ **Estado atual (2026-04-24):** wizard (6 steps) → `POST /api/aplicacao` → geração OpenAI (`lib/ai/`) → `/analise/[slug]` funcionando **end-to-end**. Publica direto (sem revisão humana — TODO quando admin Fase 4 existir). Geração roda em fire-and-forget (`gerarAnaliseEmBackground`), com cálculo programático de `economiaPrevista` em cima do catálogo de substituição (`lib/ai/catalogo.ts`). **Ainda ausente**: scraping real do Instagram, admin de revisão humana, Stripe (só `express` implementado), rate-limit, tracking `analise_eventos`, troca pro `after()` do Next (risco de corte em serverless). Ver [`ANALISE_PLAN.md`](./ANALISE_PLAN.md) para auditoria completa e plano original.
+**Estado (2026-04-24):** fluxo **end-to-end funcional** — wizard estilo typeform → API → OpenAI → `/analise/[slug]`.
+
+#### Entradas (dois caminhos)
+1. **Home** → `components/sections/Contact.tsx` coleta `nome + email + site/@` → `POST /api/contact` (grava em `leads` do Payload) → `router.push('/aplicacao?name=&email=&social=')`.
+2. **Direto** em `/aplicacao` sem query params — nome e email são coletados no próprio wizard, em steps dedicados.
+
+#### Wizard (`components/sections/ApplicationWizard.tsx`)
+Layout **typeform** (uma pergunta por tela, centralizado, sem sidebar). Steps dinâmicos via `useMemo` (9-12 telas conforme caminho):
+
+1. `analise` — site/@instagram + animação fake de 2s
+2. `momento` — fase do negócio (validação/tração/escala)
+3. `gargalo` — dor principal (tráfego/posicionamento/processo/gestão)
+4. `velocidade` — prontidão
+5. `headcount` — tamanho da equipe (Operação 1/5)
+6. `cargos` — multi-select com catálogo + campo livre (Operação 2/5)
+7. `custo-funcionario` — faixa de custo médio (Operação 3/5)
+8. `plataformas` — multi-select agrupado (CRM/Atendimento/Agendamento/WhatsApp/Email) + campo livre (Operação 4/5)
+9. `custo-plataformas` — faixa de custo total mensal (Operação 5/5)
+10. `nome` *(só caminho 2)*
+11. `email` *(só caminho 2)*
+12. `whatsapp` + submit
+
+Enter avança, `autoFocus` nos inputs. Validação por step em `canAdvance` — botão "Continuar" fica desabilitado sem resposta.
+
+#### Ingestão — `POST /api/aplicacao` (`app/api/aplicacao/route.ts`)
+Valida `email` e `instagramHandle`, normaliza handle (remove `@`/URL), gera `slug` via `nanoid(22)`, INSERT em `analises` (status `pendente_dados`, tipo `express`), dispara `gerarAnaliseEmBackground(id)` **fire-and-forget** (não aguarda), retorna `{ id, slug }`. Wizard redireciona para `/aplicacao/recebido/[slug]`.
+
+#### Geração — `lib/ai/gerar.ts`
+Orquestrador assíncrono. Fluxo:
+1. Lê a row; se já tem `conteudo`, é idempotente (skip).
+2. Muda status → `gerando`.
+3. Monta prompt (`lib/ai/prompt-analise.ts`) descrevendo o lead com labels humanas e o shape esperado de `AnaliseData`.
+4. Chama OpenAI (`response_format: json_object`, modelo = `OPENAI_MODEL` ou `gpt-4.1-mini`).
+5. Parse JSON, valida seções obrigatórias (`validateConteudo`).
+6. **Calcula `economiaPrevista` programaticamente** em `lib/ai/economia.ts` — cruza `equipe.cargos` e `plataformas.items` com o catálogo (`lib/ai/catalogo.ts`) para produzir a tabela "custo atual vs projetado + total de economia". Não delega números à IA (evita alucinação).
+7. Salva `conteudo` + status → `publicada`, `publishedAt = now()`.
+
+Se falhar em qualquer etapa, grava `status='falhou'` + `revisorNotas` com a mensagem.
+
+> ⚠ **TODO Fase 4**: quando o admin de revisão existir, trocar `publicada` → `pendente_revisao` em `lib/ai/gerar.ts` (marcado com `TODO(fase 4)`).
+
+#### Espera + entrega
+- `/aplicacao/recebido/[slug]` — client component com polling a cada 3s em `/api/aplicacao/[slug]/status`. Copy adaptativa por status (`pendente_dados`/`scraping`/`gerando`/`pendente_revisao`/`publicada`/`falhou`). Quando `publicada`, redireciona pra `/analise/[slug]`.
+- `/analise/[slug]` — server component que `SELECT WHERE slug=$1 AND status='publicada'`, renderiza `<PageProposta data={conteudo} />`. `noindex` via robots meta (slug é o token).
+
+#### O que ainda falta
+- **Scraping real do Instagram**: IA hoje só tem os dados do wizard; `dados_scraped` fica `null`. Pipeline externo (n8n/worker Python) ainda não existe — B3 do gap plan.
+- **Admin de revisão humana** (Payload custom view) — B5 / Fase 4.
+- **Stripe** pra `tipo='completa'` — B7. Hoje só `express` é gerado (grátis).
+- **`tenant_id` em `analises`** — B6. Schema atual é sem tenant; análises não são isoladas por cliente da agência.
+- **Serverless fire-and-forget**: `gerarAnaliseEmBackground` é disparado sem `await`. Em Vercel, a função serverless pode ser encerrada antes da OpenAI responder (~10-30s). Trocar por `after()` do Next 15 (`import { after } from 'next/server'`) resolve. Sintoma: análise fica eternamente em `gerando`. Ver logs `[ai/gerar]` no painel Vercel.
+- **Rate-limit / antispam** em `/api/aplicacao` — H1. Bot submitando queima token OpenAI.
+- **Tracking em `analise_eventos`** — H4. Tabela + índice existem; endpoint `POST /api/analise-eventos` não.
+- **Validação zod runtime** em `AnaliseData` — hoje a validação é estrutural (existência de chaves obrigatórias), não profunda.
+
+Ver [`ANALISE_PLAN.md`](./ANALISE_PLAN.md) para o plano priorizado completo.
+
+### Pipeline de IA (`lib/ai/`)
+
+Todo o código de geração fica aqui, server-only.
+
+| Arquivo | Responsabilidade |
+|---|---|
+| `openai.ts` | Cliente OpenAI lazy (só instancia no 1º uso). Exporta `getOpenAI()` + `OPENAI_MODEL`. |
+| `catalogo.ts` | **Catálogo de substituição** — source of truth do "o que a Futurah substitui". Dois maps: `CATALOGO_CARGOS` (10 cargos: sdr, atendente-whatsapp, agendadora, suporte-n1, qualificador, social-media, gestor-trafego, webdesigner, financeiro-op, recepcionista) e `CATALOGO_PLATAFORMAS` (19 SaaS agrupados em CRM/Atendimento/Agendamento/WhatsApp/Email). Cada entry tem `{ label, substituivel: boolean, como/alternativa: string }`. Também `CUSTO_ESTIMADO_CARGO` e `CUSTO_ESTIMADO_PLATAFORMA` (pontos de referência em R$). |
+| `economia.ts` | `calcularEconomia(equipe, plataformas)` determinístico — monta `EconomiaPrevistaData` cruzando respostas do wizard com o catálogo. Fator de escala por headcount e ajuste por faixa de custo. Totaliza `custoAtualMensal`/`custoProjetadoMensal`/`economiaMensal`/`economiaAnual` + CTA para Sessão Estratégica. |
+| `prompt-analise.ts` | `buildPrompt(input)` retorna `{ system, user }`. System = persona Futurah + shape de `AnaliseData` inline. User = dados do lead com labels humanizadas (ex: `"Fase de Tração (R$ 10k a R$ 50k/mês, já vende...)"`). **Instrui a IA a não gerar `economiaPrevista`** (calculado em code). |
+| `gerar.ts` | `gerarAnaliseEmBackground(id)` — orquestrador descrito acima. |
+
+**Como estender o catálogo** (ex: adicionar o cargo "copywriter"):
+1. Adicionar entry em `CATALOGO_CARGOS` (`lib/ai/catalogo.ts`) com `substituivel`/`como`.
+2. Adicionar estimativa em `CUSTO_ESTIMADO_CARGO`.
+3. Adicionar opção em `cargosDisponiveis` (`components/sections/ApplicationWizard.tsx`) para aparecer no wizard.
+4. Pronto — `calcularEconomia` pega automaticamente.
+
+Mesmo fluxo para plataformas.
 
 ## Painel admin — Payload 3 + multi-tenant
 
@@ -140,6 +220,7 @@ Fonte padrão: **Neue Haas Grotesk Display** (carregada localmente via `lib/font
 5. **`importMap.js` precisa estar populado para o `/admin` funcionar em runtime.** Se ficar vazio (`export const importMap = {}`), o `/admin` responde mas crasha em SSR com `TypeError: Cannot read properties of undefined (reading 'call')` no `webpack-runtime.js` — o plugin multi-tenant tenta consumir entries (TenantSelectionProvider, TenantSelector, etc.) e encontra `undefined`. **Fix**: rodar `npm run dev` uma vez — o próprio dev server regenera o arquivo com todas as entries necessárias (Lexical features, multi-tenant, Vercel Blob client uploads). O CLI `generate:importmap` standalone (via `node --import tsx/esm …`) tende a não popular nada; confiar no `npm run dev`.
 6. **Layout split entre site e admin é obrigatório**. O root `app/layout.tsx` **não pode** importar `globals.css` nem aplicar classes globais (`dark`, fontes, etc.) — qualquer `@tailwind base` ou `body { color }` vaza pro admin e quebra a UI do Payload (inputs pretos em fundo claro, labels invisíveis). Estilos do site moram em `app/(site)/layout.tsx`, embrulhados num `<div>` com classes/fontes.
 7. **Access control defensivo**: ao adicionar uma nova Collection tenant-scoped, copiar o padrão de `collections/Posts.ts`/`Categories.ts`/`Authors.ts` — `read/create/update/delete: ({req}) => !!req.user`. O filtro de tenant do plugin multi-tenant **só** é aplicado quando `req.user` existe, então `read: () => true` vaza dados entre tenants via REST anônimo. Site público sempre via Local API com `overrideAccess: true`.
+8. **Fire-and-forget em serverless (pipeline de análise)**: `POST /api/aplicacao` dispara `gerarAnaliseEmBackground(id).catch(...)` sem `await`. Em dev funciona; em Vercel, a função serverless pode ser **encerrada antes da OpenAI responder** (~10-30s), deixando a análise eternamente em `gerando`. **Fix**: trocar por `import { after } from 'next/server'` + `after(() => gerarAnaliseEmBackground(id))` — garante execução pós-response dentro do budget da função. Sintoma em prod: análise publicada nunca aparece na página de espera; logs `[ai/gerar]` no Vercel param no meio.
 
 ### Bootstrap de DB novo (ou recriar do zero)
 

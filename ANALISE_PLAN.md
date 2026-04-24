@@ -1,54 +1,66 @@
 # Fluxo de Análise — Auditoria + Gap Plan
 
-> **Status (2026-04-23):** diagnóstico entregue por arquiteto sênior após migração Payload 3 concluída. Pontas do funil (wizard + render) estão implementadas; miolo (ingestão, pipeline, admin, pagamento, tracking) **está ausente**. Este doc é fonte para o plano de implementação da Fase 4 + hardening de produção.
+> **Status (2026-04-23):** diagnóstico inicial entregue por arquiteto sênior após migração Payload 3 concluída. Pontas do funil (wizard + render) estão implementadas; miolo (ingestão, pipeline, admin, pagamento, tracking) **estava ausente**. Este doc foi a fonte do plano de implementação executado em 2026-04-24.
+>
+> **Atualização (2026-04-24):** ingestão + geração via OpenAI + espera + entrega **implementadas end-to-end**. O miolo agora existe (API de ingestão, gerador `lib/ai/`, página de recebido, wizard refeito em typeform). Ainda pendente: scraping real, admin de revisão, Stripe, tenant_id em `analises`, hardening (rate-limit, tracking `analise_eventos`, zod runtime). Ver seção 3 pra blockers resolvidos/pendentes e seção **7 — Pós-implementação** no final.
 
 Ver também:
-- [`CLAUDE.md`](./CLAUDE.md) — seção "Fluxo de Análise (pipeline interno)"
+- [`CLAUDE.md`](./CLAUDE.md) — seção "Fluxo de Análise (pipeline interno)" e "Pipeline de IA (`lib/ai/`)"
 - [`PAYLOAD_RUNBOOK.md`](./PAYLOAD_RUNBOOK.md) — Fase 4 (esqueleto): decisão 4.2 = manter análises em Drizzle + custom admin view
 
-## 1. Mapa do fluxo (estado atual)
+## 1. Mapa do fluxo (atualizado 2026-04-24)
 
 ```
-[ Landing / Hero ]
-   | Botão "Aplicação" → /aplicacao?name=&social=    [IMPLEMENTADO]
+[ Landing / Hero / Home Contact ]
+   | Caminho 1: form "Solicitar Diagnóstico Gratuito" → POST /api/contact → router.push(/aplicacao?name=&email=&social=)   [IMPLEMENTADO]
+   | Caminho 2: link direto /aplicacao (sem query)                                                                          [IMPLEMENTADO]
    v
 [ /aplicacao — app/(site)/aplicacao/page.tsx ]
-   | ApplicationWizard (5 steps client-side)         [PARCIAL — só UI]
-   | step 0: social | step 1: momento | step 2: gargalo
-   | step 3: velocidade | step 4: whatsapp + CTA "agenda"
-   | NENHUM fetch pra backend. Nenhum /api/aplicacao.   [AUSENTE]
+   | ApplicationWizard — typeform, 1 pergunta por tela, 9-12 steps dinâmicos    [IMPLEMENTADO]
+   | 0: analise | 1: momento | 2: gargalo | 3: velocidade
+   | 4: headcount | 5: cargos | 6: custo-funcionario
+   | 7: plataformas | 8: custo-plataformas
+   | [9: nome] [10: email]  (só caminho 2) | 11: whatsapp + submit
    v
-[ INSERT em public.analises com status='pendente_dados' ]   [AUSENTE]
-   | Schema existe (migration 0000 aplicada). Nenhum código grava.
+[ POST /api/aplicacao — app/api/aplicacao/route.ts ]                            [IMPLEMENTADO]
+   | Valida email + handle, normaliza, gera slug nanoid(22)
+   | INSERT analises status='pendente_dados', tipo='express'
+   | Dispara gerarAnaliseEmBackground(id) fire-and-forget
    v
-[ Pipeline externo: scraping IG → dadosScraped jsonb ]      [AUSENTE / EXTERNO]
-   | status: pendente_dados → scraping → gerando
-   | Nada no repo escreve em dados_scraped. Sem webhook.
+[ Pipeline externo: scraping IG → dadosScraped jsonb ]                          [AUSENTE / EXTERNO]
+   | Ainda não existe. conteudo é gerado só com dados do wizard.
    v
-[ Geração IA → conteudo jsonb (shape AnaliseData) ]         [AUSENTE / EXTERNO]
-   | status: gerando → pendente_revisao
-   | Nenhum provider de LLM em package.json (openai/anthropic/gemini ausentes).
+[ lib/ai/gerar.ts — geração via OpenAI ]                                        [IMPLEMENTADO]
+   | status: pendente_dados → gerando
+   | buildPrompt() com shape AnaliseData → chat.completions.create (json_object)
+   | Parse + validateConteudo (seções obrigatórias)
+   | calcularEconomia() — determinístico, cruza catalogo com respostas do wizard
+   | Merge → conteudo.economiaPrevista
    v
-[ Revisão humana → aprovar/rejeitar ]                       [AUSENTE]
-   | status: pendente_revisao → publicada | falhou
-   | Não há custom admin view em app/(payload)/admin/custom/analises/
-   | (Fase 4 do Payload Runbook está TODO).
+[ Revisão humana → aprovar/rejeitar ]                                           [AUSENTE — TODO fase 4]
+   | Por ora publica direto (status='publicada').
+   | Troca publicada → pendente_revisao quando admin existir
+   | (marcado TODO(fase 4) em lib/ai/gerar.ts:88).
    v
-[ Pagamento Stripe (só tipo="completa") ]                   [AUSENTE]
-   | stripeSessionId existe no schema, zero código usa.
-   | Nenhuma dependência Stripe no package.json, nenhum webhook.
+[ Pagamento Stripe (só tipo="completa") ]                                       [AUSENTE]
+   | Só tipo 'express' é gerado. stripeSessionId no schema, zero código usa.
    v
-[ /analise/[slug] — app/(site)/analise/[slug]/page.tsx ]    [IMPLEMENTADO]
+[ /aplicacao/recebido/[slug] — espera com polling ]                             [IMPLEMENTADO]
+   | AguardandoAnalise.tsx faz GET /api/aplicacao/[slug]/status a cada 3s
+   | Quando 'publicada' → router.replace(/analise/[slug])
+   | Quando 'falhou' → CTA pra contato@futurah.co
+   v
+[ /analise/[slug] — app/(site)/analise/[slug]/page.tsx ]                        [IMPLEMENTADO]
    | SELECT where slug=$1 AND status='publicada'
    | Render via <PageProposta data={conteudo as AnaliseData}/>
-   | noindex via robots meta.                                [OK]
+   | EconomiaSection renderiza antes de Encerramento (hook pro CTA)
+   | noindex via robots meta
    v
-[ Tracking: analise_eventos ]                               [AUSENTE]
+[ Tracking: analise_eventos ]                                                   [AUSENTE — H4]
    | Tabela existe + índice. Nenhum endpoint populado.
-   | firstViewedAt/lastViewedAt nunca são atualizados.
 ```
 
-**Resumo**: apenas as **pontas** (wizard visual + render da análise publicada) existem. O miolo (API de ingestão, pipeline, Stripe, admin de revisão, tracking) é inexistente.
+**Resumo**: o **miolo agora existe** — ingestão + geração + espera + entrega. Pendente: scraping real, admin humano, Stripe, tenant_id, hardening.
 
 ## 2. Auditoria — Checklist de integridade
 
@@ -106,60 +118,60 @@ Ver também:
 
 ### Blockers (fluxo não existe sem isto)
 
-| ID | Item | Arquivo(s) | Esforço | Depende de |
+Legenda: ✅ resolvido · 🟡 parcial · 🔴 pendente.
+
+| ID | Status | Item | Arquivo(s) | Notas |
 |---|---|---|---|---|
-| **B1** | `POST /api/aplicacao` — cria row `pendente_dados`, gera slug random, resolve `tenant_id` via host (copiar padrão de `/api/contact`) | `app/api/aplicacao/route.ts` (novo) | 4h | B2, B6 |
-| **B2** | Reconciliar campos wizard × schema — expandir schema (`momento`, `gargalo`, `velocidade`) OU converter wizard pros campos atuais (`objetivo`, `monetizaHoje`, `tempoDisponivel`); adicionar input de **email** | `components/sections/ApplicationWizard.tsx`, `lib/db/schema.ts`, nova migration | 3h | — |
-| **B3** | Webhook de pipeline — `POST /api/pipeline/webhook` autenticado via `PIPELINE_WEBHOOK_SECRET`, aceita `{ analiseId, status, dadosScraped?, conteudo?, error? }`, aplica transição | `app/api/pipeline/webhook/route.ts` (novo), `.env.example` | 4h | B1 |
-| **B4** | Validação zod do `conteudo` — schema zod espelhando `AnaliseData`; rejeita payload inválido | `lib/proposta/validation.ts` (novo) | 3h | — |
-| **B5** | Custom admin view de análises — tabela + filtros (status, tenant) + preview JSON + botões aprovar/rejeitar/reprocessar | `app/(payload)/admin/custom/analises/page.tsx`, `payload.config.ts` (`admin.components.views`), `endpoints:[...]` custom que tocam Drizzle | 12h | B6 |
-| **B6** | `tenant_id` em `analises` + `analise_eventos` — migration Drizzle, backfill pra `futurah`, atualizar schema TS | `lib/db/schema.ts`, `lib/db/migrations/0002_*.sql` | 2h | — |
-| **B7** | Stripe (se `completa` entra no MVP) — `npm i stripe`, rota `/api/stripe/checkout`, webhook `/api/stripe/webhook` (grava `pago=true` + `stripeSessionId`), gate em `/analise/[slug]` | vários | 8h | B5 |
+| **B1** | ✅ | `POST /api/aplicacao` — cria row `pendente_dados`, gera slug `nanoid(22)`, valida email + handle, dispara geração em background | `app/api/aplicacao/route.ts` | **Sem** resolução de `tenant_id` ainda (depende de B6). Sem PATCH incremental — wizard envia tudo no submit final. |
+| **B2** | ✅ | Reconciliar campos wizard × schema — schema ganhou `momento`, `gargalo`, `velocidade`, `equipe` (jsonb), `plataformas` (jsonb). Email é coletado no wizard (step dedicado quando caminho 2). | `components/sections/ApplicationWizard.tsx`, `lib/db/schema.ts`, migrations 0002/0003 | Colunas antigas (`objetivo`, `monetiza_hoje`, `tempo_disponivel`) ficaram no schema como deprecadas — não removidas. |
+| **B3** | 🔴 | Webhook de pipeline — `POST /api/pipeline/webhook` autenticado via `PIPELINE_WEBHOOK_SECRET`, aceita transições `scraping/gerando/pendente_revisao` com `dadosScraped`/`conteudo` | `app/api/pipeline/webhook/route.ts` | **Pendente**. Hoje a IA gera só com dados do wizard. Scraping real fica como próxima iteração. |
+| **B4** | 🟡 | Validação do `conteudo` — hoje `validateConteudo` em `lib/ai/gerar.ts` checa só existência das seções obrigatórias. Zod runtime profundo ainda não existe. | `lib/ai/gerar.ts` | Cobertura suficiente pra MVP. Zod completo fica pro sprint de hardening. |
+| **B5** | 🔴 | Custom admin view de análises | `app/(payload)/admin/custom/analises/page.tsx` | **Pendente** (Fase 4 Payload). Hoje geração publica direto (status='publicada'), sem revisão humana. `TODO(fase 4)` marcado em `lib/ai/gerar.ts:88`. |
+| **B6** | 🔴 | `tenant_id` em `analises` + `analise_eventos` | `lib/db/schema.ts` | **Pendente**. Sem isolamento multi-tenant nas análises ainda. `tenant_id` ausente não bloqueia o MVP (só existe um tenant — `futurah`). |
+| **B7** | 🔴 | Stripe (só `completa`) | vários | **Pendente**. Hoje só `express` é gerado (grátis). |
 
 ### Hardening (produção decente)
 
-| ID | Item | Esforço |
+| ID | Status | Item |
 |---|---|---|
-| **H1** | Rate-limit em `/api/aplicacao` (Upstash ou in-memory por IP+email) | 2h |
-| **H2** | Slug seguro — 22 chars nanoid ou uuidv4 | 0.5h (dentro de B1) |
-| **H3** | Access control no webhook — constant-time compare do secret + allowlist IP se pipeline for fixo | 1h |
-| **H4** | `analise_eventos` endpoint + pixel no `/analise/[slug]` — `POST /api/analise-eventos` + hook client que dispara open/scroll/click, atualiza `firstViewedAt/lastViewedAt` | 4h |
-| **H5** | Idempotência — unique parcial `(email, instagram_handle)` onde `status <> 'falhou'` pra evitar submissão duplicada | 1h |
-| **H6** | Error state no wizard — feedback quando POST falha + retry | 2h |
-| **H7** | RLS no `public` — mesmo com API-only, adicionar policy defensiva | 2h |
+| **H1** | 🔴 | Rate-limit em `/api/aplicacao` (Upstash ou in-memory por IP+email). **Crítico** — cada submissão consome token OpenAI. |
+| **H2** | ✅ | Slug seguro — `nanoid(22)` em `app/api/aplicacao/route.ts`. |
+| **H3** | 🔴 | Access control no webhook — depende de B3 existir primeiro. |
+| **H4** | 🔴 | `analise_eventos` endpoint + pixel no `/analise/[slug]`. Tabela e índice existem, nada popula. |
+| **H5** | 🔴 | Idempotência — unique parcial `(email, instagram_handle)` onde `status <> 'falhou'`. |
+| **H6** | 🟡 | Error state no wizard — `submitError` implementado; página `/aplicacao/recebido/[slug]` tem copy para `falhou`. Retry ainda não. |
+| **H7** | 🔴 | RLS no `public`. |
+| **H8** | 🔴 | **Serverless fire-and-forget** — `gerarAnaliseEmBackground` pode ser cortado antes da OpenAI responder em Vercel. Fix: trocar por `after()` do Next 15. **Crítico pra prod**. |
 
 ### Nice-to-have
 
-| ID | Item | Esforço |
+| ID | Status | Item |
 |---|---|---|
-| **N1** | Página "aguarde" após submit (`/aplicacao/recebido?id=...`) com poll até `publicada` | 3h |
-| **N2** | Email transacional ("sua análise está pronta") via Resend | 3h |
-| **N3** | Dashboard de métricas no admin (conversão, tempo médio no pipeline, % falhou) | 4h |
-| **N4** | Logs estruturados (pino) nas rotas de API + IDs de correlação | 2h |
-| **N5** | Preview da análise ainda em `pendente_revisao` pro revisor (`?preview=<token>`) | 2h |
+| **N1** | ✅ | Página "aguarde" — `/aplicacao/recebido/[slug]` com polling a cada 3s. |
+| **N2** | 🔴 | Email transacional via Resend. |
+| **N3** | 🔴 | Dashboard de métricas no admin. |
+| **N4** | 🔴 | Logs estruturados (pino). Hoje `console.error` com prefixos `[API]` e `[ai/gerar]`. |
+| **N5** | 🔴 | Preview da análise em `pendente_revisao` (depende de B5). |
 
-## 4. Recomendação de ordem — 5 sprints curtos
+## 4. Recomendação de ordem — sprints (revisada 2026-04-24)
 
-### Sprint 1 — destravar ingestão (1.5 dia)
-`B2 → B6 → B1`. Ao fim do sprint, um lead real preenche o wizard e uma row aparece em `analises` com tenant. Nada é gerado ainda, mas a ponta-esquerda do funil está viva e mensurável.
+### Sprint 1 — destravar ingestão ✅ CONCLUÍDO
+Original `B2 → B6 → B1`. Executado como **`B2 → B1`** (sem B6 — `tenant_id` ficou pra depois, não bloqueia MVP single-tenant).
 
-### Sprint 2 — contrato com pipeline externo (1 dia)
-`B3 + B4 + H3`. Pipeline externo (fora do repo — n8n, worker Python, etc.) ganha um endpoint estável pra reportar status e entregar `conteudo`. Com zod validando, `AnaliseData` malformado é rejeitado antes de virar `publicada`. A ponta-direita do funil (`/analise/[slug]`) já funciona — portanto **fim do Sprint 2 = fluxo end-to-end `express` rodando**, sem humano no meio.
+### Sprint 2 — pipeline end-to-end 🟡 PARCIAL
+Original `B3 + B4 + H3`. **Divergência**: em vez de pipeline externo com webhook (B3), o gerador foi integrado diretamente ao repo (`lib/ai/` + `gerarAnaliseEmBackground`) consumindo OpenAI direto. Scraping real ainda ausente. B3 + H3 ficam como próxima iteração se quisermos trazer scraping do Instagram pra dentro do pipeline. B4 resolvido só parcialmente (validação leve em `validateConteudo`).
 
-### Sprint 3 — revisão humana no admin (1.5 dia)
-`B5 + N5`. Destrava a transição `pendente_revisao → publicada` manual, que é o ponto onde a Futurah protege a marca antes de publicar. É aqui que a decisão 4.2 (Caminho A do Runbook) é de fato exercitada: custom view em Payload lendo Drizzle via endpoints.
+### Sprint 3 — revisão humana no admin 🔴 PENDENTE
+`B5 + N5`. Não iniciado. Sem isso, toda análise gerada publica direto (risco de marca). Bloqueador pra abrir tráfego pago.
 
-### Sprint 4 — hardening (1 dia)
-`H1, H2, H4, H5, H6, N4`. Rate-limit, tracking, logs. Tudo que separa "liguei pra 3 amigos" de "posso rodar tráfego pago nisto".
+### Sprint 4 — hardening 🔴 PENDENTE (urgente)
+`H1 (rate-limit)`, `H8 (after() do Next)`, `H4 (tracking)`, `H5 (idempotência)`, `N4 (logs)`. **`H8` é o mais urgente** — sem isso, análises podem ficar travadas em `gerando` em prod quando a função serverless é encerrada antes da OpenAI responder. `H1` também crítico se for abrir tráfego (custo OpenAI).
 
-### Sprint 5 — monetização `completa` (1–2 dias)
-`B7 + N1 + N2`. Stripe + espera + email. **Opcional no primeiro lançamento** se a Futurah só entregar `express` grátis como isca.
+### Sprint 5 — monetização `completa` 🔴 PENDENTE
+`B7 + N2`. Opcional — só se quiser lançar `completa` pago. `express` grátis como isca já está no ar.
 
-### Racional da ordem
-- **B6 antes de B1**: adicionar `tenant_id` depois da rota obriga retrabalho; melhor já entrar com a coluna.
-- **B4 no Sprint 2**: zod de `AnaliseData` é barato e protege o Sprint 3 (admin não vai precisar lidar com JSON inválido).
-- **Admin depois do pipeline**: sem dados reais chegando, não dá pra validar a UI do admin.
-- **Stripe por último**: maior incerteza está no pipeline — atrasar o pagamento permite iterar no produto `express` grátis primeiro.
+### Sprint 6 — scraping real (novo)
+`B3 + H3` + integração real com Instagram scraping (n8n, Apify, etc). Promove o `dadosScraped` de `null` pra conteúdo real, aumentando a qualidade da análise gerada. Fica como sprint dedicado porque envolve decisão de stack externo.
 
 ## 5. Critical files for implementation
 
@@ -179,3 +191,22 @@ Ver também:
 | Tudo (blockers + hardening + nice-to-have) | ~55h | 1+2+3+4+5 |
 
 **MVP mínimo rodando em prod** (wizard → pipeline → análise publicada, sem pagamento): **~28h ≈ 3.5 dias de foco**.
+
+## 7. Pós-implementação (2026-04-24)
+
+### O que foi entregue
+- **Ingestão**: `POST /api/aplicacao` (`app/api/aplicacao/route.ts`), wizard com validação + submit, página de espera com polling (`/aplicacao/recebido/[slug]`).
+- **Geração via IA**: todo o código em `lib/ai/` — cliente OpenAI, prompt estruturado, catálogo de substituição (10 cargos + 19 plataformas), cálculo programático de economia, orquestrador com idempotência e error handling.
+- **Seção nova na análise**: `EconomiaPrevista` — raio-X de custos com bloco de "economia mensal/anual" e CTA pra Sessão Estratégica. Plugada em `PageProposta` antes do encerramento.
+- **Wizard typeform**: 9-12 steps dinâmicos, 1 pergunta por tela, centralizado, progress bar, Enter avança. Steps de contato (nome/email/whatsapp) condicionais ao caminho 1 vs 2.
+- **Schema**: colunas novas (`momento`, `gargalo`, `velocidade`, `equipe`, `plataformas`) via migrations 0002 e 0003.
+
+### Commits
+- `a658b31` — feat(analise): fluxo end-to-end wizard → OpenAI → /analise/[slug]
+- `291a2dd` — feat(wizard): redesign typeform — uma pergunta por tela
+
+### Próxima ação crítica
+**H8** (trocar fire-and-forget por `after()` do Next 15). Enquanto isso não for feito, existe risco real em prod de análises travarem em `gerando` por corte serverless.
+
+### Catálogo extensível
+Adicionar um cargo/plataforma ao catálogo leva 3 passos (editar `lib/ai/catalogo.ts` + `ApplicationWizard.tsx`). Detalhe documentado no `CLAUDE.md` → seção "Pipeline de IA".
