@@ -1,0 +1,23 @@
+{
+  "name": "@futurah/payload-config",
+  "version": "0.1.0",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@payloadcms/db-postgres": "^3.84.1",
+    "@payloadcms/plugin-multi-tenant": "^3.84.1",
+    "@payloadcms/richtext-lexical": "^3.84.1",
+    "@payloadcms/storage-vercel-blob": "^3.84.1",
+    "payload": "^3.84.1",
+    "sharp": "^0.34.5"
+  },
+  "peerDependencies": {
+    "next": "*"
+  },
+  "devDependencies": {
+    "@futurah/tsconfig": "*",
+    "typescript": "^5"
+  }
+}

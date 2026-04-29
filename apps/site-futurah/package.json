@@ -1,0 +1,42 @@
+{
+  "name": "@futurah/site-futurah",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@futurah/payload-config": "*",
+    "@payloadcms/next": "^3.84.1",
+    "cli-color": "^2.0.4",
+    "drizzle-orm": "^0.45.2",
+    "graphql": "^16.13.2",
+    "lucide-react": "^0.562.0",
+    "nanoid": "^5.1.9",
+    "next": "15.4.11",
+    "openai": "^6.34.0",
+    "postgres": "^3.4.9",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "styled-components": "^6.3.9",
+    "use-effect-event": "^2.0.3"
+  },
+  "devDependencies": {
+    "@futurah/tsconfig": "*",
+    "@types/node": "^20",
+    "@types/react": "^19.2.9",
+    "@types/react-dom": "^19.2.3",
+    "autoprefixer": "^10.4.18",
+    "dotenv": "^17.4.2",
+    "drizzle-kit": "^0.31.10",
+    "eslint": "^8",
+    "eslint-config-next": "15.4.10",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5"
+  }
+}
