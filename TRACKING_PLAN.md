@@ -180,8 +180,8 @@ Premissa: dev fluente em TS/Next, **iniciante em Workers**. Estimativas em dias 
 
 - [x] Plano aprovado
 - [ ] Decisões 1–7 fechadas
-- [ ] Fase 0 — Setup
-- [ ] Fase 1 — MVP UTM
+- [x] Fase 0 — Setup _(Worker `tracker-worker` deployado em CF, KV/D1/AE provisionados, secrets configurados, CNAMEs `t.futurah.co` e `t.augustofelipe.com` criados proxied, env vars no Vercel — 2026-04-29)_
+- [x] Fase 1 — MVP UTM _(SDK + ingest com dedup KV + AE indexado por site_id, integração Next.js nos 2 apps via `<TrackerBoundary />`, dashboard `/admin/tracking` consumindo `GET /api/utm-summary` — 2026-04-29)_
 - [ ] Fase 2 — Sessões + conversões
 - [ ] Fase 3 — Atribuição + dashboard
 - [ ] Fase 4 — Server-side tagging

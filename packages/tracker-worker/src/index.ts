@@ -1,5 +1,5 @@
 // Entrypoint do Worker. Roteia /e (ingest) e /api/* (read).
-// Um único Worker atende t.futurah.com.br e t.fidevidraceiro.com.br;
+// Um único Worker atende t.futurah.co (site Futurah) e t.augustofelipe.com (bio link fidevidraceiro);
 // a separação por tenant é feita via site_id no payload + allowlists em KV.
 
 import { handleIngest, handleIngestOptions } from "./ingest";

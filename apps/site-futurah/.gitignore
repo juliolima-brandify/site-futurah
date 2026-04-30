@@ -47,3 +47,5 @@ next-env.d.ts
 
 # scratch local (extração de PDFs de cliente, scripts throwaway, dumps intermediários)
 /tmp/
+
+.vercel
