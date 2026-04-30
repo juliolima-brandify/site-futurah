@@ -10,7 +10,7 @@ import { init, track } from "@futurah/tracker-sdk";
 
 init({
   siteId: "futurah",
-  endpoint: "https://t.futurah.com.br/e",
+  endpoint: "https://t.futurah.co/e",
   debug: false,
 });
 

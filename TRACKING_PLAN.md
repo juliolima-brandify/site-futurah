@@ -4,7 +4,7 @@
 
 ## 1. Arquitetura
 
-**Stack:** beacon JS no front → **Worker** de ingestão (endpoint público, ex.: `https://t.futurah.com.br`) → escreve em **Analytics Engine** (séries temporais, eventos brutos) + **D1** (sessões, identidades, conversões com schema relacional) + **KV** (config/feature flags + dedup curto). Dashboard em uma rota Next.js dos próprios sites (ou app Pages dedicado), lendo via Worker que faz `SELECT` no Analytics Engine SQL API e joins em D1. Para Fase 4 (server-side tagging), **Queues** desacopla a ingestão do envio síncrono pra Meta CAPI / Google Ads.
+**Stack:** beacon JS no front → **Worker** de ingestão (endpoint público, ex.: `https://t.futurah.co`) → escreve em **Analytics Engine** (séries temporais, eventos brutos) + **D1** (sessões, identidades, conversões com schema relacional) + **KV** (config/feature flags + dedup curto). Dashboard em uma rota Next.js dos próprios sites (ou app Pages dedicado), lendo via Worker que faz `SELECT` no Analytics Engine SQL API e joins em D1. Para Fase 4 (server-side tagging), **Queues** desacopla a ingestão do envio síncrono pra Meta CAPI / Google Ads.
 
 ```
 Browser (apps/site-futurah, apps/fidevidraceiro)
@@ -40,7 +40,7 @@ Premissa: dev fluente em TS/Next, **iniciante em Workers**. Estimativas em dias 
 **Tarefas:**
 - Criar `packages/tracker-worker` (Worker) e `packages/tracker-sdk` (cliente JS) no monorepo Turbo.
 - `wrangler.toml` com bindings: `ANALYTICS` (AE dataset), `DB` (D1), `KV` (config).
-- DNS pra `t.futurah.com.br` (CNAME pro Worker route) — **mesmo apex** dos sites pra evitar ad-blocker.
+- DNS pra `t.futurah.co` (CNAME pro Worker route) — **mesmo apex** dos sites pra evitar ad-blocker.
 - Provisionar D1 + AE dataset + KV namespace via wrangler.
 - CI: GitHub Action com `wrangler deploy --dry-run` em PR e deploy em main.
 
@@ -154,7 +154,7 @@ Premissa: dev fluente em TS/Next, **iniciante em Workers**. Estimativas em dias 
 
 ## 4. Top 3 armadilhas técnicas
 
-1. **Ad-blockers no subdomínio.** Use `t.futurah.com.br`, **não** `tracking.` ou `analytics.`. Mesmo assim ~15–25% de perda em audiência tech-savvy é normal (vs 40–60% do GA4).
+1. **Ad-blockers no subdomínio.** Use `t.futurah.co`, **não** `tracking.` ou `analytics.`. Mesmo assim ~15–25% de perda em audiência tech-savvy é normal (vs 40–60% do GA4).
 2. **Cardinality no Analytics Engine.** Indexar **só** `site_id`. Indexar `path` ou `anon_id` quebra em semanas.
 3. **`ctx.waitUntil()` obrigatório.** Sem isso, escrita em D1/AE pode ser cortada após response. Mesma classe de bug do `gerarAnaliseEmBackground` em Vercel.
 
@@ -166,13 +166,13 @@ Premissa: dev fluente em TS/Next, **iniciante em Workers**. Estimativas em dias 
 
 | # | Decisão | Recomendação |
 |---|---|---|
-| 1 | Endpoint único ou um por site | **Um por site** (`t.futurah.com.br` + `t.fidevidraceiro.com.br`) — evita CORS, ad-blockers |
+| 1 | Endpoint único ou um por site | ✅ **Fechada (2026-04-29)**: 1 endpoint por site (`t.futurah.co` + `t.augustofelipe.com`), atendidos pelo mesmo Worker `tracker-worker` via routes — evita CORS, ad-blockers |
 | 2 | GA4/Meta Pixel em paralelo? | **Sim, 30 dias** depois da Fase 2 pra reconciliar |
 | 3 | Política consent (LGPD) | Definir: opt-out total, opt-out só marketing, ou legitimate interest |
-| 4 | Dashboard onde mora | **App novo `apps/dash-tracking`** (auth separada) |
-| 5 | Multi-tenancy desde Fase 1 | **Sim** — `site_id` atrelado a `tenant_id` desde já |
+| 4 | Dashboard onde mora | **MVP**: rota `/admin/tracking` dentro do `site-futurah` (auth Payload superadmin). **Fase 3**: migrar pra app novo `apps/dash-tracking` com auth separada (Cloudflare Access). |
+| 5 | Multi-tenancy desde Fase 1 | ✅ **Fechada (2026-04-29)**: `site_id` no payload + allowlist KV `config:sites` = `["futurah","fidevidraceiro"]` + index único `site_id` no AE. Vincular a `tenant_id` do Payload fica pra Fase 2 quando D1 entrar em uso real. |
 | 6 | Importar histórico GA4 | **Não** — GA4 vira arquivo morto consultável |
-| 7 | Migrar deploy `fidevidraceiro` pra CF Pages | Não obrigatório pro tracking — beacon vai pro Worker independente |
+| 7 | Migrar deploy `fidevidraceiro` pra CF Pages | ✅ **Fechada (2026-04-29)**: NÃO migrar. Continua na Vercel. Beacon vai pro Worker via `t.augustofelipe.com` independente do hosting. |
 
 ---
 

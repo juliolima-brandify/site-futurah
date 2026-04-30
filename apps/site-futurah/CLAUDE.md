@@ -33,15 +33,21 @@ node --import tsx/esm ./node_modules/payload/dist/bin/index.js generate:importma
 ## Arquitetura
 
 ### Deploy
-O projeto é deployado na **Vercel**, team `Brandify Hub` (`team_BSOkCBupLNa1JZKNL8Yu4kka`), projeto `site-futurah` (`prj_6BuaAO5ec1tIeCyoUZGcv7CujOL8`). O `npm run build` padrão do Next.js é suficiente.
+O projeto é deployado na **Vercel**, team `admbrandify-gmailcoms-projects` (`team_BSOkCBupLNa1JZKNL8Yu4kka`, ex-"Brandify Hub"), projeto `site-futurah`. Build é orquestrado pelo Turbo (root `turbo.json`). Site em `https://futurah.co`.
 
 **Env vars configuradas no painel Vercel** (Production + Preview + Development):
 - `DATABASE_URL` — Supabase pooler us-west-2
 - `PAYLOAD_SECRET` — hex 64-char (mesmo valor do `.env.local`; **não regenerar sem coordenar**, invalida sessões)
 - `BLOB_READ_WRITE_TOKEN` — injetado automaticamente pelo Vercel Blob Store `site-futurah-media` (region iad1), conectado via integration em 2026-04-23
 - `OPENAI_API_KEY` — adicionar manualmente em Settings → Environment Variables. Rotacionar direto pela OpenAI Dashboard; editar a var e **fazer Redeploy** (env só pega no próximo build).
+- `NEXT_PUBLIC_TRACKER_ENDPOINT` — `https://t.futurah.co/e` (consumido pelo `<TrackerBoundary />` do site).
+- `TRACKER_API_URL` — `https://t.futurah.co` (consumido pelo dashboard `/admin/tracking` server-side).
+- `TRACKER_API_TOKEN` — bearer pra ler `/api/utm-summary` no Worker (sincronizado com o secret `API_READ_TOKEN` no Worker via `wrangler secret put`).
 
-> Os arquivos `wrangler.jsonc`, `open-next.config.ts` e os scripts `cf:build`/`deploy` no `package.json` são resquícios de uma migração anterior para Cloudflare e podem ser ignorados.
+**Gotchas do build em monorepo Turbo 2 strict** (já consertados no repo, ler antes de mexer):
+- `package.json` raiz precisa de `"packageManager"` (Turbo 2 strict). Sem isso: `Could not resolve workspaces`.
+- `turbo.json` precisa listar **todas** as env vars usadas pelo build em `tasks.build.env` (`NEXT_PUBLIC_*`, `PAYLOAD_SECRET`, `DATABASE_URL`, `BLOB_READ_WRITE_TOKEN`, `OPENAI_API_KEY`, `OPENAI_MODEL`, `TRACKER_API_URL`, `TRACKER_API_TOKEN`, `NEXTJS_ENV`). Sem isso, vars existem no Vercel mas não chegam dentro do build → falha em runtime "PAYLOAD_SECRET nao definido" durante "Collecting page data".
+- Next 15 strict typecheck atravessa todo `*.ts` no projeto, mesmo arquivos não importados — qualquer resíduo (ex: `open-next.config.ts` que importava pacote desinstalado) quebra build. Manter o tree limpo.
 
 ### Roteamento — Route Groups
 - `app/layout.tsx` (root) — **minimalista**: só `<html lang="pt-BR"><body>{children}</body></html>`. **Não adicionar** imports de CSS, fontes ou classes aqui — vazam pro admin do Payload.
