@@ -49,9 +49,9 @@ async function runSql(env: Env, sql: string): Promise<unknown> {
     method: "POST",
     headers: {
       Authorization: `Bearer ${env.CF_API_TOKEN_AE}`,
-      "Content-Type": "application/json",
+      "Content-Type": "text/plain",
     },
-    body: JSON.stringify({ query: sql }),
+    body: sql,
   });
   if (!res.ok) {
     const text = await res.text();
