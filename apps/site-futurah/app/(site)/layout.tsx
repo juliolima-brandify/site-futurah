@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import { inter } from "@/lib/fonts";
+import { TrackerBoundary } from "@/components/tracker/TrackerBoundary";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -43,6 +45,10 @@ export default function Layout({
             className={`${inter.variable} ${inter.className}`}
             style={{ fontFamily: 'var(--font-neue-haas)' }}
         >
+            {/* Tracker isolado em Suspense — usePathname pode suspender em SPA navigations */}
+            <Suspense fallback={null}>
+                <TrackerBoundary />
+            </Suspense>
             {children}
         </div>
     );

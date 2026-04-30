@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import { TrackerBoundary } from "@/components/tracker/TrackerBoundary";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -13,7 +15,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body>{children}</body>
+      <body>
+        <Suspense fallback={null}>
+          <TrackerBoundary />
+        </Suspense>
+        {children}
+      </body>
     </html>
   );
 }

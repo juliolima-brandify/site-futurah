@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: false,
+    transpilePackages: ["@futurah/tracker-sdk"],
     images: {
         remotePatterns: [
             { protocol: 'https', hostname: 'framerusercontent.com' },

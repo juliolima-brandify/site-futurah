@@ -1,6 +1,6 @@
 import { Space_Grotesk, Archivo_Black } from "next/font/google";
-import { SectionCounter } from "./SectionCounter";
-import "./styles.css";
+import { SectionCounter } from "../SectionCounter";
+import "../styles.css";
 
 const grotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -356,7 +356,7 @@ export default function FiDeVidraceiroDesignSystem() {
             <span>Fi de Vidraceiro</span>
           </div>
           <div style={{ color: "var(--fdv-text-muted)", fontSize: "var(--fdv-text-sm)" }}>
-            Design System v0.2 — tokens em <code>app/(prototipos)/fi-de-vidraceiro/styles.css</code>
+            Design System v0.2 — tokens em <code>app/styles.css</code>
           </div>
         </div>
       </footer>

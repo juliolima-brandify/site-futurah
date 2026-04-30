@@ -1,0 +1,50 @@
+name = "tracker-worker"
+main = "src/index.ts"
+compatibility_date = "2025-04-01"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+
+# Routes — preencher após o DNS apontar t.futurah.com.br e t.fidevidraceiro.com.br
+# para a Cloudflare. Necessário que os domínios estejam na zona CF.
+# TODO(routes): descomentar após DNS pronto e ajustar zone_name.
+# [[routes]]
+# pattern = "t.futurah.com.br/*"
+# zone_name = "futurah.com.br"
+#
+# [[routes]]
+# pattern = "t.fidevidraceiro.com.br/*"
+# zone_name = "fidevidraceiro.com.br"
+
+# Analytics Engine: dataset rígido (blobs/doubles/indexes).
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "tracker_events"
+
+# KV: config (allowlist sites, allowlist origins, salt rotativo de IP).
+# TODO(kv): rodar `wrangler kv namespace create tracker-config` e colar o id aqui.
+[[kv_namespaces]]
+binding = "KV"
+id = "REPLACE_WITH_KV_ID"
+preview_id = "REPLACE_WITH_KV_PREVIEW_ID"
+
+# D1: placeholder pra Fase 2 (sessions, conversions). Não usado em Fase 1.
+# TODO(d1): rodar `wrangler d1 create tracker-db` e colar o database_id aqui.
+[[d1_databases]]
+binding = "DB"
+database_name = "tracker-db"
+database_id = "REPLACE_WITH_D1_DB_ID"
+
+# Vars não-secretas. Account ID precisa ser visível pra fazer query no AE SQL API.
+# TODO(account): substituir pelo Account ID da CF (Dashboard → conta).
+[vars]
+CF_ACCOUNT_ID = "REPLACE_WITH_CF_ACCOUNT_ID"
+AE_DATASET = "tracker_events"
+
+# Secrets gerenciados via `wrangler secret put`:
+#   API_READ_TOKEN     — bearer token consumido por GET /api/*
+#   CF_API_TOKEN_AE    — token CF com permissão "Account Analytics: Read" para SQL API
+#
+# Cron de rotação de salt do hash de IP (Workers Paid).
+# TODO(cron): habilitar após upgrade pra plano paid.
+# [triggers]
+# crons = ["0 0 * * *"]

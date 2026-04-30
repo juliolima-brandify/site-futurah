@@ -10,7 +10,9 @@
 **Handle principal:** @fidevidraceiro (739k seguidores — em explosão orgânica)  
 **Handle secundário:** @fidevidraceiro.art  
 **E-mail:** fidevidraceiro@outlook.com  
-**Linktree atual:** linktr.ee/fidevidraceiro (não converte — será substituído)  
+**E-mail comercial (parcerias):** fidevidraceiro@futurah.co  
+**Linktree antigo:** linktr.ee/fidevidraceiro (taxa de conversão 0,07% — descontinuado)  
+**Bio link novo:** https://fidevidraceiro.augustofelipe.com (no ar desde 29/abr/2026)  
 **Parceria:** Coprodução com Futurah and Co. — 60% Augusto / 40% Futurah  
 **Status:** Primeiro cliente da Futurah · Fechado em abril/2026
 
@@ -71,10 +73,11 @@ ATENÇÃO (14M views) → CAPTURA (leads) → VENDA
 ```
 
 ### Fase 1 — Caixa rápido (semanas 1–4)
-- [ ] Media kit pronto → prospecção de patrocínios
+- [x] Media kit pronto → prospecção de patrocínios (`/midia-kit`)
+- [x] Bio link próprio no ar substituindo o Linktree (`fidevidraceiro.augustofelipe.com`)
 - [ ] 1ª publicidade fechada (meta: R$5–10k)
 - [ ] Produto físico em pré-venda
-- [ ] Site v1 no ar (landing + captura de e-mail)
+- [ ] Captura de e-mail/WhatsApp na bio link (próxima iteração)
 
 ### Fase 2 — Produtos no ar (semanas 5–8)
 - [ ] Drop físico lançado
@@ -188,10 +191,10 @@ Reels viral (topo)
 - E-mail: sequência pré e pós-compra automatizada
 
 ### Páginas a criar (prioridade do projeto)
-1. **Linktree/bio link** — substituto imediato, converte visita em lead
+1. **Linktree/bio link** — ✅ no ar em `fidevidraceiro.augustofelipe.com` (V1: avatar, YouTube com thumbnail, Parcerias por e-mail, share button, footer com políticas). Captura de lead ainda não foi adicionada — próximo iteração.
 2. **Landing page de captura** — e-mail / WhatsApp em troca de lead magnet
 3. **Página de vendas** — curso (quando pronto)
-4. **Media kit** — PDF para prospecção de marcas
+4. **Media kit** — ✅ no ar em `/midia-kit` (mesma app)
 5. **Página "sobre"** — história de Augusto, prova social, contato comercial
 
 ### Dashboard e gestão
@@ -246,10 +249,27 @@ Reels viral (topo)
 | | |
 |---|---|
 | E-mail do perfil | fidevidraceiro@outlook.com |
+| E-mail comercial (parcerias) | fidevidraceiro@futurah.co |
 | E-mail Futurah | contato@futurah.com.br |
 | Proposta online | futurah.com.br/proposta-augusto-felipe/ |
-| Linktree atual | linktr.ee/fidevidraceiro |
+| Bio link novo | fidevidraceiro.augustofelipe.com |
+| Mídia Kit online | fidevidraceiro.augustofelipe.com/midia-kit |
+| Linktree antigo (descontinuado) | linktr.ee/fidevidraceiro |
 | Período de dados | 18 mar – 16 abr/2026 |
+
+---
+
+## 14. INFRA TÉCNICA (referência rápida)
+
+| | |
+|---|---|
+| Repositório | monorepo `futurah/` (Turborepo + npm workspaces) |
+| App do Augusto | `apps/fidevidraceiro/` (Next.js 15 + React 19) |
+| Deploy | Vercel — projeto `fidevidraceiro` (Root Directory: `apps/fidevidraceiro`) |
+| DNS | Cloudflare (zona `augustofelipe.com`) |
+| Subdomínio | `fidevidraceiro.augustofelipe.com` → CNAME `cname.vercel-dns.com` (DNS only, não proxied) |
+| Comando deploy | `cd <repo-root> && vercel --prod` |
+| Design system | `apps/fidevidraceiro/app/styles.css` (tokens `--fdv-*`, paleta laranja/preto/lima ácido, Archivo Black + Space Grotesk, sombras hard) |
 
 ---
 
@@ -264,4 +284,4 @@ Reels viral (topo)
 ---
 
 *CONTEXT.md · Futurah and Co. · Uso interno · Não compartilhar*  
-*Última atualização: Abril 2026*
+*Última atualização: 29/abr/2026*

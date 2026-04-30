@@ -1,4 +1,7 @@
 {
+  "name": "instagram-analyzer",
+  "version": "0.0.0",
+  "private": true,
   "dependencies": {
     "docx": "^9.6.1"
   }

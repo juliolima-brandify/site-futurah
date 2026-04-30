@@ -1,0 +1,21 @@
+{
+  "name": "@futurah/tracker-worker",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cloudflare Worker de ingestão de eventos + API de leitura.",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --noEmit",
+    "cf-typegen": "wrangler types"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250109.0",
+    "@futurah/tsconfig": "*",
+    "typescript": "^5",
+    "wrangler": "^3.99.0"
+  }
+}

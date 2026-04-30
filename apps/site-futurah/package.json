@@ -6,10 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@futurah/payload-config": "*",
+    "@futurah/tracker-sdk": "*",
     "@payloadcms/next": "^3.84.1",
     "cli-color": "^2.0.4",
     "drizzle-orm": "^0.45.2",

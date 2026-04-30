@@ -1,0 +1,48 @@
+# CI deploy do Worker de tracking.
+#
+# DESABILITADO. Pra habilitar:
+# 1. Configurar secret CLOUDFLARE_API_TOKEN no repo (Settings → Secrets → Actions).
+#    Token precisa de permissões: Workers Scripts:Edit, Workers KV Storage:Edit,
+#    Workers D1:Edit, Account Analytics:Read.
+# 2. Configurar secret CLOUDFLARE_ACCOUNT_ID com o id da conta CF.
+# 3. Trocar o `if: false` abaixo por uma condição real (ex: `paths: ['packages/tracker-worker/**']`).
+# 4. Apagar este aviso.
+
+name: tracker-deploy
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "packages/tracker-worker/**"
+      - ".github/workflows/tracker-deploy.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    if: false # TODO(ci): habilitar após configurar secrets CLOUDFLARE_*
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Type-check
+        run: pnpm --filter @futurah/tracker-worker typecheck
+
+      - name: Deploy Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: packages/tracker-worker
+          command: deploy
