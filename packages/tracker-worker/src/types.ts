@@ -54,3 +54,15 @@ export type EnrichedEvent = TrackEvent & {
   device_type: string;
   browser: string;
 };
+
+// Props promovidos a colunas dedicadas no AE.
+// Usados pelo /api/events para breakdown por url/label/target.
+// blob13..blob16 e double3..double4 do dataset.
+export type PromotedProps = {
+  url: string;        // blob13
+  label: string;      // blob14
+  target: string;     // blob15
+  rest_json: string;  // blob16
+  position: number;   // double3
+  value: number;      // double4
+};

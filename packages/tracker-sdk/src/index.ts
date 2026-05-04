@@ -118,4 +118,56 @@ export function pageview(extraProps?: Record<string, unknown>): void {
   track("pageview", extraProps);
 }
 
+/**
+ * Opções de `trackClick`. Os campos `url`, `label`, `target`, `position` e
+ * `value` são **promoted keys** no Worker — viram colunas dedicadas no
+ * Analytics Engine (blob13/blob14/blob15 e double3/double4) e ficam
+ * disponíveis em `/api/events?dim=url|label|target` no dashboard.
+ *
+ * Qualquer chave fora dessas 5 vai para `props.rest_json` (blob16) com cap
+ * de ~1.5KB no JSON serializado — use só metadata leve.
+ */
+export type TrackClickOpts = {
+  /** URL de destino do clique. Sem espaços (validação no Worker). */
+  url: string;
+  /** Texto humano do botão/link. Truncado em 128 chars. */
+  label?: string;
+  /** Slug interno (segmenta múltiplos botões pra mesma url). 128 chars. */
+  target?: string;
+  /** Índice (0-based) na lista de links — útil pra heatmap de posição. */
+  position?: number;
+  /** Valor monetário/numérico associado ao clique. */
+  value?: number;
+  /** Nome do evento. Default `link_click`. */
+  event?: string;
+  /** Metadata extra — vai pra blob16 como JSON; manter leve. */
+  extra?: Record<string, unknown>;
+};
+
+/**
+ * Helper acima de `track()` para registrar cliques em links/botões com
+ * shape padronizado. Equivalente a:
+ *
+ *   track('link_click', { url, label, target, position, value, ...extra })
+ *
+ * As 5 promoted keys (`url`, `label`, `target`, `position`, `value`) viram
+ * colunas dedicadas no AE e podem ser quebradas no dashboard.
+ */
+export function trackClick(opts: TrackClickOpts): void {
+  const { url, label, target, position, value, event = "link_click", extra } = opts;
+  const props: Record<string, unknown> = { url };
+  if (label) props.label = label;
+  if (target) props.target = target;
+  if (typeof position === "number") props.position = position;
+  if (typeof value === "number") props.value = value;
+  if (extra) {
+    for (const [k, v] of Object.entries(extra)) {
+      // Não permitir extra sobrescrever as promoted keys já setadas acima.
+      if (k in props) continue;
+      props[k] = v;
+    }
+  }
+  track(event, props);
+}
+
 export type { AttributionPayload } from "./utm";

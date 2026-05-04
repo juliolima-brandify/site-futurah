@@ -68,3 +68,30 @@ export type PageviewResponse = {
     rows: PageviewRow[];
     error?: true;
 };
+
+// Eventos custom — espelha /api/events e /api/event-names do Worker.
+export type EventBreakdownDim = "url" | "label" | "target" | "path";
+
+export type EventBreakdownRow = {
+    label: string;
+    count: number;
+    visitors: number;
+    avg_value: number;
+};
+
+export type EventBreakdownResponse = {
+    rows: EventBreakdownRow[];
+    dim: EventBreakdownDim;
+    event: string;
+    error?: true;
+};
+
+export type EventNameRow = {
+    event: string;
+    count: number;
+};
+
+export type EventNamesResponse = {
+    rows: EventNameRow[];
+    error?: true;
+};

@@ -1,6 +1,7 @@
 import { Space_Grotesk, Archivo_Black } from "next/font/google";
 import "./styles.css";
 import { ShareButton } from "./ShareButton";
+import { LinkButton } from "../components/LinkButton";
 
 const grotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -168,12 +169,13 @@ export default function LinksPage() {
             marginTop: "var(--fdv-space-4)",
           }}
         >
-          {links.map((l) => (
-            <a
+          {links.map((l, index) => (
+            <LinkButton
               key={l.url}
-              href={l.url}
-              target={l.external ? "_blank" : undefined}
-              rel={l.external ? "noopener noreferrer" : undefined}
+              url={l.url}
+              label={l.label}
+              position={index}
+              external={l.external}
               className={`fdv-btn fdv-btn-${l.variant}`}
               style={{
                 width: "100%",
@@ -241,7 +243,7 @@ export default function LinksPage() {
                   </span>
                 )}
               </div>
-            </a>
+            </LinkButton>
           ))}
         </nav>
 

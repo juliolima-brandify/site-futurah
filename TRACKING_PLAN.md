@@ -182,7 +182,33 @@ Premissa: dev fluente em TS/Next, **iniciante em Workers**. Estimativas em dias 
 - [ ] Decisões 1–7 fechadas
 - [x] Fase 0 — Setup _(Worker `tracker-worker` deployado em CF, KV/D1/AE provisionados, secrets configurados, CNAMEs `t.futurah.co` e `t.augustofelipe.com` criados proxied, env vars no Vercel — 2026-04-29)_
 - [x] Fase 1 — MVP UTM _(SDK + ingest com dedup KV + AE indexado por site_id, integração Next.js nos 2 apps via `<TrackerBoundary />`, dashboard `/admin/tracking` consumindo `GET /api/utm-summary` — 2026-04-29)_
+- [x] Fase 1.5 — Dashboard v2 _(novos endpoints `/api/timeseries`, `/api/kpis`, `/api/breakdown?dim={campaign,referrer,country,device,browser}`; `anon_id` gravado como `blob12` para visitors únicos via `count(DISTINCT)`; UI com KPIs+delta, timeseries em SVG inline RSC, grid de 7 breakdowns, range custom, cache 60s — 2026-05-04, PR #2)_
+- [x] Fase 1.6 — Eventos custom _(props sanitizados em ingest com promoted keys: `blob13`=url, `blob14`=label, `blob15`=target, `blob16`=rest_json até 1.5KB, `double3`=position, `double4`=value; novos endpoints `/api/events`, `/api/event-names`; SDK `trackClick({url,label,position})`; bio do fidevidraceiro instrumentada via `<LinkButton>` em `pointerdown`+`auxclick`; seção "Eventos custom" no dashboard — 2026-05-04, PR #3)_
 - [ ] Fase 2 — Sessões + conversões
 - [ ] Fase 3 — Atribuição + dashboard
 - [ ] Fase 4 — Server-side tagging
 - [ ] Fase 5 — Polimento
+
+## Schema atual do AE `tracker_events` (post-Fase 1.6)
+
+**APPEND-ONLY a partir de blob13.** Endpoints em `api.ts` indexam blobs por posição — qualquer reordenação quebra leitura.
+
+| Slot | Campo | Origem |
+|---|---|---|
+| index1 | site_id | enriched |
+| blob1 | event | enriched (`pageview`, `link_click`, etc.) |
+| blob2 | path | enriched |
+| blob3..7 | utm_source/medium/campaign/term/content | attribution preference current > last > first |
+| blob8 | referrer | enriched |
+| blob9 | country | CF meta |
+| blob10 | device_type | UA parse |
+| blob11 | browser | UA parse |
+| blob12 | anon_id | cookie SDK |
+| blob13 | props.url | sanitizeProps (cap 512) |
+| blob14 | props.label | sanitizeProps (cap 128) |
+| blob15 | props.target | sanitizeProps (cap 128) |
+| blob16 | rest_json | sanitizeProps (cap 1500, JSON dos props não-promovidos) |
+| double1 | viewport_w | enriched |
+| double2 | viewport_h | enriched |
+| double3 | props.position | sanitizeProps (clamp ±1e9) |
+| double4 | props.value | sanitizeProps (clamp ±1e9) |
