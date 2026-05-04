@@ -9,6 +9,8 @@ import {
   handleTimeseries,
   handleKpis,
   handleBreakdown,
+  handleEvents,
+  handleEventNames,
 } from "./api";
 import { rotateSaltCron } from "./salt";
 import type { Env } from "./types";
@@ -47,6 +49,16 @@ export default {
     if (path === "/api/breakdown") {
       if (request.method !== "GET") return new Response(null, { status: 405 });
       return handleBreakdown(request, env);
+    }
+
+    if (path === "/api/events") {
+      if (request.method !== "GET") return new Response(null, { status: 405 });
+      return handleEvents(request, env);
+    }
+
+    if (path === "/api/event-names") {
+      if (request.method !== "GET") return new Response(null, { status: 405 });
+      return handleEventNames(request, env);
     }
 
     if (path === "/health") {

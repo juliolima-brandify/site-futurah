@@ -340,6 +340,104 @@ export async function handleKpis(request: Request, env: Env): Promise<Response> 
   }
 }
 
+// === Eventos custom (Fase B) =============================================
+// /api/events e /api/event-names operam sobre TODOS os eventos (não só
+// pageview), e quebram por colunas blob13/blob14/blob15 (props promovidos
+// pelo ingest a partir de `track(event, props)`).
+//
+// Allowlist de dimensões — mesmo padrão de BREAKDOWN_DIMS: nunca interpolar
+// `dim` na SQL, só os literais aqui.
+const EVENT_DIMS = {
+  url: "blob13",
+  label: "blob14",
+  target: "blob15",
+  path: "blob2",
+} as const;
+
+type EventDim = keyof typeof EVENT_DIMS;
+
+export async function handleEvents(request: Request, env: Env): Promise<Response> {
+  if (!checkAuth(request, env)) return unauthorized();
+  const url = new URL(request.url);
+  const siteId = url.searchParams.get("site_id");
+  if (!siteId || siteId.length > 64) return badRequest("missing_site_id");
+  const eventName = url.searchParams.get("event");
+  if (!eventName || eventName.length > 64) return badRequest("missing_event");
+
+  const dimRaw = (url.searchParams.get("dim") || "url").toLowerCase();
+  if (!(dimRaw in EVENT_DIMS)) return badRequest("invalid_dim");
+  const dim = dimRaw as EventDim;
+  const column = EVENT_DIMS[dim];
+
+  const limitRaw = parseInt(url.searchParams.get("limit") || "50", 10);
+  const limit = Math.min(Math.max(isNaN(limitRaw) ? 50 : limitRaw, 1), 200);
+
+  const win = parseTimeWindow(url);
+  const dataset = env.AE_DATASET || "tracker_events";
+
+  const sql = `
+    SELECT
+      ${column} AS label,
+      SUM(_sample_interval) AS count,
+      count(DISTINCT blob12) AS visitors,
+      AVG(double4) AS avg_value
+    FROM ${dataset}
+    WHERE index1 = '${escapeSqlString(siteId)}'
+      AND blob1 = '${escapeSqlString(eventName)}'
+      AND ${win.whereSql}
+    GROUP BY ${column}
+    ORDER BY count DESC
+    LIMIT ${limit}
+  `;
+
+  try {
+    const data = (await runSql(env, sql)) as { data?: Array<Record<string, unknown>> };
+    const rows = (data.data || []).map((r) => ({
+      label: (r.label as string) || "",
+      count: Number(r.count) || 0,
+      visitors: Number(r.visitors) || 0,
+      avg_value: Number(r.avg_value) || 0,
+    }));
+    return jsonResponse({ rows, dim, event: eventName });
+  } catch (err) {
+    console.error("[api] events failed", err);
+    return jsonResponse({ error: "query_failed" }, { status: 500, cache: "no-store" });
+  }
+}
+
+export async function handleEventNames(request: Request, env: Env): Promise<Response> {
+  if (!checkAuth(request, env)) return unauthorized();
+  const url = new URL(request.url);
+  const siteId = url.searchParams.get("site_id");
+  if (!siteId || siteId.length > 64) return badRequest("missing_site_id");
+  const win = parseTimeWindow(url);
+  const dataset = env.AE_DATASET || "tracker_events";
+
+  const sql = `
+    SELECT
+      blob1 AS event,
+      SUM(_sample_interval) AS count
+    FROM ${dataset}
+    WHERE index1 = '${escapeSqlString(siteId)}'
+      AND ${win.whereSql}
+    GROUP BY blob1
+    ORDER BY count DESC
+    LIMIT 50
+  `;
+
+  try {
+    const data = (await runSql(env, sql)) as { data?: Array<Record<string, unknown>> };
+    const rows = (data.data || []).map((r) => ({
+      event: (r.event as string) || "",
+      count: Number(r.count) || 0,
+    }));
+    return jsonResponse({ rows });
+  } catch (err) {
+    console.error("[api] event-names failed", err);
+    return jsonResponse({ error: "query_failed" }, { status: 500, cache: "no-store" });
+  }
+}
+
 export async function handleBreakdown(request: Request, env: Env): Promise<Response> {
   if (!checkAuth(request, env)) return unauthorized();
   const url = new URL(request.url);
