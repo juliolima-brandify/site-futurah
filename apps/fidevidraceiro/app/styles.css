@@ -406,6 +406,38 @@
   border-radius: 1px;
 }
 
+/* Reels collage — 4 cards em formato vertical (9:16) com leve escalonamento */
+.fdv-reels-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--fdv-space-3);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+@media (min-width: 768px) {
+  .fdv-reels-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--fdv-space-4);
+    align-items: start;
+  }
+  .fdv-reels-grid > :nth-child(1) { transform: translateY(28%); }
+  .fdv-reels-grid > :nth-child(2) { transform: translateY(0); }
+  .fdv-reels-grid > :nth-child(3) { transform: translateY(20%); }
+  .fdv-reels-grid > :nth-child(4) { transform: translateY(-4%); }
+}
+.fdv-reel-card {
+  position: relative;
+  display: block;
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  border-radius: var(--fdv-radius-md);
+  background: var(--fdv-primary-100);
+  text-decoration: none;
+  color: inherit;
+  transition: transform var(--fdv-transition);
+}
+.fdv-reel-card:hover { transform: translateY(-4px) scale(1.02); }
+
 /* Voice block — declaração de tom em tipo gigantesco */
 .fdv-voice {
   font-family: var(--fdv-font-display);

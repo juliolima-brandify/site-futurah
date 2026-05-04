@@ -124,6 +124,13 @@ const gallery = [
   "page08_img13.jpeg", "page08_img14.jpeg", "page08_img15.png", "page08_img16.png",
 ].map((f) => `${IMG}/${f}`);
 
+const reels = [
+  { url: "https://www.instagram.com/reel/DABVb2RpAGP/", thumb: `${IMG}/reel_01.png`, alt: "Reel — 684 mil visualizações" },
+  { url: "https://www.instagram.com/reel/C9o-WtANqcx/", thumb: `${IMG}/reel_02.png`, alt: "Reel — 5,5 milhões de visualizações" },
+  { url: "https://www.instagram.com/reel/C9-pZObpe9-/", thumb: `${IMG}/reel_03.png`, alt: "Reel — 8 milhões de visualizações" },
+  { url: "https://www.instagram.com/reel/DQFgPVxiTDO/", thumb: `${IMG}/reel_04.png`, alt: "Reel — 6,3 milhões de visualizações" },
+];
+
 /* =========================================================
    COMPONENTES
    ========================================================= */
@@ -167,18 +174,20 @@ function Section({
 function DashboardSection({
   eyebrow,
   bandLabel = "PÚBLICO-ALVO",
+  light = false,
   children,
 }: {
   eyebrow: string;
   bandLabel?: string;
+  light?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <section
       className="fdv-section"
       style={{
-        background: "var(--fdv-primary-900)",
-        color: "var(--fdv-bg)",
+        background: light ? "var(--fdv-bg)" : "var(--fdv-primary-900)",
+        color: light ? "var(--fdv-primary-900)" : "var(--fdv-bg)",
         padding: 0,
         display: "flex",
         flexDirection: "row",
@@ -196,7 +205,7 @@ function DashboardSection({
           minWidth: 0,
         }}
       >
-        <div className="fdv-section-eyebrow" style={{ color: "var(--fdv-primary-300)" }}>
+        <div className="fdv-section-eyebrow" style={{ color: light ? "var(--fdv-primary-500)" : "var(--fdv-primary-300)" }}>
           {eyebrow}
         </div>
         {children}
@@ -239,7 +248,7 @@ function DashH3({ children, style }: { children: React.ReactNode; style?: React.
         fontSize: "clamp(1.5rem, 3.2vw, 2.5rem)",
         letterSpacing: "-0.03em",
         textTransform: "uppercase",
-        color: "var(--fdv-bg)",
+        color: "currentColor",
         marginBottom: "var(--fdv-space-3)",
         lineHeight: 1,
         ...style,
@@ -384,7 +393,7 @@ export default function MidiaKit() {
       </Section>
 
       {/* 03 — PÚBLICO-ALVO (dashboard) */}
-      <DashboardSection eyebrow="03 / PÚBLICO-ALVO">
+      <DashboardSection eyebrow="03 / PÚBLICO-ALVO" light>
         {/* Gênero */}
         <div>
           <DashH3>Gênero</DashH3>
@@ -394,7 +403,7 @@ export default function MidiaKit() {
                 <circle cx="25" cy="8" r="7" />
                 <path d="M16 17 L34 17 L42 48 L36 48 L36 64 L29 64 L29 48 L21 48 L21 64 L14 64 L14 48 L8 48 Z" />
               </svg>
-              <span style={{ fontFamily: "var(--fdv-font-display)", fontSize: "clamp(2.5rem, 7vw, 5rem)", letterSpacing: "-0.04em", lineHeight: 0.9, color: "#F5EDE0" }}>
+              <span style={{ fontFamily: "var(--fdv-font-display)", fontSize: "clamp(2.5rem, 7vw, 5rem)", letterSpacing: "-0.04em", lineHeight: 0.9, color: "currentColor" }}>
                 52%
               </span>
             </div>
@@ -403,7 +412,7 @@ export default function MidiaKit() {
                 <circle cx="25" cy="8" r="7" />
                 <path d="M16 17 L34 17 L34 40 L31 40 L31 64 L25 64 L25 40 L19 40 L19 64 L13 64 L13 40 Z" />
               </svg>
-              <span style={{ fontFamily: "var(--fdv-font-display)", fontSize: "clamp(2.5rem, 7vw, 5rem)", letterSpacing: "-0.04em", lineHeight: 0.9, color: "#F5EDE0" }}>
+              <span style={{ fontFamily: "var(--fdv-font-display)", fontSize: "clamp(2.5rem, 7vw, 5rem)", letterSpacing: "-0.04em", lineHeight: 0.9, color: "currentColor" }}>
                 48%
               </span>
             </div>
@@ -419,7 +428,7 @@ export default function MidiaKit() {
             <DashLegend color="var(--fdv-orange-500)" label="Uberlândia" />
           </div>
           <svg viewBox="0 0 600 180" preserveAspectRatio="none" style={{ width: "100%", height: 160, display: "block" }} aria-hidden>
-            <g stroke="rgba(255,255,255,0.07)" strokeWidth="1">
+            <g stroke="currentColor" strokeOpacity="0.1" strokeWidth="1">
               <line x1="0" y1="30" x2="600" y2="30" />
               <line x1="0" y1="60" x2="600" y2="60" />
               <line x1="0" y1="90" x2="600" y2="90" />
@@ -624,9 +633,59 @@ export default function MidiaKit() {
         </div>
       </Section>
 
+      {/* 07 — TRABALHO EM AÇÃO */}
+      <Section eyebrow="07 / TRABALHO EM AÇÃO" noTitle>
+        <div style={{ textAlign: "center", marginBottom: "clamp(2.5rem, 6vw, 4.5rem)" }}>
+          <h2
+            style={{
+              fontSize: "clamp(2rem, 5vw, 3.75rem)",
+              lineHeight: 0.95,
+              maxWidth: "22ch",
+              margin: "0 auto var(--fdv-space-6)",
+            }}
+          >
+            Quer ver meu trabalho em ação?
+          </h2>
+          <p
+            style={{
+              fontSize: "clamp(0.875rem, 1.3vw, 1.0625rem)",
+              textTransform: "uppercase",
+              letterSpacing: "0.06em",
+              color: "var(--fdv-text-muted)",
+              maxWidth: "60ch",
+              margin: "0 auto",
+              lineHeight: 1.6,
+              fontWeight: 400,
+            }}
+          >
+            Acesse os links abaixo e veja como entrego resultado real para marcas
+          </p>
+        </div>
+
+        <div className="fdv-reels-grid">
+          {reels.map((r, i) => (
+            <a
+              key={`${r.url}-${i}`}
+              href={r.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="fdv-reel-card"
+              aria-label={r.alt}
+            >
+              <img
+                src={r.thumb}
+                alt={r.alt}
+                loading="lazy"
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              />
+            </a>
+          ))}
+        </div>
+      </Section>
+
       {/* 08 — FORMATOS */}
       <Section
-        eyebrow="07 / PARCERIAS"
+        eyebrow="08 / PARCERIAS"
         title="Muito além de uma publi"
         description="Entrego arte, verdade e conexão real. Os 5 pilares de qualquer parceria comigo:"
       >
@@ -665,7 +724,7 @@ export default function MidiaKit() {
 
       {/* 09 — GALERIA */}
       <Section
-        eyebrow="08 / PORTFÓLIO"
+        eyebrow="09 / PORTFÓLIO"
         title="Reflexos do meu trabalho"
         description="Recorte de obras, instalações e bastidores recentes."
       >
@@ -694,7 +753,7 @@ export default function MidiaKit() {
       {/* 10 — CONTATO */}
       <footer className="fdv-section">
         <div className="max-w-6xl mx-auto px-6 w-full">
-          <div className="fdv-section-eyebrow">09 / CONTATO</div>
+          <div className="fdv-section-eyebrow">10 / CONTATO</div>
           <h2 style={{ fontSize: "clamp(2.5rem, 8vw, 6rem)", lineHeight: 0.9 }} className="mb-12">
             E AÍ, VAMOS<br />
             <span style={{ background: "var(--fdv-orange-500)", padding: "0 0.08em" }}>TRABALHAR JUNTOS</span>?
