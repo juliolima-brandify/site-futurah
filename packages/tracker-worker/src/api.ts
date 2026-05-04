@@ -227,3 +227,161 @@ export async function handlePageviews(request: Request, env: Env): Promise<Respo
     return jsonResponse({ error: "query_failed" }, { status: 500, cache: "no-store" });
   }
 }
+
+// === Endpoints novos (Fase B) ============================================
+//
+// Notas sobre o dialect SQL do Analytics Engine:
+// - `uniq()` e `uniqIf()` NÃO são suportados — usar `count(DISTINCT col)`.
+// - `toUInt64()` NÃO é suportado — usar `toStartOfHour`/`toStartOfDay` direto
+//   no timestamp (ambos retornam DateTime, serializado como string).
+// - `IF(cond, a, b)` exige `a` e `b` do mesmo tipo. NULL como literal quebra;
+//   por isso para "uniqIf-like" rodamos duas queries separadas (curr/prev),
+//   em vez de tentar `count(DISTINCT IF(cond, blob12, NULL))`.
+
+// Allowlist de dimensões para /api/breakdown.
+// Mapeia o nome legível para a coluna fixa do AE (blob5..blob11).
+// IMPORTANTE: nunca interpolar `dim` na SQL — usar só os literais aqui.
+const BREAKDOWN_DIMS = {
+  campaign: "blob5",
+  referrer: "blob8",
+  country: "blob9",
+  device: "blob10",
+  browser: "blob11",
+} as const;
+
+type BreakdownDim = keyof typeof BREAKDOWN_DIMS;
+
+export async function handleTimeseries(request: Request, env: Env): Promise<Response> {
+  if (!checkAuth(request, env)) return unauthorized();
+  const url = new URL(request.url);
+  const siteId = url.searchParams.get("site_id");
+  if (!siteId || siteId.length > 64) return badRequest("missing_site_id");
+  const win = parseTimeWindow(url);
+  const dataset = env.AE_DATASET || "tracker_events";
+
+  const bucketFn = win.bucketUnit === "HOUR" ? "toStartOfHour" : "toStartOfDay";
+
+  const sql = `
+    SELECT
+      ${bucketFn}(timestamp) AS bucket,
+      SUM(_sample_interval) AS pageviews,
+      count(DISTINCT blob12) AS visitors
+    FROM ${dataset}
+    WHERE index1 = '${escapeSqlString(siteId)}'
+      AND blob1 = 'pageview'
+      AND ${win.whereSql}
+    GROUP BY bucket
+    ORDER BY bucket ASC
+    LIMIT 2000
+  `;
+
+  try {
+    const data = (await runSql(env, sql)) as { data?: Array<Record<string, unknown>> };
+    const rows = (data.data || []).map((r) => ({
+      // bucket é DateTime serializado como "YYYY-MM-DD HH:MM:SS" (UTC).
+      bucket: (r.bucket as string) || "",
+      pageviews: Number(r.pageviews) || 0,
+      visitors: Number(r.visitors) || 0,
+    }));
+    return jsonResponse({ rows, bucketUnit: win.bucketUnit });
+  } catch (err) {
+    console.error("[api] timeseries failed", err);
+    return jsonResponse({ error: "query_failed" }, { status: 500, cache: "no-store" });
+  }
+}
+
+export async function handleKpis(request: Request, env: Env): Promise<Response> {
+  if (!checkAuth(request, env)) return unauthorized();
+  const url = new URL(request.url);
+  const siteId = url.searchParams.get("site_id");
+  if (!siteId || siteId.length > 64) return badRequest("missing_site_id");
+  const win = parseTimeWindow(url);
+  const dataset = env.AE_DATASET || "tracker_events";
+  const siteEsc = escapeSqlString(siteId);
+
+  // Duas queries (curr e prev): mais simples e exata que tentar
+  // count(DISTINCT IF(...)) — o AE rejeita NULL no IF e contar string vazia
+  // como bucket distinto polui o resultado.
+  const sqlCurr = `
+    SELECT
+      SUM(_sample_interval) AS pageviews,
+      count(DISTINCT blob12) AS visitors
+    FROM ${dataset}
+    WHERE index1 = '${siteEsc}'
+      AND blob1 = 'pageview'
+      AND ${win.whereSql}
+  `;
+  const sqlPrev = `
+    SELECT
+      SUM(_sample_interval) AS pageviews,
+      count(DISTINCT blob12) AS visitors
+    FROM ${dataset}
+    WHERE index1 = '${siteEsc}'
+      AND blob1 = 'pageview'
+      AND ${win.prevWhereSql}
+  `;
+
+  try {
+    const [currRaw, prevRaw] = await Promise.all([runSql(env, sqlCurr), runSql(env, sqlPrev)]);
+    const curr = (((currRaw as { data?: Array<Record<string, unknown>> }).data || [])[0] || {}) as Record<string, unknown>;
+    const prev = (((prevRaw as { data?: Array<Record<string, unknown>> }).data || [])[0] || {}) as Record<string, unknown>;
+    const pv_curr = Number(curr.pageviews) || 0;
+    const vi_curr = Number(curr.visitors) || 0;
+    const pv_prev = Number(prev.pageviews) || 0;
+    const vi_prev = Number(prev.visitors) || 0;
+    return jsonResponse({
+      pageviews: { current: pv_curr, previous: pv_prev },
+      visitors: { current: vi_curr, previous: vi_prev },
+      window: { approxHours: win.approxHours, bucketUnit: win.bucketUnit },
+    });
+  } catch (err) {
+    console.error("[api] kpis failed", err);
+    return jsonResponse({ error: "query_failed" }, { status: 500, cache: "no-store" });
+  }
+}
+
+export async function handleBreakdown(request: Request, env: Env): Promise<Response> {
+  if (!checkAuth(request, env)) return unauthorized();
+  const url = new URL(request.url);
+  const siteId = url.searchParams.get("site_id");
+  if (!siteId || siteId.length > 64) return badRequest("missing_site_id");
+
+  const dimRaw = (url.searchParams.get("dim") || "").toLowerCase();
+  if (!(dimRaw in BREAKDOWN_DIMS)) return badRequest("invalid_dim");
+  const dim = dimRaw as BreakdownDim;
+  // CRÍTICO: column é literal — vem de switch fechado, não da query string.
+  const column = BREAKDOWN_DIMS[dim];
+
+  const limitRaw = parseInt(url.searchParams.get("limit") || "50", 10);
+  const limit = Math.min(Math.max(isNaN(limitRaw) ? 50 : limitRaw, 1), 200);
+
+  const win = parseTimeWindow(url);
+  const dataset = env.AE_DATASET || "tracker_events";
+
+  const sql = `
+    SELECT
+      ${column} AS label,
+      SUM(_sample_interval) AS count,
+      count(DISTINCT blob12) AS visitors
+    FROM ${dataset}
+    WHERE index1 = '${escapeSqlString(siteId)}'
+      AND blob1 = 'pageview'
+      AND ${win.whereSql}
+    GROUP BY ${column}
+    ORDER BY count DESC
+    LIMIT ${limit}
+  `;
+
+  try {
+    const data = (await runSql(env, sql)) as { data?: Array<Record<string, unknown>> };
+    const rows = (data.data || []).map((r) => ({
+      label: (r.label as string) || "",
+      count: Number(r.count) || 0,
+      visitors: Number(r.visitors) || 0,
+    }));
+    return jsonResponse({ rows, dim });
+  } catch (err) {
+    console.error("[api] breakdown failed", err);
+    return jsonResponse({ error: "query_failed" }, { status: 500, cache: "no-store" });
+  }
+}
