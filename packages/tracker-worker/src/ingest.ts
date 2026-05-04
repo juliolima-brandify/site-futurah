@@ -6,11 +6,20 @@
 
 import { getCfMeta, getClientIp, parseUserAgent } from "./enrichment";
 import { hashIp } from "./salt";
-import type { Env, TrackEvent, EnrichedEvent } from "./types";
+import type { Env, TrackEvent, EnrichedEvent, PromotedProps } from "./types";
 
 const MAX_BODY_BYTES = 16 * 1024;
 const ALLOWED_SITES_KEY = "config:sites";
 const ALLOWED_ORIGINS_KEY = "config:allowed_origins";
+
+// Limites para sanitização de `props` arbitrários no payload de track().
+// MAX_PROPS_KEYS evita objetos enormes; MAX_PROPS_VALUE_LEN é o teto por
+// valor escalar antes de virar blob; MAX_PROPS_JSON_LEN é o teto do
+// stringify do "resto" (sem promoted keys) que vai pra blob16.
+const MAX_PROPS_KEYS = 32;
+const MAX_PROPS_VALUE_LEN = 512;
+const MAX_PROPS_JSON_LEN = 1500;
+const PROMOTED_PROP_KEYS = ["url", "label", "target", "position", "value"] as const;
 
 async function readAllowlist(env: Env, key: string): Promise<string[]> {
   const raw = await env.KV.get(key);
@@ -32,7 +41,90 @@ function isValidEvent(body: unknown): body is TrackEvent {
   if (typeof e.event !== "string" || e.event.length === 0 || e.event.length > 64) return false;
   if (typeof e.anon_id !== "string" || e.anon_id.length < 8) return false;
   if (typeof e.path !== "string") return false;
+  // props é opcional — null/undefined ok. Quando presente precisa ser objeto plano.
+  if (e.props != null && (typeof e.props !== "object" || Array.isArray(e.props))) return false;
   return true;
+}
+
+function clampNumber(n: number, lo: number, hi: number): number {
+  if (!Number.isFinite(n)) return 0;
+  if (n < lo) return lo;
+  if (n > hi) return hi;
+  return n;
+}
+
+// sanitizeProps: extrai promoted keys (url/label/target/position/value) em
+// colunas dedicadas e serializa o resto em blob16 (rest_json). Tudo que
+// não for string|number|boolean é descartado silenciosamente. Caps:
+// - até MAX_PROPS_KEYS chaves processadas (resto cortado);
+// - MAX_PROPS_VALUE_LEN por valor textual;
+// - rest_json virou "" se o JSON ficar acima de MAX_PROPS_JSON_LEN
+//   (preferimos perder a metadata extra a estourar o blob).
+function sanitizeProps(raw: unknown): PromotedProps {
+  const empty: PromotedProps = {
+    url: "",
+    label: "",
+    target: "",
+    rest_json: "",
+    position: 0,
+    value: 0,
+  };
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return empty;
+  const obj = raw as Record<string, unknown>;
+
+  let url = "";
+  let label = "";
+  let target = "";
+  let position = 0;
+  let value = 0;
+  const rest: Record<string, string | number | boolean> = {};
+
+  let count = 0;
+  for (const key of Object.keys(obj)) {
+    if (count >= MAX_PROPS_KEYS) break;
+    count++;
+    const v = obj[key];
+    if (v === undefined || v === null) continue;
+    const t = typeof v;
+    if (t !== "string" && t !== "number" && t !== "boolean") continue;
+
+    if (key === "url") {
+      const s = String(v).slice(0, MAX_PROPS_VALUE_LEN);
+      // URLs com whitespace são quase certamente bug do caller; recusar
+      // pra não poluir o breakdown com lixo.
+      if (s.includes(" ")) continue;
+      url = s;
+    } else if (key === "label") {
+      label = String(v).slice(0, 128);
+    } else if (key === "target") {
+      target = String(v).slice(0, 128);
+    } else if (key === "position") {
+      position = clampNumber(Number(v), -1e9, 1e9);
+    } else if (key === "value") {
+      value = clampNumber(Number(v), -1e9, 1e9);
+    } else {
+      // Resto vai pro rest_json. Strings truncadas pelo MAX_PROPS_VALUE_LEN.
+      if (t === "string") {
+        rest[key] = (v as string).slice(0, MAX_PROPS_VALUE_LEN);
+      } else if (t === "number") {
+        rest[key] = Number.isFinite(v as number) ? (v as number) : 0;
+      } else {
+        rest[key] = v as boolean;
+      }
+    }
+  }
+
+  let rest_json = "";
+  if (Object.keys(rest).length > 0) {
+    try {
+      const s = JSON.stringify(rest);
+      rest_json = s.length > MAX_PROPS_JSON_LEN ? "" : s;
+    } catch {
+      rest_json = "";
+    }
+  }
+
+  return { url, label, target, rest_json, position, value };
 }
 
 function sanitizeBlob(value: unknown, max = 200): string {
@@ -135,6 +227,11 @@ export async function handleIngest(
   });
 }
 
+// IMPORTANTE: o esquema do Analytics Engine é APPEND-ONLY a partir de blob13.
+// NUNCA inserir blob no meio — `api.ts` lê os blobs por posição (blob1=event,
+// blob2=path, blob3=utm_source, ..., blob12=anon_id, blob13=props.url, etc.).
+// Reordenar quebra todos os endpoints (utm-summary, breakdown, kpis, events).
+// Adicionar campos novos: aumentar a lista no fim de `blobs:` e/ou `doubles:`.
 async function persistEvent(event: TrackEvent, request: Request, env: Env): Promise<void> {
   // Dedup 5 min por (site, anon_id, event, path): mesma combinação em janela
   // de 300s vira no-op. Protege quota do AE contra flood (ataque ou bug de
@@ -175,6 +272,8 @@ async function persistEvent(event: TrackEvent, request: Request, env: Env): Prom
     pickAttr(event.attribution?.first) ??
     {};
 
+  const p = sanitizeProps(event.props);
+
   try {
     env.ANALYTICS.writeDataPoint({
       indexes: [enriched.site_id],
@@ -190,13 +289,16 @@ async function persistEvent(event: TrackEvent, request: Request, env: Env): Prom
         sanitizeBlob(enriched.country, 8),
         sanitizeBlob(enriched.device_type, 16),
         sanitizeBlob(enriched.browser, 16),
-        // blob12 (último): anon_id rotativo do SDK. Permite contar visitors
-        // únicos via count(DISTINCT blob12) em /api/kpis|timeseries|breakdown.
-        // Mantém último pra não quebrar consumidores existentes que indexam
-        // por posição (utm-summary usa blob3/blob4, etc.).
+        // blob12: anon_id rotativo do SDK. Permite contar visitors únicos
+        // via count(DISTINCT blob12) em /api/kpis|timeseries|breakdown.
         sanitizeBlob(enriched.anon_id, 64),
+        // blob13+ APPEND-ONLY (props promovidos):
+        sanitizeBlob(p.url, 512),
+        sanitizeBlob(p.label, 128),
+        sanitizeBlob(p.target, 128),
+        sanitizeBlob(p.rest_json, 1500),
       ],
-      doubles: [enriched.viewport_w || 0, enriched.viewport_h || 0],
+      doubles: [enriched.viewport_w || 0, enriched.viewport_h || 0, p.position, p.value],
     });
   } catch (err) {
     console.error("[ingest] writeDataPoint failed", err);
