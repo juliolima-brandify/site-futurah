@@ -108,6 +108,22 @@
     border-color: var(--trk-border);
 }
 
+.trk-select {
+    background: var(--trk-surface);
+    color: var(--trk-text);
+    border: 1px solid var(--trk-border);
+    border-radius: var(--trk-radius-sm);
+    padding: 5px 10px;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.trk-select:focus {
+    outline: 2px solid var(--trk-accent, #4d7cff);
+    outline-offset: 1px;
+}
+
 /* === KPI grid === */
 
 .trk-kpi-grid {

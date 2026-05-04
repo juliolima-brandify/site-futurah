@@ -7,6 +7,8 @@ import { KPIGrid } from "./components/KPIGrid";
 import { TimeseriesChart } from "./components/TimeseriesChart";
 import { BreakdownTable, refLabel } from "./components/BreakdownTable";
 import { DataState } from "./components/DataState";
+import { EventBreakdownTable } from "./components/EventBreakdownTable";
+import { EventNameSelector } from "./components/EventNameSelector";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +22,10 @@ export default async function TrackingDashboardPage({
     await requireSuperadmin();
     const sp = (await searchParams) ?? {};
     const ctx = resolveCtx(sp);
+    // `event` controla a seção "Eventos custom" abaixo. Default link_click,
+    // que é o evento disparado pelo LinkButton da bio do fidevidraceiro.
+    const eventName =
+        typeof sp.event === "string" && sp.event.length > 0 ? sp.event : "link_click";
 
     return (
         <main className="trk-root">
@@ -104,6 +110,41 @@ export default async function TrackingDashboardPage({
                                 dim="browser"
                                 title="Browsers"
                                 subtitle="user-agent simplificado · top 10"
+                            />
+                        </Suspense>
+                    </div>
+                </section>
+
+                <section style={{ marginTop: 8 }}>
+                    <div
+                        className="trk-card-header"
+                        style={{
+                            marginBottom: 12,
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "flex-end",
+                            flexWrap: "wrap",
+                            gap: 12,
+                        }}
+                    >
+                        <div>
+                            <h3 className="trk-card-title">Eventos custom</h3>
+                            <span className="trk-card-subtitle">
+                                cliques e outros eventos disparados via track() — top destinos por url
+                            </span>
+                        </div>
+                        <Suspense fallback={null}>
+                            <EventNameSelector ctx={ctx} currentEvent={eventName} />
+                        </Suspense>
+                    </div>
+                    <div className="trk-grid">
+                        <Suspense fallback={<TableFallback title="Top destinos clicados" />}>
+                            <EventBreakdownTable
+                                ctx={ctx}
+                                eventName={eventName}
+                                dim="url"
+                                title="Top destinos clicados"
+                                subtitle={`${eventName} · agrupado por url`}
                             />
                         </Suspense>
                     </div>

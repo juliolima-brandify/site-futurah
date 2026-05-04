@@ -3,6 +3,9 @@ import type {
     BreakdownDim,
     BreakdownResponse,
     Ctx,
+    EventBreakdownDim,
+    EventBreakdownResponse,
+    EventNamesResponse,
     KpisResponse,
     PageviewResponse,
     SiteId,
@@ -125,6 +128,40 @@ export async function fetchPageviews(ctx: Ctx): Promise<PageviewResponse> {
     const sp = buildWindowParams(ctx);
     const data = await fetchJson<PageviewResponse>(
         `${cfg.base}/api/pageviews?${sp.toString()}`,
+        cfg.token,
+        ctx.siteId,
+    );
+    if (!data) return { rows: [], error: true };
+    return data;
+}
+
+export async function fetchEvents(
+    ctx: Ctx,
+    eventName: string,
+    dim: EventBreakdownDim,
+    limit = 10,
+): Promise<EventBreakdownResponse> {
+    const cfg = buildBase();
+    if (!cfg) return { rows: [], dim, event: eventName, error: true };
+    const sp = buildWindowParams(ctx);
+    sp.set("event", eventName);
+    sp.set("dim", dim);
+    sp.set("limit", String(limit));
+    const data = await fetchJson<EventBreakdownResponse>(
+        `${cfg.base}/api/events?${sp.toString()}`,
+        cfg.token,
+        ctx.siteId,
+    );
+    if (!data) return { rows: [], dim, event: eventName, error: true };
+    return data;
+}
+
+export async function fetchEventNames(ctx: Ctx): Promise<EventNamesResponse> {
+    const cfg = buildBase();
+    if (!cfg) return { rows: [], error: true };
+    const sp = buildWindowParams(ctx);
+    const data = await fetchJson<EventNamesResponse>(
+        `${cfg.base}/api/event-names?${sp.toString()}`,
         cfg.token,
         ctx.siteId,
     );
