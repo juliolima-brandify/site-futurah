@@ -1,11 +1,11 @@
 import { Suspense } from "react";
 import { requireSuperadmin } from "./lib/auth";
 import { resolveCtx } from "./lib/ctx";
-import type { Ctx } from "./lib/types";
 import { SiteSelector } from "./components/SiteSelector";
 import { WindowSelector } from "./components/WindowSelector";
 import { KPIGrid } from "./components/KPIGrid";
 import { TimeseriesChart } from "./components/TimeseriesChart";
+import { BreakdownTable, refLabel } from "./components/BreakdownTable";
 import { DataState } from "./components/DataState";
 
 export const dynamic = "force-dynamic";
@@ -43,9 +43,84 @@ export default async function TrackingDashboardPage({
                     <TimeseriesChart ctx={ctx} />
                 </Suspense>
 
-                <BreakdownGridPlaceholder />
+                <section style={{ marginTop: 8 }}>
+                    <div className="trk-card-header" style={{ marginBottom: 12 }}>
+                        <h3 className="trk-card-title">Breakdown</h3>
+                        <span className="trk-card-subtitle">páginas, UTMs, referrers, países, devices, browsers</span>
+                    </div>
+                    <div className="trk-grid">
+                        <Suspense fallback={<TableFallback title="Páginas mais vistas" />}>
+                            <BreakdownTable
+                                ctx={ctx}
+                                variant="path"
+                                title="Páginas mais vistas"
+                                subtitle="top 10 por pageviews"
+                            />
+                        </Suspense>
+                        <Suspense fallback={<TableFallback title="UTMs (source / medium)" />}>
+                            <BreakdownTable
+                                ctx={ctx}
+                                variant="utm"
+                                title="UTMs"
+                                subtitle="source × medium · top 10"
+                            />
+                        </Suspense>
+                        <Suspense fallback={<TableFallback title="Campanhas" />}>
+                            <BreakdownTable
+                                ctx={ctx}
+                                dim="campaign"
+                                title="Campanhas"
+                                subtitle="utm_campaign · top 10"
+                            />
+                        </Suspense>
+                        <Suspense fallback={<TableFallback title="Referrers" />}>
+                            <BreakdownTable
+                                ctx={ctx}
+                                dim="referrer"
+                                title="Referrers"
+                                subtitle="domínio de origem · top 10"
+                                transformLabel={refLabel}
+                            />
+                        </Suspense>
+                        <Suspense fallback={<TableFallback title="Países" />}>
+                            <BreakdownTable
+                                ctx={ctx}
+                                dim="country"
+                                title="Países"
+                                subtitle="ISO-2 · top 10"
+                            />
+                        </Suspense>
+                        <Suspense fallback={<TableFallback title="Devices" />}>
+                            <BreakdownTable
+                                ctx={ctx}
+                                dim="device"
+                                title="Devices"
+                                subtitle="mobile / desktop / tablet · top 10"
+                            />
+                        </Suspense>
+                        <Suspense fallback={<TableFallback title="Browsers" />}>
+                            <BreakdownTable
+                                ctx={ctx}
+                                dim="browser"
+                                title="Browsers"
+                                subtitle="user-agent simplificado · top 10"
+                            />
+                        </Suspense>
+                    </div>
+                </section>
             </div>
         </main>
+    );
+}
+
+function TableFallback({ title }: { title: string }) {
+    return (
+        <div className="trk-card">
+            <div className="trk-card-header">
+                <h3 className="trk-card-title">{title}</h3>
+            </div>
+            <DataState status="loading" />
+        </div>
     );
 }
 
@@ -73,16 +148,3 @@ function ChartFallback() {
     );
 }
 
-// Placeholder pra Fase E. Mantém o lugar da grid no layout pra evitar
-// reflow grande quando a próxima fase plugar os componentes.
-function BreakdownGridPlaceholder(_props: { ctx?: Ctx } = {}) {
-    return (
-        <section style={{ marginTop: 8 }}>
-            <div className="trk-card-header" style={{ marginBottom: 12 }}>
-                <h3 className="trk-card-title">Breakdown</h3>
-                <span className="trk-card-subtitle">páginas, UTMs, referrers, países, devices</span>
-            </div>
-            <DataState status="empty" message="Em breve (Fase E)." hint="Tabelas por dimensão chegam no próximo deploy." />
-        </section>
-    );
-}
