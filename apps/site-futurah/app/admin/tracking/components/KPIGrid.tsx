@@ -17,6 +17,15 @@ export async function KPIGrid({ ctx }: { ctx: Ctx }) {
     const sessions = vi;
     const sessionsPrev = viPrev;
 
+    if (kpis.error) {
+        return (
+            <div className="trk-state" data-tone="error" style={{ marginBottom: 24 }}>
+                Falha ao carregar KPIs do Worker.
+                <div className="trk-state-hint">Verifique TRACKER_API_URL e TRACKER_API_TOKEN.</div>
+            </div>
+        );
+    }
+
     return (
         <div className="trk-kpi-grid">
             <KPICard label="Pageviews" value={pv} previous={pvPrev} />

@@ -21,14 +21,14 @@ export function WindowSelector({ ctx }: { ctx: Ctx }) {
                         className="trk-control-link"
                         href={ctxQueryString(ctx, { since: "24h", clearRange: true })}
                         data-active={true}
-                        title="Limpar range custom"
+                        title="Limpar range custom — voltar pra preset"
                     >
                         custom ✕
                     </a>
                 ) : null}
             </div>
-            <details className="trk-range-form">
-                <summary>Range custom (from / to UTC)</summary>
+            <details className="trk-range-form" {...(ctx.customRange ? { open: true } : {})}>
+                <summary>Range custom (from / to, UTC)</summary>
                 <form method="GET" action="" style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                     <input type="hidden" name="site" value={ctx.siteId} />
                     <input
