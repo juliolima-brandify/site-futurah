@@ -26,7 +26,7 @@ async function fetchUtmSummary(siteId: string): Promise<UtmRow[]> {
             `${base}/api/utm-summary?site_id=${encodeURIComponent(siteId)}&since=24h`,
             {
                 headers: { Authorization: `Bearer ${token}` },
-                cache: "no-store",
+                next: { revalidate: 60 },
             },
         );
         if (!res.ok) return [];
