@@ -30,3 +30,12 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# wrangler local secrets (workers)
+.dev.vars
+
+# claude code workspace
+.claude/
+
+# scripts ad-hoc / debug que não devem ser versionados
+apps/site-futurah/test-keystatic.js
