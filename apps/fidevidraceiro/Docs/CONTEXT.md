@@ -1,5 +1,5 @@
 # CONTEXT.md — Projeto @fidevidraceiro · Augusto Felipe
-> Futurah and Co. · Uso interno · Abril 2026  
+> Futurah and Co. · Uso interno · Maio 2026  
 > Este arquivo é o briefing-mestre do projeto. Leia antes de qualquer tarefa.
 
 ---
@@ -194,7 +194,7 @@ Reels viral (topo)
 1. **Linktree/bio link** — ✅ no ar em `fidevidraceiro.augustofelipe.com` (V1: avatar, YouTube com thumbnail, Parcerias por e-mail, share button, footer com políticas). Captura de lead ainda não foi adicionada — próximo iteração.
 2. **Landing page de captura** — e-mail / WhatsApp em troca de lead magnet
 3. **Página de vendas** — curso (quando pronto)
-4. **Media kit** — ✅ no ar em `/midia-kit` (mesma app)
+4. **Media kit** — ✅ no ar em `/midia-kit` (mesma app). Snap-scroll de seção por viewport, capa com foto de bg + gradient overlay esquerda→direita + logo branco, dashboards de Público-Alvo (gênero silhuetas, área-chart de cidades, pill bars de idades) e Conteúdo (chips de interesse, bubble chart de temas) com banda lateral laranja "PÚBLICO-ALVO". Imprensa reduzida aos 4 logos extraídos do PDF (Empresas & Negócios, MGTV, g1 Triângulo Mineiro, BAND). `ScrollBottomBlur` faz fade do rodapé conforme scrolla.
 5. **Página "sobre"** — história de Augusto, prova social, contato comercial
 
 ### Dashboard e gestão
@@ -270,6 +270,7 @@ Reels viral (topo)
 | Subdomínio | `fidevidraceiro.augustofelipe.com` → CNAME `cname.vercel-dns.com` (DNS only, não proxied) |
 | Comando deploy | `cd <repo-root> && vercel --prod` |
 | Design system | `apps/fidevidraceiro/app/styles.css` (tokens `--fdv-*`, paleta laranja/preto/lima ácido, Archivo Black + Space Grotesk, sombras hard) |
+| Mídia Kit | `apps/fidevidraceiro/app/midia-kit/page.tsx` (snap-scroll, dashboards SVG inline, helpers `DashboardSection`/`DashH3`/`PlatformIcon`). Assets em `public/midia-kit-fi/` (cover-bg.png, logo-white.svg, materia-*.png, page06_*, page08_*) |
 
 ---
 
@@ -284,4 +285,4 @@ Reels viral (topo)
 ---
 
 *CONTEXT.md · Futurah and Co. · Uso interno · Não compartilhar*  
-*Última atualização: 29/abr/2026*
+*Última atualização: 01/mai/2026*
