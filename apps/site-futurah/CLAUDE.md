@@ -231,6 +231,29 @@ Mesmo fluxo para plataformas.
 - [`PAYLOAD_MIGRATION.md`](./PAYLOAD_MIGRATION.md) — plano original, decisões e fallbacks (histórico).
 - [`PAYLOAD_RUNBOOK.md`](./PAYLOAD_RUNBOOK.md) — runbook executável Fases 0-3 + seção **Lições aprendidas** com correções aplicadas durante o QA (imports sem extensão, `next/cache` lazy em hooks, CLI via `node --import tsx/esm`, setup de DB novo).
 
+## Dashboard de tracking — `/admin/tracking`
+
+Server-rendered (RSC), gated por `requireSuperadmin()` (Payload). Lê do Worker `tracker-worker` (em `t.futurah.co` / `t.augustofelipe.com`) via `TRACKER_API_URL` + `TRACKER_API_TOKEN`. Cache `next: { revalidate: 60, tags: ['tracker:<siteId>'] }`. Nada bate o Worker direto do browser.
+
+**Estrutura** (`app/admin/tracking/`):
+- `layout.tsx` + `dashboard.css` — CSS escopado em `.trk-*` (sem Tailwind, isolamento intencional pra não vazar pro Payload admin).
+- `lib/{auth,types,format,ctx,tracker-client}.ts` — RSC fetchers tipados, `import 'server-only'`, fallback `{rows:[], error: true}` em falha (UI degrada, não quebra).
+- `components/`:
+  - `KPIGrid` (Pageviews, Visitors ≈ via `count(DISTINCT)`, PV/dia, Sessions=proxy) com delta vs janela anterior.
+  - `TimeseriesChart` — SVG inline RSC, ~150 LOC, `<title>` nativo pra tooltip, **zero JS no client**.
+  - `BreakdownTable` (genérico) × 7 instâncias: paths, UTMs, campaign, referrer (com domain extraction), country, device, browser.
+  - `EventBreakdownTable` + `EventNameSelector` (Fase 1.6) — seção dedicada a eventos custom (`link_click` etc.); dropdown lista event names distintos, default `link_click`.
+  - `WindowSelector` (presets 24h/7d/30d/90d + `<details>` pra range custom `from`/`to`), `SiteSelector` (futurah / fidevidraceiro), `DataState` (empty/error padrão).
+
+**Endpoints consumidos** (todos via Read API do Worker, `Bearer ${TRACKER_API_TOKEN}`):
+- `/api/utm-summary`, `/api/pageviews` — legados, mantidos por compat.
+- `/api/timeseries`, `/api/kpis`, `/api/breakdown?dim={campaign,referrer,country,device,browser}` — Fase 1.5.
+- `/api/events?event=&dim={url,label,target,path}`, `/api/event-names` — Fase 1.6.
+
+**Para instrumentar cliques em qualquer página** (padrão estabelecido): client component que importa lazy o SDK e chama `trackClick({url, label, position})` em `onPointerDown` + `onAuxClick` (cobre clique do meio, antecipa unload). Exemplo de referência: `apps/fidevidraceiro/components/LinkButton.tsx`. Promoted keys (`url`, `label`, `target`, `position`, `value`) viram colunas queryable; outras chaves caem em `blob16` (rest_json) sem agregação direta.
+
+**Ao adicionar novo widget**: criar fetcher em `lib/tracker-client.ts` no mesmo padrão (server-only, revalidate 60s, fallback erro vazio); criar tipo em `lib/types.ts`; criar componente RSC em `components/`; envolver em `<Suspense>` no `page.tsx` (cada widget streama independente). Não importar Tailwind — usar classes `.trk-*` ou estender `dashboard.css`.
+
 ### Gotchas operacionais (ler antes de mexer em Payload)
 
 1. **Imports no `payload.config.ts` são sem extensão** (`./collections/Authors`). `.ts` e `.js` quebram Next em typecheck/webpack. Consequência: o wrapper `npx payload …` quebra com `ERR_REQUIRE_ASYNC_MODULE` (TLA do `lexical`). **Usar sempre** `node --import tsx/esm ./node_modules/payload/dist/bin/index.js <cmd>`.
