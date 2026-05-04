@@ -1,0 +1,420 @@
+/*
+ * Dashboard de tracking — CSS isolado por escopo `.trk-root`.
+ * Não importar globals.css aqui: o layout root do site não tem estilos,
+ * então CSS daqui não vaza pro admin do Payload nem pro site público.
+ */
+
+.trk-root,
+.trk-root *,
+.trk-root *::before,
+.trk-root *::after {
+    box-sizing: border-box;
+}
+
+.trk-root {
+    --trk-bg: #0d1014;
+    --trk-surface: #161b22;
+    --trk-surface-alt: #1c232c;
+    --trk-border: #2a313a;
+    --trk-text: #e6edf3;
+    --trk-text-muted: #8b949e;
+    --trk-text-dim: #6e7681;
+    --trk-accent: #DCFF69;
+    --trk-accent-dim: rgba(220, 255, 105, 0.16);
+    --trk-blue: #58a6ff;
+    --trk-positive: #56d364;
+    --trk-negative: #f85149;
+    --trk-radius: 8px;
+    --trk-radius-sm: 4px;
+
+    background: var(--trk-bg);
+    color: var(--trk-text);
+    min-height: 100vh;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 24px;
+}
+
+.trk-container {
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+.trk-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--trk-border);
+}
+
+.trk-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0;
+    color: var(--trk-text);
+}
+
+.trk-subtitle {
+    color: var(--trk-text-muted);
+    margin: 4px 0 0 0;
+    font-size: 13px;
+}
+
+.trk-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.trk-control-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.trk-control-label {
+    color: var(--trk-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.trk-control-link {
+    color: var(--trk-text-muted);
+    text-decoration: none;
+    padding: 4px 10px;
+    border-radius: var(--trk-radius-sm);
+    border: 1px solid transparent;
+    transition: background 120ms, border 120ms, color 120ms;
+}
+
+.trk-control-link:hover {
+    color: var(--trk-text);
+    background: var(--trk-surface);
+}
+
+.trk-control-link[data-active="true"] {
+    color: var(--trk-text);
+    background: var(--trk-surface);
+    border-color: var(--trk-border);
+}
+
+/* === KPI grid === */
+
+.trk-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.trk-kpi {
+    background: var(--trk-surface);
+    border: 1px solid var(--trk-border);
+    border-radius: var(--trk-radius);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.trk-kpi-label {
+    color: var(--trk-text-muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+}
+
+.trk-kpi-value {
+    color: var(--trk-text);
+    font-size: 28px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+}
+
+.trk-kpi-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--trk-text-dim);
+}
+
+.trk-delta {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+}
+
+.trk-delta[data-direction="up"] {
+    color: var(--trk-positive);
+}
+
+.trk-delta[data-direction="down"] {
+    color: var(--trk-negative);
+}
+
+.trk-delta[data-direction="neutral"] {
+    color: var(--trk-text-dim);
+}
+
+.trk-kpi-hint {
+    color: var(--trk-text-dim);
+    font-size: 11px;
+}
+
+/* === Card / sections === */
+
+.trk-card {
+    background: var(--trk-surface);
+    border: 1px solid var(--trk-border);
+    border-radius: var(--trk-radius);
+    padding: 16px;
+    margin-bottom: 24px;
+}
+
+.trk-card-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.trk-card-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0;
+    color: var(--trk-text);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.trk-card-subtitle {
+    font-size: 12px;
+    color: var(--trk-text-dim);
+}
+
+/* === Chart === */
+
+.trk-chart-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.trk-chart svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+}
+
+.trk-chart .trk-chart-axis {
+    stroke: var(--trk-border);
+    stroke-width: 1;
+}
+
+.trk-chart .trk-chart-grid {
+    stroke: var(--trk-border);
+    stroke-width: 1;
+    stroke-dasharray: 2 4;
+    opacity: 0.5;
+}
+
+.trk-chart .trk-chart-line {
+    fill: none;
+    stroke: var(--trk-accent);
+    stroke-width: 2;
+}
+
+.trk-chart .trk-chart-area {
+    fill: var(--trk-accent-dim);
+    stroke: none;
+}
+
+.trk-chart .trk-chart-dot {
+    fill: var(--trk-accent);
+    stroke: var(--trk-bg);
+    stroke-width: 1;
+    cursor: pointer;
+}
+
+.trk-chart .trk-chart-tick {
+    fill: var(--trk-text-dim);
+    font-size: 10px;
+    font-family: inherit;
+}
+
+/* === Table / breakdown === */
+
+.trk-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.trk-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.trk-table thead th {
+    text-align: left;
+    color: var(--trk-text-muted);
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--trk-border);
+}
+
+.trk-table thead th.trk-num {
+    text-align: right;
+}
+
+.trk-table tbody td {
+    padding: 8px;
+    border-bottom: 1px solid var(--trk-border);
+    color: var(--trk-text);
+}
+
+.trk-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.trk-table .trk-num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: var(--trk-text);
+}
+
+.trk-table .trk-bar-cell {
+    position: relative;
+    width: 30%;
+    min-width: 80px;
+    padding-right: 8px;
+}
+
+.trk-bar {
+    position: relative;
+    height: 6px;
+    background: var(--trk-surface-alt);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.trk-bar-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: var(--trk-accent);
+    opacity: 0.85;
+    border-radius: 3px;
+}
+
+.trk-label-cell {
+    color: var(--trk-text);
+    word-break: break-word;
+    max-width: 240px;
+    overflow-wrap: anywhere;
+}
+
+.trk-label-muted {
+    color: var(--trk-text-muted);
+    font-style: italic;
+}
+
+/* === Empty / error states === */
+
+.trk-state {
+    padding: 24px 12px;
+    text-align: center;
+    color: var(--trk-text-muted);
+    font-size: 13px;
+    border: 1px dashed var(--trk-border);
+    border-radius: var(--trk-radius-sm);
+}
+
+.trk-state[data-tone="error"] {
+    color: var(--trk-negative);
+    border-color: rgba(248, 81, 73, 0.4);
+    background: rgba(248, 81, 73, 0.05);
+}
+
+.trk-state-hint {
+    margin-top: 8px;
+    color: var(--trk-text-dim);
+    font-size: 12px;
+}
+
+/* === Misc === */
+
+.trk-row-skeleton {
+    display: block;
+    height: 18px;
+    background: var(--trk-surface-alt);
+    border-radius: var(--trk-radius-sm);
+    animation: trk-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes trk-pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+}
+
+.trk-range-form {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.trk-range-form input[type="datetime-local"] {
+    background: var(--trk-surface);
+    color: var(--trk-text);
+    border: 1px solid var(--trk-border);
+    border-radius: var(--trk-radius-sm);
+    padding: 4px 8px;
+    font-size: 12px;
+    font-family: inherit;
+    color-scheme: dark;
+}
+
+.trk-range-form button {
+    background: var(--trk-accent);
+    color: #0d1014;
+    border: none;
+    border-radius: var(--trk-radius-sm);
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.trk-range-form button:hover {
+    opacity: 0.9;
+}
+
+.trk-range-form details summary {
+    cursor: pointer;
+    color: var(--trk-text-muted);
+    font-size: 12px;
+}
+
+.trk-range-form details[open] summary {
+    color: var(--trk-text);
+}
