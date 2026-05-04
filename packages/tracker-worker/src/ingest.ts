@@ -190,6 +190,11 @@ async function persistEvent(event: TrackEvent, request: Request, env: Env): Prom
         sanitizeBlob(enriched.country, 8),
         sanitizeBlob(enriched.device_type, 16),
         sanitizeBlob(enriched.browser, 16),
+        // blob12 (último): anon_id rotativo do SDK. Permite contar visitors
+        // únicos via count(DISTINCT blob12) em /api/kpis|timeseries|breakdown.
+        // Mantém último pra não quebrar consumidores existentes que indexam
+        // por posição (utm-summary usa blob3/blob4, etc.).
+        sanitizeBlob(enriched.anon_id, 64),
       ],
       doubles: [enriched.viewport_w || 0, enriched.viewport_h || 0],
     });

@@ -3,7 +3,13 @@
 // a separação por tenant é feita via site_id no payload + allowlists em KV.
 
 import { handleIngest, handleIngestOptions } from "./ingest";
-import { handleUtmSummary, handlePageviews } from "./api";
+import {
+  handleUtmSummary,
+  handlePageviews,
+  handleTimeseries,
+  handleKpis,
+  handleBreakdown,
+} from "./api";
 import { rotateSaltCron } from "./salt";
 import type { Env } from "./types";
 
@@ -26,6 +32,21 @@ export default {
     if (path === "/api/pageviews") {
       if (request.method !== "GET") return new Response(null, { status: 405 });
       return handlePageviews(request, env);
+    }
+
+    if (path === "/api/timeseries") {
+      if (request.method !== "GET") return new Response(null, { status: 405 });
+      return handleTimeseries(request, env);
+    }
+
+    if (path === "/api/kpis") {
+      if (request.method !== "GET") return new Response(null, { status: 405 });
+      return handleKpis(request, env);
+    }
+
+    if (path === "/api/breakdown") {
+      if (request.method !== "GET") return new Response(null, { status: 405 });
+      return handleBreakdown(request, env);
     }
 
     if (path === "/health") {

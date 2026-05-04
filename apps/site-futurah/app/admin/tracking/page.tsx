@@ -1,134 +1,150 @@
 import { Suspense } from "react";
-import { headers as nextHeaders } from "next/headers";
-import { notFound } from "next/navigation";
-import { getPayload } from "payload";
-import config from "@payload-config";
+import { requireSuperadmin } from "./lib/auth";
+import { resolveCtx } from "./lib/ctx";
+import { SiteSelector } from "./components/SiteSelector";
+import { WindowSelector } from "./components/WindowSelector";
+import { KPIGrid } from "./components/KPIGrid";
+import { TimeseriesChart } from "./components/TimeseriesChart";
+import { BreakdownTable, refLabel } from "./components/BreakdownTable";
+import { DataState } from "./components/DataState";
 
 export const dynamic = "force-dynamic";
 
-async function requireSuperadmin(): Promise<void> {
-    const payload = await getPayload({ config });
-    const headers = await nextHeaders();
-    const { user } = await payload.auth({ headers });
-    if (!user || user.role !== "superadmin") {
-        notFound();
-    }
-}
-
-type UtmRow = { utm_source: string; utm_medium: string; count: number };
-
-async function fetchUtmSummary(siteId: string): Promise<UtmRow[]> {
-    const base = process.env.TRACKER_API_URL;
-    const token = process.env.TRACKER_API_TOKEN;
-    if (!base || !token) return [];
-    try {
-        const res = await fetch(
-            `${base}/api/utm-summary?site_id=${encodeURIComponent(siteId)}&since=24h`,
-            {
-                headers: { Authorization: `Bearer ${token}` },
-                cache: "no-store",
-            },
-        );
-        if (!res.ok) return [];
-        const data = (await res.json()) as { rows?: UtmRow[] };
-        return data.rows || [];
-    } catch {
-        return [];
-    }
-}
-
-async function UtmTable({ siteId }: { siteId: string }) {
-    const rows = await fetchUtmSummary(siteId);
-    return (
-        <table style={{ borderCollapse: "collapse", width: "100%", fontSize: 14 }}>
-            <thead>
-                <tr style={{ textAlign: "left", borderBottom: "1px solid #ccc" }}>
-                    <th style={{ padding: "8px 12px" }}>utm_source</th>
-                    <th style={{ padding: "8px 12px" }}>utm_medium</th>
-                    <th style={{ padding: "8px 12px", textAlign: "right" }}>count</th>
-                </tr>
-            </thead>
-            <tbody>
-                {rows.length === 0 ? (
-                    <tr>
-                        <td
-                            colSpan={3}
-                            style={{ padding: "16px 12px", color: "#666", fontStyle: "italic" }}
-                        >
-                            Sem eventos nas últimas 24h. Verifique se TRACKER_API_URL e
-                            TRACKER_API_TOKEN estão configurados, e se o Worker já recebeu
-                            tráfego.
-                        </td>
-                    </tr>
-                ) : (
-                    rows.map((r, i) => (
-                        <tr key={`${r.utm_source}-${r.utm_medium}-${i}`} style={{ borderBottom: "1px solid #eee" }}>
-                            <td style={{ padding: "8px 12px" }}>{r.utm_source || "(direct)"}</td>
-                            <td style={{ padding: "8px 12px" }}>{r.utm_medium || "(none)"}</td>
-                            <td style={{ padding: "8px 12px", textAlign: "right", fontVariantNumeric: "tabular-nums" }}>
-                                {r.count}
-                            </td>
-                        </tr>
-                    ))
-                )}
-            </tbody>
-        </table>
-    );
-}
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 export default async function TrackingDashboardPage({
     searchParams,
 }: {
-    searchParams?: Promise<{ site?: string }>;
+    searchParams?: SearchParams;
 }) {
     await requireSuperadmin();
+    const sp = (await searchParams) ?? {};
+    const ctx = resolveCtx(sp);
+
     return (
-        <main style={{ maxWidth: 960, margin: "40px auto", padding: 24, fontFamily: "system-ui, sans-serif" }}>
-            <h1 style={{ fontSize: 24, marginBottom: 8 }}>Tracking — UTM summary (24h)</h1>
-            <p style={{ color: "#666", marginBottom: 24, fontSize: 14 }}>
-                MVP. Auth Payload (superadmin); sem filtros; sem gráficos. Lê do Worker
-                <code style={{ marginLeft: 4, padding: "2px 4px", background: "#eee", borderRadius: 3 }}>
-                    GET /api/utm-summary
-                </code>
-                .
-            </p>
+        <main className="trk-root">
+            <div className="trk-container">
+                <header className="trk-header">
+                    <div>
+                        <h1 className="trk-title">Tracking — {ctx.siteId}</h1>
+                        <p className="trk-subtitle">{ctx.sinceLabel}</p>
+                    </div>
+                    <div className="trk-controls" style={{ marginBottom: 0 }}>
+                        <SiteSelector ctx={ctx} />
+                        <WindowSelector ctx={ctx} />
+                    </div>
+                </header>
 
-            <SiteSelector searchParams={searchParams} />
+                <Suspense fallback={<KpiGridFallback />}>
+                    <KPIGrid ctx={ctx} />
+                </Suspense>
 
-            <Suspense fallback={<p>Carregando...</p>}>
-                <SiteTables searchParams={searchParams} />
-            </Suspense>
+                <Suspense fallback={<ChartFallback />}>
+                    <TimeseriesChart ctx={ctx} />
+                </Suspense>
+
+                <section style={{ marginTop: 8 }}>
+                    <div className="trk-card-header" style={{ marginBottom: 12 }}>
+                        <h3 className="trk-card-title">Breakdown</h3>
+                        <span className="trk-card-subtitle">páginas, UTMs, referrers, países, devices, browsers</span>
+                    </div>
+                    <div className="trk-grid">
+                        <Suspense fallback={<TableFallback title="Páginas mais vistas" />}>
+                            <BreakdownTable
+                                ctx={ctx}
+                                variant="path"
+                                title="Páginas mais vistas"
+                                subtitle="top 10 por pageviews"
+                            />
+                        </Suspense>
+                        <Suspense fallback={<TableFallback title="UTMs (source / medium)" />}>
+                            <BreakdownTable
+                                ctx={ctx}
+                                variant="utm"
+                                title="UTMs"
+                                subtitle="source × medium · top 10"
+                            />
+                        </Suspense>
+                        <Suspense fallback={<TableFallback title="Campanhas" />}>
+                            <BreakdownTable
+                                ctx={ctx}
+                                dim="campaign"
+                                title="Campanhas"
+                                subtitle="utm_campaign · top 10"
+                            />
+                        </Suspense>
+                        <Suspense fallback={<TableFallback title="Referrers" />}>
+                            <BreakdownTable
+                                ctx={ctx}
+                                dim="referrer"
+                                title="Referrers"
+                                subtitle="domínio de origem · top 10"
+                                transformLabel={refLabel}
+                            />
+                        </Suspense>
+                        <Suspense fallback={<TableFallback title="Países" />}>
+                            <BreakdownTable
+                                ctx={ctx}
+                                dim="country"
+                                title="Países"
+                                subtitle="ISO-2 · top 10"
+                            />
+                        </Suspense>
+                        <Suspense fallback={<TableFallback title="Devices" />}>
+                            <BreakdownTable
+                                ctx={ctx}
+                                dim="device"
+                                title="Devices"
+                                subtitle="mobile / desktop / tablet · top 10"
+                            />
+                        </Suspense>
+                        <Suspense fallback={<TableFallback title="Browsers" />}>
+                            <BreakdownTable
+                                ctx={ctx}
+                                dim="browser"
+                                title="Browsers"
+                                subtitle="user-agent simplificado · top 10"
+                            />
+                        </Suspense>
+                    </div>
+                </section>
+            </div>
         </main>
     );
 }
 
-async function SiteSelector({
-    searchParams,
-}: {
-    searchParams?: Promise<{ site?: string }>;
-}) {
-    const sp = (await searchParams) ?? {};
-    const current = sp.site ?? "futurah";
+function TableFallback({ title }: { title: string }) {
     return (
-        <p style={{ marginBottom: 16, fontSize: 14 }}>
-            Site:{" "}
-            <a href="?site=futurah" style={{ fontWeight: current === "futurah" ? 700 : 400 }}>
-                futurah
-            </a>{" "}
-            |{" "}
-            <a href="?site=fidevidraceiro" style={{ fontWeight: current === "fidevidraceiro" ? 700 : 400 }}>
-                fidevidraceiro
-            </a>
-        </p>
+        <div className="trk-card">
+            <div className="trk-card-header">
+                <h3 className="trk-card-title">{title}</h3>
+            </div>
+            <DataState status="loading" />
+        </div>
     );
 }
 
-async function SiteTables({
-    searchParams,
-}: {
-    searchParams?: Promise<{ site?: string }>;
-}) {
-    const sp = (await searchParams) ?? {};
-    const siteId = sp.site === "fidevidraceiro" ? "fidevidraceiro" : "futurah";
-    return <UtmTable siteId={siteId} />;
+function KpiGridFallback() {
+    return (
+        <div className="trk-kpi-grid">
+            {[0, 1, 2, 3].map((i) => (
+                <div className="trk-kpi" key={i}>
+                    <span className="trk-row-skeleton" style={{ width: "50%" }} />
+                    <span className="trk-row-skeleton" style={{ width: "70%", height: 28 }} />
+                </div>
+            ))}
+        </div>
+    );
 }
+
+function ChartFallback() {
+    return (
+        <div className="trk-card">
+            <div className="trk-card-header">
+                <h3 className="trk-card-title">Pageviews ao longo do tempo</h3>
+            </div>
+            <DataState status="loading" />
+        </div>
+    );
+}
+
