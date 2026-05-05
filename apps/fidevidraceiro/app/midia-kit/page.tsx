@@ -221,58 +221,13 @@ function DashboardSection({
   children: React.ReactNode;
 }) {
   return (
-    <section
-      className="fdv-section"
-      style={{
-        background: light ? "var(--fdv-bg)" : "var(--fdv-primary-900)",
-        color: light ? "var(--fdv-primary-900)" : "var(--fdv-bg)",
-        padding: 0,
-        display: "flex",
-        flexDirection: "row",
-        overflow: "hidden",
-      }}
-    >
-      <div
-        style={{
-          flex: 1,
-          padding: "clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 4vw, 3rem)",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          gap: "clamp(1.5rem, 3vw, 2.5rem)",
-          minWidth: 0,
-        }}
-      >
-        <div className="fdv-section-eyebrow" style={{ color: light ? "var(--fdv-primary-500)" : "var(--fdv-primary-300)" }}>
-          {eyebrow}
-        </div>
+    <section className={`fdv-section fdv-dash ${light ? "fdv-dash-light" : "fdv-dash-dark"}`}>
+      <div className="fdv-dash-content">
+        <div className="fdv-section-eyebrow fdv-dash-eyebrow">{eyebrow}</div>
         {children}
       </div>
-      <div
-        style={{
-          background: "var(--fdv-orange-500)",
-          width: "clamp(56px, 7vw, 88px)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0,
-        }}
-      >
-        <span
-          style={{
-            writingMode: "vertical-rl",
-            transform: "rotate(180deg)",
-            fontFamily: "var(--fdv-font-display)",
-            fontSize: "clamp(2rem, 5.5vw, 4.5rem)",
-            letterSpacing: "-0.03em",
-            textTransform: "uppercase",
-            color: "var(--fdv-bg)",
-            whiteSpace: "nowrap",
-            lineHeight: 1,
-          }}
-        >
-          {bandLabel}
-        </span>
+      <div className="fdv-dash-band">
+        <span className="fdv-dash-band-label">{bandLabel}</span>
       </div>
     </section>
   );

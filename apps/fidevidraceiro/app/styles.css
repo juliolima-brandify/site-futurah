@@ -294,51 +294,52 @@
    ALTERNÂNCIA — branco/preto a cada seção
    Sections pares ficam pretas. Texto e tokens semânticos
    se ajustam automaticamente.
+   .fdv-dash é excluída — controla as próprias cores.
    ========================================================= */
-.fdv-root .fdv-section:nth-child(even) {
+.fdv-root .fdv-section:nth-child(even):not(.fdv-dash) {
   background: var(--fdv-primary-900);
   color: var(--fdv-bg);
   --fdv-text-muted: var(--fdv-primary-300);
 }
-.fdv-root .fdv-section:nth-child(even) h1,
-.fdv-root .fdv-section:nth-child(even) h2,
-.fdv-root .fdv-section:nth-child(even) h3 {
+.fdv-root .fdv-section:nth-child(even):not(.fdv-dash) h1,
+.fdv-root .fdv-section:nth-child(even):not(.fdv-dash) h2,
+.fdv-root .fdv-section:nth-child(even):not(.fdv-dash) h3 {
   color: var(--fdv-bg);
 }
-.fdv-root .fdv-section:nth-child(even) .fdv-section-eyebrow {
+.fdv-root .fdv-section:nth-child(even):not(.fdv-dash) .fdv-section-eyebrow {
   color: var(--fdv-primary-300);
 }
 /* Botão primary fica invisível em bg preto — inverte */
-.fdv-root .fdv-section:nth-child(even) .fdv-btn-primary {
+.fdv-root .fdv-section:nth-child(even):not(.fdv-dash) .fdv-btn-primary {
   background: var(--fdv-bg);
   color: var(--fdv-primary-900);
   border-color: var(--fdv-bg);
   box-shadow: 2px 2px 0 0 var(--fdv-bg);
 }
-.fdv-root .fdv-section:nth-child(even) .fdv-btn-primary:hover {
+.fdv-root .fdv-section:nth-child(even):not(.fdv-dash) .fdv-btn-primary:hover {
   box-shadow: 4px 4px 0 0 var(--fdv-bg);
 }
-.fdv-root .fdv-section:nth-child(even) .fdv-btn-primary:active {
+.fdv-root .fdv-section:nth-child(even):not(.fdv-dash) .fdv-btn-primary:active {
   box-shadow: 0 0 0 0 var(--fdv-bg);
 }
 /* Secondary também precisa inverter (fundo branco vira preto, borda branca) */
-.fdv-root .fdv-section:nth-child(even) .fdv-btn-secondary {
+.fdv-root .fdv-section:nth-child(even):not(.fdv-dash) .fdv-btn-secondary {
   background: var(--fdv-primary-900);
   color: var(--fdv-bg);
   border-color: var(--fdv-bg);
   box-shadow: 2px 2px 0 0 var(--fdv-bg);
 }
-.fdv-root .fdv-section:nth-child(even) .fdv-btn-secondary:hover {
+.fdv-root .fdv-section:nth-child(even):not(.fdv-dash) .fdv-btn-secondary:hover {
   box-shadow: 4px 4px 0 0 var(--fdv-bg);
 }
-.fdv-root .fdv-section:nth-child(even) .fdv-btn-secondary:active {
+.fdv-root .fdv-section:nth-child(even):not(.fdv-dash) .fdv-btn-secondary:active {
   box-shadow: 0 0 0 0 var(--fdv-bg);
 }
 /* Ghost — inverte texto */
-.fdv-root .fdv-section:nth-child(even) .fdv-btn-ghost {
+.fdv-root .fdv-section:nth-child(even):not(.fdv-dash) .fdv-btn-ghost {
   color: var(--fdv-bg);
 }
-.fdv-root .fdv-section:nth-child(even) .fdv-btn-ghost:hover {
+.fdv-root .fdv-section:nth-child(even):not(.fdv-dash) .fdv-btn-ghost:hover {
   background: var(--fdv-primary-700);
 }
 
@@ -360,6 +361,46 @@
   z-index: 50;
   pointer-events: none;
   user-select: none;
+}
+
+/* DashboardSection — duas colunas (conteúdo + faixa lateral vertical) */
+.fdv-dash {
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+}
+.fdv-dash-light { background: var(--fdv-bg); color: var(--fdv-primary-900); --fdv-text-muted: var(--fdv-primary-500); }
+.fdv-dash-dark  { background: var(--fdv-primary-900); color: var(--fdv-bg); --fdv-text-muted: var(--fdv-primary-300); }
+.fdv-dash-content {
+  flex: 1;
+  padding: clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 4vw, 3rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  min-width: 0;
+}
+.fdv-dash-light .fdv-dash-eyebrow { color: var(--fdv-primary-500); }
+.fdv-dash-dark  .fdv-dash-eyebrow { color: var(--fdv-primary-300); }
+.fdv-dash-band {
+  background: var(--fdv-orange-500);
+  width: clamp(56px, 7vw, 88px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.fdv-dash-band-label {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--fdv-font-display);
+  font-size: clamp(2rem, 5.5vw, 4.5rem);
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  color: var(--fdv-bg);
+  white-space: nowrap;
+  line-height: 1;
 }
 
 /* Setas de navegação entre seções */
@@ -616,4 +657,65 @@
   font-style: normal;
   background: var(--fdv-orange-500);
   padding: 0 0.15em;
+}
+
+/* =========================================================
+   MOBILE — desliga snap, ajusta DashboardSection e esconde
+   affordances que só fazem sentido no desktop.
+   ========================================================= */
+@media (max-width: 767px) {
+  /* Scroll natural: a página vira um documento longo no mobile */
+  .fdv-snap-container {
+    height: auto;
+    min-height: 100dvh;
+    overflow-y: visible;
+    scroll-snap-type: none;
+    scroll-behavior: auto;
+  }
+  .fdv-snap-container .fdv-section {
+    min-height: auto;
+    scroll-snap-align: none;
+    scroll-snap-stop: normal;
+    padding-top: var(--fdv-space-12);
+    padding-bottom: var(--fdv-space-12);
+  }
+  /* Cover continua tela cheia pra dar impacto */
+  .fdv-snap-container .fdv-cover {
+    min-height: 100dvh;
+    justify-content: center;
+  }
+
+  /* Affordances de snap fora */
+  .fdv-nav-arrows { display: none; }
+  .fdv-scroll-blur { display: none; }
+  .fdv-scroll-hint { display: none; }
+  .fdv-counter { display: none; }
+
+  /* DashboardSection — empilha em coluna, faixa laranja vira banner topo */
+  .fdv-dash {
+    flex-direction: column;
+  }
+  .fdv-dash-band {
+    width: 100%;
+    height: 56px;
+    order: -1;
+  }
+  .fdv-dash-band-label {
+    writing-mode: horizontal-tb;
+    transform: none;
+    font-size: clamp(1.25rem, 6vw, 1.75rem);
+  }
+  .fdv-dash-content {
+    padding: var(--fdv-space-8) var(--fdv-space-6);
+    justify-content: flex-start;
+    gap: var(--fdv-space-6);
+  }
+
+  /* Footer — h2 sem estourar a tela */
+  .fdv-section h2 {
+    font-size: clamp(1.75rem, 9vw, 3rem) !important;
+  }
+
+  /* Reels: empilhamento desigual fica feio em mobile, normaliza */
+  .fdv-reels-grid > * { transform: none !important; }
 }

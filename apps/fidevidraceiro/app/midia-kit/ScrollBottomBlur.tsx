@@ -31,7 +31,7 @@ export default function ScrollBottomBlur() {
   return (
     <div
       aria-hidden
-      className="fixed bottom-0 left-0 right-0 pointer-events-none transition-opacity duration-300 ease-out"
+      className="fdv-scroll-blur fixed bottom-0 left-0 right-0 pointer-events-none transition-opacity duration-300 ease-out"
       style={{
         height: 240,
         zIndex: 100,
