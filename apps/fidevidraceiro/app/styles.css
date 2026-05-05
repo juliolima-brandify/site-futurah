@@ -363,15 +363,17 @@
   user-select: none;
 }
 
-/* DashboardSection — duas colunas (conteúdo + faixa lateral vertical) */
-.fdv-dash {
+/* DashboardSection — duas colunas (conteúdo + faixa lateral vertical).
+   Usa especificidade 0,2,0 (.fdv-section.fdv-dash) para ganhar do
+   .fdv-snap-container .fdv-section (mesmo nível mas definido antes). */
+.fdv-section.fdv-dash {
   padding: 0;
   display: flex;
   flex-direction: row;
   overflow: hidden;
 }
-.fdv-dash-light { background: var(--fdv-bg); color: var(--fdv-primary-900); --fdv-text-muted: var(--fdv-primary-500); }
-.fdv-dash-dark  { background: var(--fdv-primary-900); color: var(--fdv-bg); --fdv-text-muted: var(--fdv-primary-300); }
+.fdv-section.fdv-dash-light { background: var(--fdv-bg); color: var(--fdv-primary-900); --fdv-text-muted: var(--fdv-primary-500); }
+.fdv-section.fdv-dash-dark  { background: var(--fdv-primary-900); color: var(--fdv-bg); --fdv-text-muted: var(--fdv-primary-300); }
 .fdv-dash-content {
   flex: 1;
   padding: clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 4vw, 3rem);
@@ -692,7 +694,7 @@
   .fdv-counter { display: none; }
 
   /* DashboardSection — empilha em coluna, faixa laranja vira banner topo */
-  .fdv-dash {
+  .fdv-section.fdv-dash {
     flex-direction: column;
   }
   .fdv-dash-band {
