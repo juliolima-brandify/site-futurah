@@ -122,6 +122,7 @@
 .fdv-root strong {
   font-weight: 700;
   background: var(--fdv-acid-500);
+  color: var(--fdv-primary-900);
   padding: 0 4px;
 }
 
@@ -361,6 +362,44 @@
   user-select: none;
 }
 
+/* Setas de navegação entre seções */
+.fdv-nav-arrows {
+  position: fixed;
+  right: var(--fdv-space-4);
+  bottom: var(--fdv-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--fdv-space-2);
+  z-index: 110;
+}
+.fdv-nav-arrows button {
+  width: 44px;
+  height: 44px;
+  background: var(--fdv-primary-900);
+  color: var(--fdv-bg);
+  border: 2px solid var(--fdv-primary-900);
+  border-radius: var(--fdv-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--fdv-transition);
+  box-shadow: var(--fdv-shadow-sm);
+  padding: 0;
+}
+.fdv-nav-arrows button:hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+  box-shadow: var(--fdv-shadow-md);
+}
+.fdv-nav-arrows button:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 0 var(--fdv-primary-900);
+}
+.fdv-nav-arrows button:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
 /* Hint de scroll na primeira tela */
 .fdv-scroll-hint {
   position: absolute;
@@ -404,6 +443,133 @@
   height: 22px;
   background: var(--fdv-primary-900);
   border-radius: 1px;
+}
+
+/* Imprensa — grid de cards estilo YouTube */
+.fdv-press-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--fdv-space-8) var(--fdv-space-6);
+}
+@media (min-width: 760px) {
+  .fdv-press-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.fdv-yt-post {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fdv-space-3);
+  color: currentColor;
+}
+.fdv-yt-title {
+  font-family: var(--fdv-font-sans);
+  font-weight: 700;
+  font-size: clamp(1rem, 1.6vw, 1.25rem);
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  color: currentColor;
+  margin: 0;
+}
+.fdv-yt-video {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--fdv-primary-700);
+}
+.fdv-yt-video img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.fdv-yt-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.78);
+  color: #FF0000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.fdv-yt-play svg { margin-left: 3px; }
+.fdv-yt-duration {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  background: rgba(0, 0, 0, 0.85);
+  color: #FFFFFF;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-family: var(--fdv-font-sans);
+  letter-spacing: 0;
+  line-height: 1.4;
+}
+.fdv-yt-meta {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.fdv-yt-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--fdv-bg);
+  border: 1px solid var(--fdv-primary-300);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.fdv-yt-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 3px;
+}
+.fdv-yt-meta-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+.fdv-yt-channel {
+  font-size: 13px;
+  font-weight: 500;
+  color: currentColor;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.fdv-yt-verified {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--fdv-text-muted);
+  color: var(--fdv-primary-900);
+  flex-shrink: 0;
+}
+.fdv-yt-stats {
+  font-size: 12px;
+  color: var(--fdv-text-muted);
+}
+.fdv-yt-description {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--fdv-text-muted);
 }
 
 /* Reels collage — 4 cards em formato vertical (9:16) com leve escalonamento */

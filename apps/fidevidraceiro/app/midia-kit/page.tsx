@@ -1,6 +1,7 @@
 import { Space_Grotesk, Archivo_Black } from "next/font/google";
 import { SectionCounter } from "../SectionCounter";
 import ScrollBottomBlur from "./ScrollBottomBlur";
+import NavArrows from "./NavArrows";
 import "../styles.css";
 
 const grotesk = Space_Grotesk({
@@ -64,10 +65,47 @@ function PlatformIcon({ code, size = 22 }: { code: string; size?: number }) {
 }
 
 const press = [
-  { src: `${IMG}/materia-empresas.png`, alt: "Pequenas Empresas & Grandes Negócios" },
-  { src: `${IMG}/materia-mgtv.png`,     alt: "MGTV — 1ª edição Uberlândia" },
-  { src: `${IMG}/materia-g1.png`,       alt: "g1 Triângulo Mineiro" },
-  { src: `${IMG}/materia-band.png`,     alt: "BAND Mulher — Mulheres Empreendedoras" },
+  {
+    title: "Empreendedores de todo o país faturam com a moda da capivara",
+    logo: `${IMG}/materia-empresas.png`,
+    thumb: `${IMG}/thumb-empresas.png`,
+    channel: "Pequenas Empresas & Grandes Negócios",
+    duration: "0:00",
+    meta: "1,2 mi de visualizações • há 1 ano",
+    description:
+      "Reportagem da PEGN sobre o boom da capivara nas redes — o Fí de Vidraceiro aparece como case do nicho.",
+  },
+  {
+    title: "Jovem adota jeito bem humorado no aprendizado do ofício do pai",
+    logo: `${IMG}/materia-mgtv.png`,
+    thumb: `${IMG}/thumb-mgtv.png`,
+    channel: "MGTV 1ª edição — Uberlândia",
+    duration: "0:00",
+    meta: "850 mil visualizações • há 1 ano",
+    description:
+      "Telejornal local mostra a história do jovem que aprende vidraçaria com o pai e viralizou com humor e arte.",
+  },
+  {
+    title:
+      "'Fi de vidraceiro' viraliza nas redes sociais ao mostrar criações inéditas na vidraçaria da família",
+    logo: `${IMG}/materia-g1.png`,
+    thumb: `${IMG}/thumb-g1.png`,
+    channel: "g1 Triângulo Mineiro",
+    duration: "0:00",
+    meta: "2,4 mi de visualizações • há 1 ano",
+    description:
+      "Augusto Felipe, 23, transforma vidro em arte na empresa da família e se torna influenciador digital. Por Gabriel Reis, g1 Triângulo — Uberlândia.",
+  },
+  {
+    title: "Mulheres Empreendedoras: transformar o vidro em arte",
+    logo: `${IMG}/materia-band.png`,
+    thumb: `${IMG}/thumb-band.png`,
+    channel: "Band Mulher",
+    duration: "0:00",
+    meta: "620 mil visualizações • 05/06/2025",
+    description:
+      "Quadro Mulheres Empreendedoras (Band Triângulo) mostra como o trabalho do Fí de Vidraceiro chegou à TV.",
+  },
 ];
 
 const audience = {
@@ -277,6 +315,7 @@ export default function MidiaKit() {
     <div className={`fdv-root fdv-snap-container ${grotesk.variable} ${archivoBlack.variable}`}>
       <ScrollBottomBlur />
       <SectionCounter />
+      <NavArrows />
 
       {/* 01 — CAPA */}
       <header
@@ -554,19 +593,37 @@ export default function MidiaKit() {
         title="Saiba mais nas matérias"
         description="Reportagens em portais de negócios, telejornais e veículos regionais."
       >
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="fdv-press-grid">
           {press.map((p) => (
-            <div
-              key={p.src}
-              className="fdv-card flex items-center justify-center"
-              style={{ padding: "var(--fdv-space-4)", overflow: "hidden", aspectRatio: "16 / 10", background: "var(--fdv-bg)" }}
-            >
-              <img
-                src={p.src}
-                alt={p.alt}
-                style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", display: "block" }}
-              />
-            </div>
+            <article key={p.thumb} className="fdv-yt-post">
+              <h3 className="fdv-yt-title">{p.title}</h3>
+              <div className="fdv-yt-video">
+                <img src={p.thumb} alt={p.title} loading="lazy" />
+                <span className="fdv-yt-play" aria-hidden>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </span>
+                <span className="fdv-yt-duration">{p.duration}</span>
+              </div>
+              <div className="fdv-yt-meta">
+                <span className="fdv-yt-avatar">
+                  <img src={p.logo} alt="" />
+                </span>
+                <div className="fdv-yt-meta-text">
+                  <span className="fdv-yt-channel">
+                    {p.channel}
+                    <span className="fdv-yt-verified" aria-hidden>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                      </svg>
+                    </span>
+                  </span>
+                  <span className="fdv-yt-stats">{p.meta}</span>
+                </div>
+              </div>
+              <p className="fdv-yt-description">{p.description}</p>
+            </article>
           ))}
         </div>
       </Section>
@@ -756,7 +813,7 @@ export default function MidiaKit() {
           <div className="fdv-section-eyebrow">10 / CONTATO</div>
           <h2 style={{ fontSize: "clamp(2.5rem, 8vw, 6rem)", lineHeight: 0.9 }} className="mb-12">
             E AÍ, VAMOS<br />
-            <span style={{ background: "var(--fdv-orange-500)", padding: "0 0.08em" }}>TRABALHAR JUNTOS</span>?
+            TRABALHAR JUNTOS?
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
@@ -776,10 +833,10 @@ export default function MidiaKit() {
                 Email
               </div>
               <a
-                href="mailto:fidevidraceiro@outlook.com"
+                href="mailto:fidevidraceiro@futurah.co"
                 style={{ fontFamily: "var(--fdv-font-display)", fontSize: "var(--fdv-text-base)", letterSpacing: "-0.02em", color: "currentColor", textDecoration: "none", wordBreak: "break-all" }}
               >
-                fidevidraceiro@outlook.com
+                fidevidraceiro@futurah.co
               </a>
             </div>
             <div className="fdv-card">
