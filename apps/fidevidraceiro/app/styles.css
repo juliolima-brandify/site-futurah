@@ -457,6 +457,7 @@
   animation: fdv-bounce 1.6s ease-in-out infinite;
   pointer-events: none;
 }
+.fdv-scroll-icon-mobile { display: none; }
 @keyframes fdv-bounce {
   0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.6; }
   50%      { transform: translateX(-50%) translateY(8px); opacity: 1; }
@@ -692,6 +693,23 @@
   .fdv-scroll-blur { display: none; }
   .fdv-scroll-hint { display: none; }
   .fdv-counter { display: none; }
+
+  /* Ícone de scroll dentro do hero, só mobile */
+  .fdv-scroll-icon-mobile {
+    display: flex;
+    position: absolute;
+    bottom: var(--fdv-space-6);
+    left: 50%;
+    transform: translateX(-50%);
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    color: var(--fdv-bg);
+    opacity: 0.85;
+    animation: fdv-bounce 1.6s ease-in-out infinite;
+    pointer-events: none;
+  }
 
   /* DashboardSection — empilha em coluna, faixa laranja vira banner topo */
   .fdv-section.fdv-dash {

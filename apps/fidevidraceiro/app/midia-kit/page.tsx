@@ -277,9 +277,9 @@ export default function MidiaKit() {
         className="fdv-section fdv-cover"
         style={{
           position: "relative",
-          backgroundImage: `linear-gradient(90deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.45) 45%, rgba(0,0,0,0) 100%), url(${IMG}/cover-bg.png)`,
+          backgroundImage: `linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url(${IMG}/cover-bg.png)`,
           backgroundSize: "cover",
-          backgroundPosition: "center right",
+          backgroundPosition: "75% center",
           backgroundRepeat: "no-repeat",
           color: "var(--fdv-bg)",
         }}
@@ -305,6 +305,11 @@ export default function MidiaKit() {
           </div>
         </div>
         <div className="fdv-scroll-hint">↓ Scroll</div>
+        <div className="fdv-scroll-icon-mobile" aria-hidden>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </div>
       </header>
 
       {/* 02 — QUEM SOU */}

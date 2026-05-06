@@ -194,7 +194,7 @@ Reels viral (topo)
 1. **Linktree/bio link** — ✅ no ar em `fidevidraceiro.augustofelipe.com` (V1: avatar, YouTube com thumbnail, Parcerias por e-mail, share button, footer com políticas). Captura de lead ainda não foi adicionada — próximo iteração.
 2. **Landing page de captura** — e-mail / WhatsApp em troca de lead magnet
 3. **Página de vendas** — curso (quando pronto)
-4. **Media kit** — ✅ no ar em `/midia-kit` (mesma app). Snap-scroll de seção por viewport, capa com foto de bg + gradient overlay esquerda→direita + logo branco, dashboards de Público-Alvo (gênero silhuetas, área-chart de cidades, pill bars de idades) e Conteúdo (chips de interesse, bubble chart de temas) com banda lateral laranja "PÚBLICO-ALVO". Imprensa reduzida aos 4 logos extraídos do PDF (Empresas & Negócios, MGTV, g1 Triângulo Mineiro, BAND). `ScrollBottomBlur` faz fade do rodapé conforme scrolla.
+4. **Media kit** — ✅ no ar em `/midia-kit` (mesma app). Snap-scroll de seção por viewport, capa com foto de bg (`cover-bg.png`, Augusto + reflexo no espelho) + overlay preto uniforme (`rgba(0,0,0,0.55)`) + logo branco, dashboards de Público-Alvo (gênero silhuetas, área-chart de cidades, pill bars de idades) e Conteúdo (chips de interesse, bubble chart de temas) com banda lateral laranja "PÚBLICO-ALVO". Imprensa reduzida aos 4 logos extraídos do PDF (Empresas & Negócios, MGTV, g1 Triângulo Mineiro, BAND). `ScrollBottomBlur` faz fade do rodapé conforme scrolla. Hero usa `background-position: 75% center` pra manter Augusto no enquadramento; `.fdv-scroll-icon-mobile` (chevron-down animado com `fdv-bounce`) só aparece no mobile (`@media max-width: 767px`), enquanto o hint de texto `↓ Scroll` é desktop-only.
 5. **Página "sobre"** — história de Augusto, prova social, contato comercial
 
 ### Dashboard e gestão
@@ -285,4 +285,4 @@ Reels viral (topo)
 ---
 
 *CONTEXT.md · Futurah and Co. · Uso interno · Não compartilhar*  
-*Última atualização: 01/mai/2026*
+*Última atualização: 06/mai/2026*
