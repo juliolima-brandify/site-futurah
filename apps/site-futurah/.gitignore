@@ -48,4 +48,14 @@ next-env.d.ts
 # scratch local (extração de PDFs de cliente, scripts throwaway, dumps intermediários)
 /tmp/
 
+# scripts/ NÃO é gitignored. Seeds idempotentes (seed-tenants) e migrations
+# one-off ficam tracked pra que bootstrap de DB novo seja reproduzível.
+# Antes de versionar um script novo, conferir que ele não tem secrets
+# hardcoded — sempre ler de process.env (DATABASE_URL etc.).
+# Logs/artefatos locais ignorados abaixo.
+/scripts/.test.log
+/scripts/*.log
+
 .vercel
+
+.env*.local

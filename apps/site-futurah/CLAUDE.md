@@ -43,6 +43,7 @@ O projeto é deployado na **Vercel**, team `admbrandify-gmailcoms-projects` (`te
 - `NEXT_PUBLIC_TRACKER_ENDPOINT` — `https://t.futurah.co/e` (consumido pelo `<TrackerBoundary />` do site).
 - `TRACKER_API_URL` — `https://t.futurah.co` (consumido pelo dashboard `/admin/tracking` server-side).
 - `TRACKER_API_TOKEN` — bearer pra ler `/api/utm-summary` no Worker (sincronizado com o secret `API_READ_TOKEN` no Worker via `wrangler secret put`).
+- `LEADS_INGEST_TOKEN` — bearer fixo aceito por `/api/leads/ingest`. **Mesmo valor** está setado no projeto `augustofelipe` (que escreve). Rotacionar = atualizar nos dois projetos em sincronia. Listar/checar com `npx vercel env ls --scope=admbrandify-gmailcoms-projects`.
 
 **Gotchas do build em monorepo Turbo 2 strict** (já consertados no repo, ler antes de mexer):
 - `package.json` raiz precisa de `"packageManager"` (Turbo 2 strict). Sem isso: `Could not resolve workspaces`.
@@ -71,17 +72,19 @@ O projeto é deployado na **Vercel**, team `admbrandify-gmailcoms-projects` (`te
 3. Renderizar páginas como PNG via `page.get_pixmap(matrix=fitz.Matrix(1.5, 1.5))` em `tmp/page-thumbs/` pra eu inspecionar visualmente o layout antes de codar (uso o Read tool nos PNGs).
 4. Texto em UTF-8 fica no JSON (não no console — `print` em PowerShell mostra `?` pra acentos por causa de cp1252; sempre ler o JSON pra ter texto correto).
 - `app/api/` — rotas de API custom do site:
-  - `/api/contact`, `/api/newsletter` — ingestão Payload (Leads, NewsletterSubscribers).
+  - `/api/contact`, `/api/newsletter` — ingestão Payload (Leads, NewsletterSubscribers). Usa lookup por `host → tenant.domain` com fallback `tenant.slug='futurah'`.
+  - `/api/leads/ingest` (POST) — endpoint server-to-server pra outros apps do monorepo (`augustofelipe`, `fidevidraceiro`) inserirem leads no Payload central com tenant scope correto. Bearer fixo (`LEADS_INGEST_TOKEN`, mesmo valor nos dois projetos Vercel). Body: `{siteId, name, email, whatsapp, source, answers}`. Lookup `siteId → tenant.id` em `payload.tenants.siteId`. Idempotente por `(tenant, email)`. Sem unique global em email — cliente B pode ter o mesmo lead que cliente A; dedup só dentro do tenant. Token rotation: gerar novo via `[Convert]::ToHexString(...)` ou `openssl rand -hex 32`, atualizar nos dois projetos Vercel (`site-futurah` + `augustofelipe`) em production+preview+development. Worker `/lead` no D1 foi removido (migration `0002_drop_leads.sql`); este é o único caminho de ingestão cross-app.
   - `/api/aplicacao` (POST) — ingestão do wizard de análise + dispara geração em background.
   - `/api/aplicacao/[slug]/status` (GET) — polling consumido por `/aplicacao/recebido/[slug]`.
 
 ### Banco de Dados — dois schemas Postgres no mesmo Supabase
 
 **Schema `payload.*`** (gerenciado por Payload 3 + plugin multi-tenant, push automático em dev):
-- `tenants` — 1 row por cliente da agência (Futurah + próximos). O plugin injeta coluna `tenant` em `posts`, `categories`, `authors`, `leads`.
+- `tenants` — 1 row por cliente da agência. Campo `siteId` (text unique) mapeia 1:1 com o `site_id` do tracker e com os apps (`futurah`, `augustofelipe`, `fidevidraceiro`). É a chave usada por `/api/leads/ingest` pra resolver `siteId → tenant.id`. O plugin injeta coluna `tenant` em `posts`, `categories`, `authors`, `leads`.
 - `users` + `users_sessions` + `users_tenants` — auth + vínculo N:N user↔tenant. Role field: `superadmin` (Futurah, vê tudo) ou `tenant_admin`.
 - `posts` (+ `_posts_v`/`_v_rels`/`_v_version_tags` pras drafts/versions), `posts_rels`, `posts_tags`.
 - `categories`, `authors`, `media`, `leads`, `newsletter_subscribers` (esta última **global**, sem `tenant`).
+- `leads`: `nome, email, social, whatsapp (digitos), source, origem (deprecated, mantido p/ compat), answers (json), receivedAt, tenant`. Source-of-truth para captura via formulário público (`/api/contact`) e via apps externos do monorepo (`/api/leads/ingest`).
 - Internas: `payload_migrations`, `payload_preferences`, `payload_locked_documents`, `payload_kv`.
 
 **Schema `public.*`** (gerenciado por Drizzle — `lib/db/schema.ts`):
@@ -231,6 +234,10 @@ Mesmo fluxo para plataformas.
 - [`PAYLOAD_MIGRATION.md`](./PAYLOAD_MIGRATION.md) — plano original, decisões e fallbacks (histórico).
 - [`PAYLOAD_RUNBOOK.md`](./PAYLOAD_RUNBOOK.md) — runbook executável Fases 0-3 + seção **Lições aprendidas** com correções aplicadas durante o QA (imports sem extensão, `next/cache` lazy em hooks, CLI via `node --import tsx/esm`, setup de DB novo).
 
+## Leads — UI
+
+Não há mais dashboard custom de leads. A interface é a UI nativa do Payload em `/admin/collections/leads`, que respeita o tenant scope automaticamente (superadmin vê todos via switcher, tenant_admin vê só os do próprio tenant). O dashboard custom em `/admin/leads` (que lia D1 via Worker) foi removido junto com a tabela `leads` do D1 e o endpoint `/lead` do Worker — fonte autoritativa agora é só `payload.leads`.
+
 ## Dashboard de tracking — `/admin/tracking`
 
 Server-rendered (RSC), gated por `requireSuperadmin()` (Payload). Lê do Worker `tracker-worker` (em `t.futurah.co` / `t.augustofelipe.com`) via `TRACKER_API_URL` + `TRACKER_API_TOKEN`. Cache `next: { revalidate: 60, tags: ['tracker:<siteId>'] }`. Nada bate o Worker direto do browser.
@@ -294,7 +301,16 @@ curl -s http://localhost:3000/admin > /dev/null  # triggera init
 # 5. Criar 1º user via wizard em http://localhost:3000/admin, depois promover:
 psql "$DATABASE_URL" -c "UPDATE payload.users SET role='superadmin' RETURNING email, role;"
 
-# 6. Logout/login no admin (JWT pega role nova), criar tenant 'futurah' (slug exato — lib/content.ts filtra por isso)
+# 6. Logout/login no admin (JWT pega role nova). Os tenants oficiais são populados
+#    via script idempotente (slugs: futurah, augusto-felipe, fi-de-vidraceiro):
+npx tsx scripts/seed-tenants.ts
+#    Roda upsert por slug via SQL direto (mantém customizações de name/domain já existentes).
+#    Requer DATABASE_URL no .env.local (vercel env pull) — apagar o .env.local depois.
+#
+#    NOTA: NÃO use `node --import tsx/esm scripts/<x>.ts` em scripts custom que
+#    importem payload.config — quebra com ERR_REQUIRE_CYCLE_MODULE pelo TLA do
+#    Lexical. `npx tsx` lida com isso. O pattern `node --import tsx/esm` continua
+#    válido apenas pra CLIs nativas do Payload (`generate:types`, etc.).
 ```
 
-Em prod, o mesmo fluxo no primeiro deploy Vercel: abrir `<preview-url>/admin`, criar user, rodar o `UPDATE` via Supabase SQL Editor, criar tenant.
+Em prod, o mesmo fluxo no primeiro deploy Vercel: abrir `<preview-url>/admin`, criar user, rodar o `UPDATE` via Supabase SQL Editor, e rodar `seed-tenants.ts` localmente apontando pro Postgres de produção.

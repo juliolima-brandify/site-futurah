@@ -3,7 +3,6 @@
 export interface Env {
   ANALYTICS: AnalyticsEngineDataset;
   KV: KVNamespace;
-  DB: D1Database;
   CF_ACCOUNT_ID: string;
   AE_DATASET: string;
   // Secrets:

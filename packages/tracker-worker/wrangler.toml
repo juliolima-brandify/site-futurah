@@ -25,12 +25,10 @@ binding = "KV"
 id = "700f6793abf0433ba99601af785cd2d7"
 preview_id = "297465141ea34455a2dda7dc57f07904"
 
-# D1: placeholder pra Fase 2 (sessions, conversions). Não usado em Fase 1.
-# TODO(d1): rodar `wrangler d1 create tracker-db` e colar o database_id aqui.
-[[d1_databases]]
-binding = "DB"
-database_name = "tracker-db"
-database_id = "2c032f91-480a-48f6-b4fa-37b66db537f4"
+# D1: removido em 2026-05-05. A tabela `leads` foi dropada (migration
+# 0002_drop_leads.sql) e a captura de leads agora vai pra Payload via
+# /api/leads/ingest no site-futurah. Migrations antigas mantidas em
+# packages/tracker-worker/migrations/ apenas como histórico.
 
 # Vars não-secretas. Account ID precisa ser visível pra fazer query no AE SQL API.
 # TODO(account): substituir pelo Account ID da CF (Dashboard → conta).
