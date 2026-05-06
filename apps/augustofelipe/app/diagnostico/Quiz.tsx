@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 type Step = "intro" | 1 | 2 | 3 | "lead" | "result" | "pitch";
@@ -70,8 +71,15 @@ function HeroIntro({ onStart }: { onStart: () => void }) {
         em <span className="text-emerald-600 font-bold">1 minuto</span> os
         gargalos do seu perfil.
       </p>
-      <div className="mt-8 aspect-[4/3] rounded-2xl bg-neutral-900 grid place-items-center text-neutral-500 text-sm">
-        [imagem hero]
+      <div className="mt-8 relative aspect-video rounded-2xl overflow-hidden bg-neutral-900">
+        <Image
+          src="/diagnostico-hero.png"
+          alt="Augusto Felipe analisando perfis do Instagram"
+          fill
+          priority
+          sizes="(min-width: 768px) 576px, 100vw"
+          className="object-cover"
+        />
       </div>
       <button
         onClick={onStart}
