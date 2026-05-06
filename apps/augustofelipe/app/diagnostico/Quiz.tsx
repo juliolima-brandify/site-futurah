@@ -328,30 +328,207 @@ function GrowthChart() {
   );
 }
 
-function ResultStep({ onContinue }: { onContinue: () => void }) {
+function EngagementBars() {
+  return (
+    <svg viewBox="0 0 400 250" className="w-full" aria-label="Engajamento — agora vs. com ajuste vs. potencial">
+      <defs>
+        <linearGradient id="barLow" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor="#ef4444" />
+          <stop offset="100%" stopColor="#fca5a5" />
+        </linearGradient>
+        <linearGradient id="barMid" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor="#eab308" />
+          <stop offset="100%" stopColor="#fde68a" />
+        </linearGradient>
+        <linearGradient id="barHigh" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor="#22c55e" />
+          <stop offset="100%" stopColor="#86efac" />
+        </linearGradient>
+      </defs>
+
+      <g stroke="#e5e7eb" strokeWidth="1" strokeDasharray="3 3">
+        <line x1="40" x2="380" y1="40" y2="40" />
+        <line x1="40" x2="380" y1="100" y2="100" />
+        <line x1="40" x2="380" y1="160" y2="160" />
+        <line x1="40" x2="380" y1="200" y2="200" />
+      </g>
+
+      <rect x="80" y="170" width="60" height="30" rx="6" fill="url(#barLow)" />
+      <text x="110" y="158" fill="#374151" fontSize="12" textAnchor="middle" fontWeight="600">
+        Agora
+      </text>
+      <text x="110" y="225" fill="#9ca3af" fontSize="11" textAnchor="middle">
+        baixo
+      </text>
+
+      <rect x="180" y="105" width="60" height="95" rx="6" fill="url(#barMid)" />
+      <text x="210" y="93" fill="#374151" fontSize="12" textAnchor="middle" fontWeight="600">
+        Com ajuste
+      </text>
+      <text x="210" y="225" fill="#9ca3af" fontSize="11" textAnchor="middle">
+        médio
+      </text>
+
+      <rect x="280" y="45" width="60" height="155" rx="6" fill="url(#barHigh)" />
+      <text x="310" y="33" fill="#374151" fontSize="12" textAnchor="middle" fontWeight="600">
+        Potencial
+      </text>
+      <text x="310" y="225" fill="#9ca3af" fontSize="11" textAnchor="middle">
+        alto
+      </text>
+    </svg>
+  );
+}
+
+function ReachIndicator() {
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 flex items-start gap-3">
+        <span className="text-lg leading-none">🔴</span>
+        <div className="text-sm">
+          <div className="font-semibold text-rose-700">Alcance atual</div>
+          <div className="text-rose-600">
+            quase zero fora dos seus seguidores
+          </div>
+        </div>
+      </div>
+      <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 flex items-start gap-3">
+        <span className="text-lg leading-none">🟢</span>
+        <div className="text-sm">
+          <div className="font-semibold text-emerald-700">Potencial</div>
+          <div className="text-emerald-700">
+            65%+ de alcance para não seguidores
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+type Variant = "seguidores" | "engajamento" | "alcance";
+
+// A copy do pré-diagnóstico é determinada pela resposta da pergunta sobre
+// "o que mais te incomoda" (índice 1 do array de respostas).
+function variantFromAnswers(answers: string[]): Variant {
+  const a = (answers[1] ?? "").toLowerCase();
+  if (a.includes("seguidor")) return "seguidores";
+  if (a.includes("curtid") || a.includes("comentár")) return "engajamento";
+  if (a.includes("alcance")) return "alcance";
+  return "seguidores";
+}
+
+function ResultStep({
+  answers,
+  onContinue,
+}: {
+  answers: string[];
+  onContinue: () => void;
+}) {
+  const variant = variantFromAnswers(answers);
+
+  if (variant === "seguidores") {
+    return (
+      <div className="px-6 py-12 max-w-xl mx-auto">
+        <h2 className="text-2xl md:text-[26px] font-extrabold tracking-tight leading-tight text-center">
+          <span className="mr-1">⚠️</span> Seu perfil está crescendo abaixo do
+          potencial.
+        </h2>
+        <p className="mt-4 text-neutral-600">
+          Com base nas suas respostas, seu principal bloqueio é a aquisição de
+          novos seguidores. Você posta, mas o algoritmo não está empurrando seu
+          conteúdo para novas pessoas.
+        </p>
+        <p className="mt-3 text-neutral-900 font-semibold">
+          Isso não é falta de qualidade. É falta de processo.
+        </p>
+        <div className="mt-8">
+          <GrowthChart />
+        </div>
+        <p className="mt-4 text-center text-neutral-600 italic">
+          Seus concorrentes estão crescendo. Você ainda não.
+        </p>
+        <p className="mt-6 text-neutral-600">
+          O <strong className="text-neutral-900">Diagnóstico Viral</strong> vai
+          identificar exatamente o que está impedindo novos seguidores de te
+          encontrar — e o que ajustar pra mudar isso essa semana.
+        </p>
+        <button
+          onClick={onContinue}
+          className="mt-8 w-full py-4 rounded-2xl bg-emerald-500 text-white font-semibold text-lg hover:bg-emerald-600 transition"
+        >
+          Ver como resolver isso →
+        </button>
+      </div>
+    );
+  }
+
+  if (variant === "engajamento") {
+    return (
+      <div className="px-6 py-12 max-w-xl mx-auto">
+        <h2 className="text-2xl md:text-[26px] font-extrabold tracking-tight leading-tight text-center">
+          <span className="mr-1">⚠️</span> Seu perfil tem um problema silencioso.
+        </h2>
+        <p className="mt-4 text-neutral-600">
+          Com base nas suas respostas, você tem seguidores — mas eles não estão
+          reagindo ao seu conteúdo. Poucos comentários, poucas curtidas, baixa
+          interação.
+        </p>
+        <p className="mt-3 text-neutral-600">
+          Sabe o que isso sinaliza pro algoritmo? Que seu conteúdo não é
+          relevante. E quando o algoritmo pensa isso, ele para de distribuir.
+        </p>
+        <p className="mt-3 text-neutral-900 font-semibold">
+          Isso tem solução. E é mais simples do que parece.
+        </p>
+        <div className="mt-8">
+          <EngagementBars />
+        </div>
+        <p className="mt-6 text-neutral-600">
+          O <strong className="text-neutral-900">Diagnóstico Viral</strong> vai
+          mostrar o que está matando a interação do seu conteúdo — e o que fazer
+          nos próximos 7 dias pra reverter isso.
+        </p>
+        <button
+          onClick={onContinue}
+          className="mt-8 w-full py-4 rounded-2xl bg-emerald-500 text-white font-semibold text-lg hover:bg-emerald-600 transition"
+        >
+          Quero resolver o engajamento →
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="px-6 py-12 max-w-xl mx-auto">
       <h2 className="text-2xl md:text-[26px] font-extrabold tracking-tight leading-tight text-center">
-        <span className="mr-1">⚠️</span> Seu perfil está dando sinais claros de
-        baixo crescimento e pouco engajamento...
+        <span className="mr-1">⚠️</span> Seus vídeos estão morrendo antes de
+        chegar em alguém.
       </h2>
-      <p className="mt-4 text-center text-neutral-500">
-        O <strong className="text-neutral-900">Diagnóstico 100K</strong> foi
-        criado para encontrar exatamente o que está bloqueando seu perfil e te
-        mostrar o que corrigir para atrair mais seguidores e clientes.
+      <p className="mt-4 text-neutral-600">
+        Com base nas suas respostas, o problema não é o conteúdo em si — é que
+        ele não está chegando em novas pessoas. Você posta e as views ficam só
+        na sua base atual. Às vezes nem isso.
+      </p>
+      <p className="mt-3 text-neutral-600">
+        Isso é um sinal claro: o algoritmo não está reconhecendo o seu conteúdo
+        como relevante o suficiente pra distribuir.
+      </p>
+      <p className="mt-3 text-neutral-900 font-semibold">
+        Mas existe um padrão específico que faz o algoritmo mudar de ideia.
       </p>
       <div className="mt-8">
-        <GrowthChart />
+        <ReachIndicator />
       </div>
-      <p className="mt-4 text-center text-neutral-600">
-        Seus concorrentes estão crescendo e você não?{" "}
-        <strong className="text-neutral-900">Vamos mudar isso!</strong>
+      <p className="mt-6 text-neutral-600">
+        O <strong className="text-neutral-900">Diagnóstico Viral</strong>{" "}
+        identifica os bloqueios que impedem o algoritmo de distribuir seu
+        conteúdo — e entrega um plano de 7 dias pra você começar a viralizar.
       </p>
       <button
         onClick={onContinue}
-        className="mt-10 w-full py-4 rounded-2xl bg-emerald-500 text-white font-semibold text-lg hover:bg-emerald-600 transition"
+        className="mt-8 w-full py-4 rounded-2xl bg-emerald-500 text-white font-semibold text-lg hover:bg-emerald-600 transition"
       >
-        Continuar
+        Quero alcançar mais pessoas →
       </button>
     </div>
   );
@@ -368,8 +545,19 @@ function CountdownPill() {
   const ss = String(seconds % 60).padStart(2, "0");
   return (
     <div className="bg-rose-50 text-rose-600 text-center py-3 rounded-xl font-medium text-sm">
-      Resgate agora seu desconto: {mm}:{ss}
+      Preço de lançamento encerra em: {mm}:{ss}
     </div>
+  );
+}
+
+function CheckoutCTA({ label }: { label: string }) {
+  return (
+    <button
+      type="button"
+      className="w-full py-4 rounded-2xl bg-emerald-500 text-white font-semibold text-lg hover:bg-emerald-600 transition"
+    >
+      {label} →
+    </button>
   );
 }
 
@@ -377,64 +565,233 @@ function PitchStep() {
   return (
     <div className="px-6 py-8 max-w-xl mx-auto">
       <CountdownPill />
-      <h2 className="mt-6 text-2xl md:text-[28px] font-extrabold tracking-tight leading-tight text-center">
-        Tenha um{" "}
+
+      <h2 className="mt-8 text-2xl md:text-[28px] font-extrabold tracking-tight leading-tight text-center">
+        Aprenda o processo de quem chegou a{" "}
         <span className="bg-emerald-200 px-1 box-decoration-clone">
-          diagnóstico de posicionamento
+          59 milhões de views por mês
         </span>{" "}
-        focado em te fazer atingir 100 mil seguidores no Instagram de forma
-        ACELERADA
+        sem pagar tráfego — e crie seu primeiro vídeo viral ainda essa semana.
       </h2>
-      <div className="mt-6 aspect-[9/16] max-w-xs mx-auto rounded-2xl overflow-hidden bg-neutral-900 relative">
-        <div className="absolute top-3 left-3 right-3 flex items-center gap-2 text-white text-sm">
-          <div className="w-8 h-8 rounded-full bg-neutral-700" />
+      <p className="mt-4 text-center text-neutral-500">
+        Chega de postar no escuro. Chega de adivinhar o que funciona.
+      </p>
+
+      <div className="mt-8 aspect-video max-w-md mx-auto rounded-2xl overflow-hidden bg-neutral-900 relative">
+        <div className="absolute inset-0 grid place-items-center px-6 text-center text-white">
           <div>
-            <div className="font-semibold leading-tight">VSL — Diagnóstico</div>
-            <div className="text-neutral-400 text-xs leading-tight">
-              Augusto Felipe
-            </div>
+            <p className="text-xs uppercase tracking-widest text-neutral-400">
+              VSL · Augusto Felipe · ~5 min
+            </p>
+            <p className="mt-2 font-semibold leading-tight">
+              Como eu cheguei a 59M de views sem pagar nada
+            </p>
           </div>
         </div>
-        <div className="absolute inset-0 grid place-items-center">
-          <button
-            type="button"
-            className="w-16 h-16 rounded-full bg-red-600 grid place-items-center hover:scale-105 transition"
-            aria-label="Reproduzir vídeo"
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          </button>
-        </div>
+        <button
+          type="button"
+          aria-label="Reproduzir vídeo"
+          className="absolute bottom-4 left-1/2 -translate-x-1/2 w-14 h-14 rounded-full bg-red-600 grid place-items-center hover:scale-105 transition"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </button>
       </div>
-      <ul className="mt-8 space-y-3 text-neutral-700 text-[15px]">
+
+      <h3 className="mt-12 text-xl md:text-2xl font-extrabold text-center leading-tight">
+        Chega de...
+      </h3>
+      <ul className="mt-5 space-y-3 text-neutral-700 text-[15px]">
+        <li className="flex gap-2">
+          <span className="text-rose-500 font-bold">✗</span>
+          <span>Chega de comprar curso que não entrega resultado.</span>
+        </li>
+        <li className="flex gap-2">
+          <span className="text-rose-500 font-bold">✗</span>
+          <span>Chega de postar todo dia e ver zero crescimento.</span>
+        </li>
         <li className="flex gap-2">
           <span className="text-rose-500 font-bold">✗</span>
           <span>
-            <strong>Chega</strong> de comprar mentorias caras que falam o óbvio.
+            Chega de adivinhar se o erro tá no áudio, no horário ou no
+            algoritmo.
           </span>
         </li>
         <li className="flex gap-2">
           <span className="text-rose-500 font-bold">✗</span>
           <span>
-            <strong>Chega</strong> de tentar adivinhar o que está errado no seu
-            Instagram.
-          </span>
-        </li>
-        <li className="flex gap-2">
-          <span className="text-rose-500 font-bold">✗</span>
-          <span>
-            <strong>Chega</strong> de postar conteúdos que não viralizam e não
-            vendem.
+            Chega de ver criadores do seu nicho viralizando enquanto você fica
+            parado.
           </span>
         </li>
       </ul>
+
       <h3 className="mt-12 text-xl md:text-2xl font-extrabold text-center leading-tight">
-        Conheça o Assistente de Análise do Augusto:
+        Conheça o{" "}
+        <span className="bg-yellow-300 px-1 box-decoration-clone">
+          Meu Primeiro Vídeo Viral
+        </span>
       </h3>
-      <p className="mt-3 text-center text-neutral-500 text-sm">
-        [continuação da oferta — adicionar conteúdo da página comercial]
+      <p className="mt-4 text-neutral-700">
+        Um workshop direto ao ponto com tudo que você precisa pra criar o seu
+        primeiro vídeo viral — do processo criativo até a publicação.
       </p>
+      <p className="mt-3 text-neutral-700">
+        Não é teoria. É o processo real de quem chegou a 59 milhões de views
+        por mês partindo do zero, sem agência, sem equipamento caro e sem pagar
+        um centavo em anúncio.
+      </p>
+      <p className="mt-6 font-semibold text-neutral-900">
+        No workshop você vai aprender:
+      </p>
+      <ul className="mt-3 space-y-2.5 text-neutral-700 text-[15px]">
+        <li className="flex gap-2">
+          <span className="text-emerald-500 font-bold">→</span>
+          <span>
+            Como eu penso um vídeo antes de gravar — do zero ao roteiro em 10
+            minutos
+          </span>
+        </li>
+        <li className="flex gap-2">
+          <span className="text-emerald-500 font-bold">→</span>
+          <span>Como montar um perfil que o algoritmo reconhece e distribui</span>
+        </li>
+        <li className="flex gap-2">
+          <span className="text-emerald-500 font-bold">→</span>
+          <span>
+            Como analisar vídeos virais e identificar o padrão que faz eles
+            explodirem
+          </span>
+        </li>
+        <li className="flex gap-2">
+          <span className="text-emerald-500 font-bold">→</span>
+          <span>Como gravar do jeito certo só com o celular que você já tem</span>
+        </li>
+        <li className="flex gap-2">
+          <span className="text-emerald-500 font-bold">→</span>
+          <span>
+            Como editar rápido e publicar hoje — sem precisar de nada além do
+            que você já tem
+          </span>
+        </li>
+      </ul>
+
+      <h3 className="mt-12 text-xl md:text-2xl font-extrabold text-center leading-tight">
+        Bônus — Diagnóstico completo do perfil
+      </h3>
+      <p className="mt-4 text-neutral-700">
+        E além do workshop, você ainda vai receber uma análise completa e
+        individual do seu perfil.
+      </p>
+      <p className="mt-3 text-neutral-700">
+        Vamos olhar pro seu Instagram hoje — bio, conteúdo, consistência,
+        métricas e posicionamento — e entregar um diagnóstico com nota em cada
+        ponto e um plano de 7 dias específico pra você.
+      </p>
+      <p className="mt-3 text-neutral-900 font-semibold">
+        Não é uma análise genérica. É do seu perfil. Do jeito que ele está
+        agora.
+      </p>
+      <div className="mt-6 aspect-[4/3] rounded-2xl bg-neutral-100 grid place-items-center text-neutral-400 text-sm">
+        [print de exemplo de diagnóstico]
+      </div>
+
+      <h3 className="mt-12 text-xl md:text-2xl font-extrabold text-center leading-tight">
+        Para quem é esse workshop
+      </h3>
+      <ul className="mt-5 space-y-2.5 text-neutral-700 text-[15px]">
+        <li className="flex gap-2">
+          <span className="text-emerald-500 font-bold">✅</span>
+          <span>
+            Para quem quer criar conteúdo do zero e não sabe por onde começar
+          </span>
+        </li>
+        <li className="flex gap-2">
+          <span className="text-emerald-500 font-bold">✅</span>
+          <span>
+            Para quem já posta mas não consegue viralizar de forma consistente
+          </span>
+        </li>
+        <li className="flex gap-2">
+          <span className="text-emerald-500 font-bold">✅</span>
+          <span>
+            Para quem quer entender o que de verdade faz um vídeo explodir
+          </span>
+        </li>
+        <li className="flex gap-2">
+          <span className="text-emerald-500 font-bold">✅</span>
+          <span>
+            Para qualquer nicho — arte, gastronomia, fitness, negócios,
+            construção, moda
+          </span>
+        </li>
+        <li className="flex gap-2 pt-2">
+          <span className="text-rose-500 font-bold">❌</span>
+          <span>Não é pra quem quer resultado sem fazer nada</span>
+        </li>
+        <li className="flex gap-2">
+          <span className="text-rose-500 font-bold">❌</span>
+          <span>
+            Não é pra quem já tem um método que funciona e quer só escalar
+          </span>
+        </li>
+      </ul>
+
+      <div className="mt-12 rounded-2xl border border-neutral-200 p-6 text-center">
+        <p className="text-sm font-semibold text-neutral-900">
+          Workshop + Diagnóstico do Perfil
+        </p>
+        <p className="mt-3 text-neutral-400 line-through text-sm">De R$ 197</p>
+        <p className="mt-1 text-5xl font-extrabold text-neutral-900">R$ 47</p>
+        <p className="mt-1 text-sm text-neutral-500 italic">
+          ou 2x R$ 24,50 sem juros
+        </p>
+        <div className="mt-6">
+          <CheckoutCTA label="Quero meu primeiro vídeo viral" />
+        </div>
+        <p className="mt-3 text-xs text-neutral-500">
+          🔒 Pagamento seguro · Pix, cartão ou boleto
+        </p>
+        <p className="mt-2 text-xs text-neutral-400 italic">
+          Preço de lançamento. Em breve sobe para R$ 197.
+        </p>
+      </div>
+
+      <div className="mt-8 rounded-2xl bg-neutral-50 p-5 border border-neutral-200">
+        <h4 className="text-lg font-bold text-neutral-900 flex items-center gap-2">
+          <span>🛡️</span> Garantia de 7 dias
+        </h4>
+        <p className="mt-2 text-neutral-700 text-sm">
+          Se você assistir o workshop, aplicar o que eu ensino nos primeiros 7
+          dias e sentir que não valeu R$ 47 — me manda uma mensagem e eu
+          devolvo tudo. Sem burocracia, sem pergunta.
+        </p>
+        <p className="mt-2 text-neutral-700 text-sm">
+          Eu só peço uma coisa: tenta de verdade antes de pedir o reembolso.
+        </p>
+      </div>
+
+      <div className="mt-12 text-center">
+        <p className="text-neutral-700">
+          Se você chegou até aqui, você já sabe que o problema do seu perfil tem
+          solução.
+        </p>
+        <p className="mt-3 text-neutral-700">
+          A única diferença entre você hoje e você com o primeiro vídeo viral é
+          esse passo.
+        </p>
+        <p className="mt-3 text-neutral-700">
+          Clica no botão, garante o workshop e o diagnóstico do seu perfil, e
+          começa hoje.
+        </p>
+        <div className="mt-6">
+          <CheckoutCTA label="Quero meu primeiro vídeo viral" />
+        </div>
+        <p className="mt-3 text-xs text-neutral-500 italic">
+          R$ 47 · Acesso imediato · Garantia de 7 dias
+        </p>
+      </div>
     </div>
   );
 }
@@ -459,7 +816,8 @@ export default function Quiz() {
     setAnswers((prev) => [...prev, answer]);
     if (step === 1) setStep(2);
     else if (step === 2) setStep(3);
-    else if (step === 3) setStep("lead");
+    // LeadCapture desativado por enquanto — pula direto pro resultado.
+    else if (step === 3) setStep("result");
   };
 
   return (
@@ -474,7 +832,7 @@ export default function Quiz() {
           <LeadCapture answers={answers} onSubmitted={() => setStep("result")} />
         )}
         {step === "result" && (
-          <ResultStep onContinue={() => setStep("pitch")} />
+          <ResultStep answers={answers} onContinue={() => setStep("pitch")} />
         )}
         {step === "pitch" && <PitchStep />}
       </main>
