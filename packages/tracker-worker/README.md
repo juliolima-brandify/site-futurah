@@ -1,15 +1,15 @@
 # @futurah/tracker-worker
 
-Cloudflare Worker de ingestão de eventos + API de leitura. Atende ambos os
-tenants (`futurah` e `fidevidraceiro`) num único deploy — separação via
-`site_id` no payload e allowlists em KV.
+Cloudflare Worker de ingestão de eventos + API de leitura. Atende os
+tenants (`futurah`, `fidevidraceiro` e `augustofelipe`) num único deploy —
+separação via `site_id` no payload e allowlists em KV.
 
-**Status (2026-04-29):** provisionado e em produção.
+**Status (2026-05-06):** provisionado e em produção.
 
 - Worker `tracker-worker` na conta `Adm.futurah@gmail.com's Account` (id `c43e22dbbaa289eade42d31408d0e3b4`).
 - Routes: `t.futurah.co/*` e `t.augustofelipe.com/*` (CNAMEs proxied criados nas zonas `futurah.co` e `augustofelipe.com`).
 - KV namespace `tracker-config`: `700f6793abf0433ba99601af785cd2d7` (prod) / `297465141ea34455a2dda7dc57f07904` (preview).
-- D1 database `tracker-db`: `2c032f91-480a-48f6-b4fa-37b66db537f4` (placeholder Fase 2).
+- D1 database `tracker-db`: `2c032f91-480a-48f6-b4fa-37b66db537f4` provisionado mas **não bindado mais** (binding removido em 2026-05-06; tabela `leads` migrada pro Postgres do Payload — ver `apps/site-futurah/CLAUDE.md` § Leads).
 - Analytics Engine dataset: `tracker_events` (criado via UI; ver gotcha 3 abaixo).
 
 ## Endpoints
@@ -23,7 +23,6 @@ tenants (`futurah` e `fidevidraceiro`) num único deploy — separação via
 
 - `ANALYTICS` → Analytics Engine dataset `tracker_events`.
 - `KV` → namespace de config (sites, origins, salt).
-- `DB` → D1 (placeholder Fase 2).
 
 ## Vars
 

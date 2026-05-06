@@ -9,6 +9,21 @@ import { BreakdownTable, refLabel } from "./components/BreakdownTable";
 import { DataState } from "./components/DataState";
 import { EventBreakdownTable } from "./components/EventBreakdownTable";
 import { EventNameSelector } from "./components/EventNameSelector";
+import Link from "next/link";
+
+// Nav inline simples — antes vinha de /admin/leads/components/AdminNav, mas
+// /admin/leads custom foi removido (UI nativa do Payload em
+// /admin/collections/leads cobre o caso).
+function AdminNav() {
+    return (
+        <nav className="trk-adminnav" aria-label="Admin">
+            <Link href="/admin/tracking" data-active>
+                Tracking
+            </Link>
+            <Link href="/admin/collections/leads">Leads</Link>
+        </nav>
+    );
+}
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +45,7 @@ export default async function TrackingDashboardPage({
     return (
         <main className="trk-root">
             <div className="trk-container">
+                <AdminNav />
                 <header className="trk-header">
                     <div>
                         <h1 className="trk-title">Tracking — {ctx.siteId}</h1>

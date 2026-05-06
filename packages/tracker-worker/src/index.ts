@@ -1,6 +1,9 @@
 // Entrypoint do Worker. Roteia /e (ingest) e /api/* (read).
 // Um único Worker atende t.futurah.co (site Futurah) e t.augustofelipe.com (bio link fidevidraceiro);
 // a separação por tenant é feita via site_id no payload + allowlists em KV.
+//
+// Leads NÃO ficam mais aqui — captura via /api/leads/ingest no site-futurah,
+// que escreve no Payload (Postgres) com tenant scope. Worker só faz tracking.
 
 import { handleIngest, handleIngestOptions } from "./ingest";
 import {

@@ -4,7 +4,7 @@ export const Tenants: CollectionConfig = {
   slug: 'tenants',
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'slug', 'domain'],
+    defaultColumns: ['name', 'slug', 'siteId', 'domain'],
   },
   access: {
     create: ({ req }) => req.user?.role === 'superadmin',
@@ -21,6 +21,16 @@ export const Tenants: CollectionConfig = {
       unique: true,
       index: true,
       admin: { description: 'Slug unico. Ex: "futurah", "haytarzan".' },
+    },
+    {
+      name: 'siteId',
+      type: 'text',
+      unique: true,
+      index: true,
+      admin: {
+        description:
+          'Identificador usado pelo tracker (Worker `site_id`) e pelo /api/leads/ingest. Ex.: "futurah", "augustofelipe", "fidevidraceiro".',
+      },
     },
     {
       name: 'domain',

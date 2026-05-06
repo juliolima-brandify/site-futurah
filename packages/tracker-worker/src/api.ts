@@ -438,6 +438,10 @@ export async function handleEventNames(request: Request, env: Env): Promise<Resp
   }
 }
 
+// Leads (D1): removidos. Captura agora via /api/leads/ingest no site-futurah
+// (Payload, Postgres, tenant-scoped). A tabela `leads` no D1 também foi
+// dropada via migration 0002_drop_leads.sql.
+
 export async function handleBreakdown(request: Request, env: Env): Promise<Response> {
   if (!checkAuth(request, env)) return unauthorized();
   const url = new URL(request.url);

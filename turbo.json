@@ -13,6 +13,8 @@
         "OPENAI_MODEL",
         "TRACKER_API_URL",
         "TRACKER_API_TOKEN",
+        "LEADS_INGEST_TOKEN",
+        "LEADS_INGEST_URL",
         "NEXTJS_ENV"
       ]
     },
