@@ -222,6 +222,28 @@ Todo o código de geração fica aqui, server-only.
 
 Mesmo fluxo para plataformas.
 
+## Painel `/admin/analises` — revisão humana de análises
+
+Server-rendered (RSC), gated por `requireSuperadmin()` (Payload). Lista análises com `status='pendente_revisao'` ordenadas por `created_at desc`. Cada uma tem botões "Aprovar" / "Rejeitar" e link de pré-visualização (`/analise/[slug]?preview=1`).
+
+**Fluxo:** wizard → `POST /api/aplicacao` → `gerarAnaliseEmBackground` salva como `pendente_revisao` (não publica direto) → admin entra em `/admin/analises`, revisa e aprova/rejeita → `POST /api/admin/analises/[id]/aprovar` muda status pra `publicada` + dispara email Resend pro lead (não bloqueante via `after()`); rejeitar grava `revisor_notas` e marca `falhou`.
+
+**Estrutura** (`app/admin/analises/`):
+- `page.tsx` — lista server-rendered.
+- `ActionButtons.tsx` — client component, dispara as transições.
+- `lib/auth.ts` — `requireSuperadmin()` (404 silencioso) + `getSuperadminOrNull()` (401 JSON).
+- `analises.css` — estilos escopados em `.anr-*` (mesmo padrão do dashboard tracking).
+
+**Endpoints** (todos `POST`, exigem superadmin):
+- `/api/admin/analises/[id]/aprovar` — `pendente_revisao → publicada`, dispara email transacional.
+- `/api/admin/analises/[id]/rejeitar` — `pendente_revisao → falhou`, body opcional `{ nota }` salvo em `revisor_notas`.
+
+**Pré-visualização**: `/analise/[slug]?preview=1` aceita `pendente_revisao` somente quando o request vem de superadmin autenticado (gate por `payload.auth({ headers })`). Slug-guessing público continua bloqueado.
+
+**Lead** vê `/aplicacao/recebido/[slug]` → polling para em `pendente_revisao` com copy explicando que vai chegar email. Quando admin aprova, email Resend chega com link pra `/analise/[slug]`.
+
+> O link pra `/admin/analises` aparece dentro do nav do `/admin/tracking` (não na sidebar nativa do Payload). Adicionar à sidebar do Payload exige `admin.components.afterNavLinks` + regen do `importMap.js` — fica como TODO.
+
 ## Painel admin — Payload 3 + multi-tenant
 
 **Status (2026-04-23):** Fases 0-3 implementadas e validadas (build verde, 13/13 static pages). Fases 4-5 pendentes.

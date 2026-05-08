@@ -20,6 +20,7 @@ function AdminNav() {
             <Link href="/admin/tracking" data-active>
                 Tracking
             </Link>
+            <Link href="/admin/analises">Análises</Link>
             <Link href="/admin/collections/leads">Leads</Link>
         </nav>
     );

@@ -1,0 +1,197 @@
+/* Estilos escopados em .anr-* pra não vazar pro Payload admin nem pro site. */
+
+.anr-root {
+  min-height: 100vh;
+  background: #0e0e10;
+  color: #e9e9ec;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+  padding: 24px 16px 64px;
+}
+
+.anr-container {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.anr-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #232328;
+}
+
+.anr-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 4px;
+  color: #fff;
+}
+
+.anr-subtitle {
+  font-size: 13px;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.anr-adminnav {
+  display: flex;
+  gap: 4px;
+  background: #1a1a1f;
+  border: 1px solid #2a2a31;
+  border-radius: 8px;
+  padding: 4px;
+  font-size: 13px;
+}
+
+.anr-adminnav a {
+  color: #b0b0b8;
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.anr-adminnav a:hover {
+  color: #fff;
+  background: #2a2a31;
+}
+
+.anr-adminnav a[data-active] {
+  color: #fff;
+  background: #2a2a31;
+}
+
+.anr-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.anr-card {
+  background: #16161a;
+  border: 1px solid #232328;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.anr-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+.anr-pill {
+  background: #2a2a31;
+  color: #c7c7d0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.anr-card-date {
+  color: #6b7280;
+}
+
+.anr-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 4px;
+  color: #fff;
+}
+
+.anr-card-email {
+  font-weight: 400;
+  color: #9ca3af;
+  font-size: 13px;
+  margin-left: 6px;
+}
+
+.anr-card-summary {
+  font-size: 13px;
+  color: #b0b0b8;
+  margin: 4px 0 0;
+}
+
+.anr-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  border-top: 1px solid #232328;
+  padding-top: 12px;
+}
+
+.anr-actions-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.anr-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.anr-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.anr-btn-primary {
+  background: #DCFF69;
+  color: #1B1B1B;
+  border-color: #DCFF69;
+}
+
+.anr-btn-primary:hover:not(:disabled) {
+  background: #c9eb56;
+  border-color: #c9eb56;
+}
+
+.anr-btn-secondary {
+  background: transparent;
+  color: #c7c7d0;
+  border-color: #2a2a31;
+}
+
+.anr-btn-secondary:hover {
+  background: #1f1f25;
+  color: #fff;
+}
+
+.anr-btn-danger {
+  background: transparent;
+  color: #fca5a5;
+  border-color: #4b1d1d;
+}
+
+.anr-btn-danger:hover:not(:disabled) {
+  background: #2a1414;
+  border-color: #6b2828;
+}
+
+.anr-error {
+  color: #fca5a5;
+  font-size: 12px;
+}
