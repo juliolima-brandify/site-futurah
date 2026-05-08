@@ -12,6 +12,21 @@ import { buildPrompt } from "./prompt-analise";
 import { calcularEconomia } from "./economia";
 import type { AnaliseData } from "@/components/proposta/types";
 
+// OpenAI strict mode exige todo campo no `required`, então o schema usa
+// `.nullable()` em vez de `.optional()`. Normalizamos `null` -> ausência
+// antes de salvar pra `AnaliseData` (que tem `?: T`, não `T | null`).
+function stripNulls<T>(obj: T): T {
+  if (Array.isArray(obj)) return obj.map(stripNulls) as T;
+  if (obj && typeof obj === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(obj)) {
+      if (v !== null) out[k] = stripNulls(v);
+    }
+    return out as T;
+  }
+  return obj;
+}
+
 /**
  * Gera o conteúdo da análise via Vercel AI Gateway e grava no banco.
  * Idempotente: se já existe `conteudo`, não faz nada.
@@ -63,8 +78,9 @@ export async function gerarAnaliseEmBackground(analiseId: string): Promise<void>
     // for trocada depois. Sem env -> CTA cai em fallback no client.
     const agendaUrl = process.env.NEXT_PUBLIC_AGENDA_URL?.trim() || undefined;
 
+    const cleaned = stripNulls(parsed) as Omit<AnaliseData, "agendaUrl" | "economiaPrevista">;
     const conteudo: AnaliseData = {
-      ...parsed,
+      ...cleaned,
       agendaUrl,
       economiaPrevista: economia
         ? {

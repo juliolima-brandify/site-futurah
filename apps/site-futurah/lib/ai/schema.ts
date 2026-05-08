@@ -18,8 +18,8 @@ const heroSchema = z.object({
   badge: z.string().describe("Tag pequena acima do título, ex: 'Análise estratégica · @handle'"),
   titulo: z.string().describe("Título principal — pode usar quebras de linha"),
   subtitulo: z.string().describe("Subtítulo/body abaixo do título"),
-  ctaAncora: z.string().optional().describe("Texto do link âncora 'começar a leitura'"),
-  rodape: z.string().optional(),
+  ctaAncora: z.string().nullable().describe("Texto do link âncora 'começar a leitura'"),
+  rodape: z.string().nullable(),
 });
 
 const retratoStatSchema = z.object({
@@ -32,7 +32,7 @@ const retratoSchema = z.object({
   titulo: z.string(),
   subtitulo: z.string(),
   stats: z.array(retratoStatSchema).min(3).max(4).describe("3-4 stats complementares"),
-  fechamento: z.string().optional(),
+  fechamento: z.string().nullable(),
 });
 
 const diagnosticoCardSchema = z.object({
@@ -62,23 +62,23 @@ const frenteCardSchema = z.object({
   titulo: z.string(),
   body: z.string(),
   bullets: z.array(z.string()).length(4).describe("Exatamente 4 bullets"),
-  destaque: z.boolean().optional(),
+  destaque: z.boolean().nullable(),
 });
 
 const frentesSchema = z.object({
   eyebrow: z.string(),
   titulo: z.string(),
   subtitulo: z.string(),
-  layout: z.enum(["grid", "stack"]).optional().describe("Default 'stack' pra cash_on_delivery"),
+  layout: z.enum(["grid", "stack"]).nullable().describe("Default 'stack' pra cash_on_delivery"),
   cards: z.array(frenteCardSchema).min(2).max(3),
-  observacao: z.string().optional(),
+  observacao: z.string().nullable(),
 });
 
 const categoriaIdeiasSchema = z.object({
   numero: z.string().describe("'01', '02', '03'"),
   titulo: z.string(),
   itens: z.array(z.string()).length(4),
-  fullWidth: z.boolean().optional(),
+  fullWidth: z.boolean().nullable(),
 });
 
 const bancoIdeiasSchema = z.object({
@@ -86,7 +86,7 @@ const bancoIdeiasSchema = z.object({
   titulo: z.string(),
   subtitulo: z.string(),
   categorias: z.array(categoriaIdeiasSchema).min(2).max(3),
-  fechamento: z.string().optional(),
+  fechamento: z.string().nullable(),
 });
 
 const faseSchema = z.object({
@@ -116,7 +116,7 @@ const potencialCardSchema = z.object({
   body: z.string(),
   potencialLabel: z.string(),
   potencialValor: z.string(),
-  destaque: z.boolean().optional(),
+  destaque: z.boolean().nullable(),
 });
 
 const potencialSchema = z.object({
@@ -124,8 +124,8 @@ const potencialSchema = z.object({
   titulo: z.string(),
   subtitulo: z.string(),
   cards: z.array(potencialCardSchema).length(3).describe("Exatamente 3 cards, um com destaque:true"),
-  observacao: z.string().optional(),
-  formatosParceria: z.string().optional(),
+  observacao: z.string().nullable(),
+  formatosParceria: z.string().nullable(),
 });
 
 const encerramentoSchema = z.object({
@@ -133,7 +133,7 @@ const encerramentoSchema = z.object({
   titulo: z.string().describe("Pode usar marcação {{italic}}texto{{/italic}}"),
   body: z.string(),
   emailContato: z.string().describe("Sempre 'contato@futurah.co'"),
-  disclaimer: z.string().optional(),
+  disclaimer: z.string().nullable(),
 });
 
 const miniFaqItemSchema = z.object({
@@ -168,7 +168,7 @@ export const analiseGeradaSchema = z.object({
   escopo: escopoSchema,
   potencial: potencialSchema,
   encerramento: encerramentoSchema,
-  miniFaq: miniFaqSchema.optional(),
+  miniFaq: miniFaqSchema.nullable(),
 });
 
 export type AnaliseGerada = z.infer<typeof analiseGeradaSchema>;
