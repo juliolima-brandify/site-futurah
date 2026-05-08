@@ -2,6 +2,12 @@ import { NextResponse, after } from "next/server";
 import { nanoid } from "nanoid";
 import { db, analises, type EquipeAnalise, type PlataformasAnalise } from "@/lib/db";
 import { gerarAnaliseEmBackground } from "@/lib/ai/gerar";
+import {
+  consume,
+  extractIp,
+  RL_APLICACAO_IP,
+  RL_APLICACAO_EMAIL,
+} from "@/lib/rate-limit";
 
 interface Body {
   nome?: string;
@@ -34,6 +40,20 @@ function normalizeHandle(input: string): string {
 
 export async function POST(request: Request) {
   try {
+    // Rate-limit por IP (5/h). Roda antes de qualquer parsing custoso —
+    // bot spam não consome AI Gateway nem hits no Postgres.
+    const ip = extractIp(request.headers);
+    const ipCheck = consume(RL_APLICACAO_IP, ip);
+    if (!ipCheck.ok) {
+      return NextResponse.json(
+        { error: "Muitas tentativas. Aguarde alguns minutos e tente de novo." },
+        {
+          status: 429,
+          headers: { "Retry-After": String(ipCheck.retryAfterSeconds) },
+        },
+      );
+    }
+
     const body = (await request.json()) as Body;
 
     const email = body.email?.trim().toLowerCase() ?? "";
@@ -51,6 +71,22 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: "Responda momento, gargalo e velocidade." },
         { status: 400 },
+      );
+    }
+
+    // Rate-limit por email (2/24h) — só agora que email foi validado.
+    // Cada submissão queima crédito do AI Gateway, então mantemos baixo.
+    const emailCheck = consume(RL_APLICACAO_EMAIL, email);
+    if (!emailCheck.ok) {
+      return NextResponse.json(
+        {
+          error:
+            "Você já solicitou uma análise recentemente. Confira o email — se não chegou, fale com a gente em contato@futurah.co.",
+        },
+        {
+          status: 429,
+          headers: { "Retry-After": String(emailCheck.retryAfterSeconds) },
+        },
       );
     }
 
