@@ -32,6 +32,7 @@ node --import tsx/esm ./node_modules/payload/dist/bin/index.js generate:importma
 - `NEXT_PUBLIC_AGENDA_URL` — **opcional**. URL da agenda comercial (Calendly, Cal.com etc.) usada nos CTAs da página `/analise/[slug]`. **Afeta APENAS análises geradas em runtime** (lida em `lib/ai/gerar.ts` e gravada como snapshot imutável em `conteudo.agendaUrl` — trocar a var depois NÃO altera análises antigas). **Não afeta propostas estáticas** (`/proposta-haytarzan`, `/proposta-augusto-felipe`, `/proposta-carlos-damiao`): elas precisam setar `cta.href` no data file (`lib/proposta/[cliente]-data.ts`) — sem isso, o CTA cai em `mailto:contato@futurah.co`. Sem ela em análises geradas: CTA de Encerramento cai em `mailto:contato@futurah.co` e CTA de Economia usa o `cta.href` do schema.
 - `RESEND_API_KEY` — **opcional**. API key do Resend pra disparo de email quando análise é aprovada no admin. Sem ela, aprovação segue funcionando mas o lead só recebe a análise se acessar o link direto. Pegar em https://resend.com/api-keys.
 - `RESEND_FROM_EMAIL` — **opcional**. Endereço/nome do remetente (ex: `Futurah <analise@futurah.co>`). Default: `Futurah <analise@futurah.co>`. Domínio precisa estar verificado no Resend.
+- `CALENDLY_PERSONAL_ACCESS_TOKEN` — **opcional** (não consumido por código ainda — reservado para webhook de "agendamento criado", scheduling links únicos com prefill, e listagem de eventos no admin). Token tem escopo `webhooks:write`, `scheduled_events:read/write`, `scheduling_links:write`, etc. Rotacionar em https://calendly.com/integrations/api_webhooks. Setado em todos os 3 envs do Vercel.
 
 ## Arquitetura
 
@@ -50,6 +51,7 @@ O projeto é deployado na **Vercel**, team `admbrandify-gmailcoms-projects` (`te
 - `LEADS_INGEST_TOKEN` — bearer fixo aceito por `/api/leads/ingest`. **Mesmo valor** está setado no projeto `augustofelipe` (que escreve). Rotacionar = atualizar nos dois projetos em sincronia. Listar/checar com `npx vercel env ls --scope=admbrandify-gmailcoms-projects`.
 - `NEXT_PUBLIC_AGENDA_URL` — opcional. URL da agenda do CTA da análise. Coberto pelo wildcard `NEXT_PUBLIC_*` no `turbo.json` (não precisa listar individualmente).
 - `RESEND_API_KEY` + `RESEND_FROM_EMAIL` — opcionais. Email transacional pra notificar lead quando análise é aprovada no admin (`/admin/analises`).
+- `CALENDLY_PERSONAL_ACCESS_TOKEN` — opcional. PAT pra futuro webhook de "agendamento criado" + scheduling links únicos com prefill. Já provisionado nos 3 envs (2026-05-08); ainda sem código consumindo.
 
 **Gotchas do build em monorepo Turbo 2 strict** (já consertados no repo, ler antes de mexer):
 - `package.json` raiz precisa de `"packageManager"` (Turbo 2 strict). Sem isso: `Could not resolve workspaces`.
