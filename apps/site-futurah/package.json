@@ -24,6 +24,7 @@
     "postgres": "^3.4.9",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
+    "resend": "^6.12.3",
     "styled-components": "^6.3.9",
     "use-effect-event": "^2.0.3",
     "zod": "^4.4.3"

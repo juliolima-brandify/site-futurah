@@ -1,4 +1,5 @@
 import "server-only";
+import { Resend } from "resend";
 
 /**
  * Email transacional via Resend.
@@ -6,9 +7,16 @@ import "server-only";
  * Sem `RESEND_API_KEY` definido o helper apenas dá `console.warn` e
  * retorna `{ ok: false, skipped: true }` — não quebra o admin.
  *
- * Mantemos o template HTML inline aqui (sem React Email) — é simples
- * o bastante e adicionar dependência só pra um email é overkill.
+ * Template HTML inline (sem React Email) — é simples o bastante.
  */
+
+let _client: Resend | null = null;
+function getClient(): Resend | null {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return null;
+  if (!_client) _client = new Resend(apiKey);
+  return _client;
+}
 
 interface EnviarArgs {
   to: string;
@@ -125,8 +133,8 @@ function buildText({ nome, slug, agendaUrl }: EnviarArgs): string {
 export async function enviarEmailAnalisePronta(
   args: EnviarArgs,
 ): Promise<EnviarResult> {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
+  const client = getClient();
+  if (!client) {
     console.warn(
       "[email/resend] RESEND_API_KEY ausente — pulando email de aprovação para",
       args.to,
@@ -140,33 +148,20 @@ export async function enviarEmailAnalisePronta(
     : "Sua análise estratégica da Futurah está pronta";
 
   try {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from,
-        to: args.to,
-        subject,
-        html: buildHtml(args),
-        text: buildText(args),
-      }),
+    const { data, error } = await client.emails.send({
+      from,
+      to: args.to,
+      subject,
+      html: buildHtml(args),
+      text: buildText(args),
     });
 
-    if (!res.ok) {
-      const body = await res.text().catch(() => "");
-      console.error(
-        "[email/resend] falhou",
-        res.status,
-        body.slice(0, 500),
-      );
-      return { ok: false, error: `HTTP ${res.status}` };
+    if (error) {
+      console.error("[email/resend] falhou", error);
+      return { ok: false, error: error.message ?? "unknown" };
     }
 
-    const data = (await res.json()) as { id?: string };
-    return { ok: true, id: data.id };
+    return { ok: true, id: data?.id };
   } catch (err) {
     console.error("[email/resend] exception:", err);
     return {

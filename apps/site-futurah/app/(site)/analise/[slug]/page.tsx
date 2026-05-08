@@ -7,6 +7,7 @@ import config from "@payload-config";
 import { db, analises } from "@/lib/db";
 import { PageProposta } from "@/components/proposta/PageProposta";
 import type { AnaliseData } from "@/components/proposta/types";
+import { AnaliseTracker } from "./AnaliseTracker";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -79,5 +80,14 @@ export default async function AnaliseSlugPage({ params, searchParams }: PageProp
 
   const data = analise.conteudo as AnaliseData;
 
-  return <PageProposta data={data} />;
+  return (
+    <div style={{ position: "relative" }}>
+      <AnaliseTracker
+        slug={slug}
+        variante={data.variante}
+        modelo={data.modelo ?? "cash_on_delivery"}
+      />
+      <PageProposta data={data} />
+    </div>
+  );
 }
