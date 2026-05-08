@@ -2,10 +2,16 @@
  * Resolve a URL da agenda (Calendly etc.) usada nos CTAs da página de análise.
  *
  * Ordem de precedência:
- *  1. `data.agendaUrl` — snapshot setado server-side na hora de salvar (imutável por análise)
- *  2. `NEXT_PUBLIC_AGENDA_URL` — fallback global (vale pra propostas estáticas que não passam pelo gerador)
- *  3. `cta.href` — eventual override que veio do schema
- *  4. `mailto:contato@futurah.co` — último recurso
+ *  1. `data.agendaUrl` — snapshot setado server-side na hora de salvar
+ *     (imutável por análise; preenchido em `lib/ai/gerar.ts` lendo
+ *     `process.env.NEXT_PUBLIC_AGENDA_URL`)
+ *  2. `cta.href` — override do schema da proposta estática
+ *  3. `mailto:contato@futurah.co` — último recurso
+ *
+ * **Sem fallback de env aqui**: propostas estáticas (Haytarzan, Augusto,
+ * Carlos) que só têm `mailto:` no `cta.href` permanecem com mailto. A env
+ * `NEXT_PUBLIC_AGENDA_URL` afeta APENAS análises geradas em runtime via
+ * `/aplicacao` — onde fica gravada como snapshot em `data.agendaUrl`.
  *
  * Recebe `agendaUrl?` em vez do `AnaliseData` inteiro pra cada seção poder ser
  * usada de forma autocontida.
@@ -16,7 +22,6 @@ export function resolveAgendaUrl(
 ): string {
   return (
     agendaUrl?.trim() ||
-    process.env.NEXT_PUBLIC_AGENDA_URL?.trim() ||
     ctaHref?.trim() ||
     "mailto:contato@futurah.co"
   );

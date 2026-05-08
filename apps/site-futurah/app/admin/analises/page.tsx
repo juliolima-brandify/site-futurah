@@ -3,7 +3,7 @@ import Link from "next/link";
 import { db, analises } from "@/lib/db";
 import { requireSuperadmin } from "./lib/auth";
 import { ActionButtons } from "./ActionButtons";
-import "./analises.css";
+// CSS escopado importado em ./layout.tsx (ponto canônico pra route group).
 
 export const dynamic = "force-dynamic";
 

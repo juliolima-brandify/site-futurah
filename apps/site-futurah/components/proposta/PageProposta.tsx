@@ -18,9 +18,15 @@ import { MiniFaqSection } from "./sections/MiniFaqSection";
 
 interface Props {
   data: AnaliseData;
+  /**
+   * Slot opcional renderizado como primeiro filho do `<main>` da análise.
+   * Usado por `/analise/[slug]` pra inserir `<AnaliseTracker>` (sentinelas
+   * de scroll ancoradas só ao conteúdo da análise, sem incluir Header/Footer).
+   */
+  tracker?: React.ReactNode;
 }
 
-export function PageProposta({ data }: Props) {
+export function PageProposta({ data, tracker }: Props) {
   const modelo = resolveModeloProposta(data.modelo);
   const ofertaNoFinal = modelo === "cash_on_delivery";
   const esconderEscopo = modelo === "cash_on_delivery";
@@ -28,7 +34,12 @@ export function PageProposta({ data }: Props) {
   return (
     <>
       <Header />
-      <main className="bg-white" data-proposta-modelo={modelo}>
+      <main
+        className="bg-white relative"
+        data-proposta-modelo={modelo}
+        data-analise-content
+      >
+        {tracker}
         <HeroSection data={data.hero} />
         <RetratoSection data={data.retrato} />
         <DiagnosticoSection data={data.diagnostico} />

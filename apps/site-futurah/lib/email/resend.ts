@@ -44,9 +44,18 @@ function escapeHtml(input: string): string {
     .replace(/'/g, "&#39;");
 }
 
+/**
+ * Sanitiza nome pra uso em headers (subject) e corpos: remove CR/LF que
+ * permitiriam header injection no envelope SMTP. Defensivo — Resend
+ * provavelmente já filtra, mas mantemos o filtro local também.
+ */
+function sanitizeNome(nome: string): string {
+  return nome.replace(/[\r\n]+/g, " ").trim();
+}
+
 function buildHtml({ nome, slug, agendaUrl }: EnviarArgs): string {
   const link = `${SITE_URL}/analise/${encodeURIComponent(slug)}`;
-  const safeNome = nome ? escapeHtml(nome.split(" ")[0]) : "Olá";
+  const safeNome = nome ? escapeHtml(sanitizeNome(nome).split(" ")[0]) : "Olá";
   const ctaAgenda = agendaUrl
     ? `<p style="margin: 24px 0 0;">
          <a href="${escapeHtml(agendaUrl)}"
@@ -110,7 +119,7 @@ function buildHtml({ nome, slug, agendaUrl }: EnviarArgs): string {
 
 function buildText({ nome, slug, agendaUrl }: EnviarArgs): string {
   const link = `${SITE_URL}/analise/${slug}`;
-  const oi = nome ? `${nome.split(" ")[0]},` : "Olá,";
+  const oi = nome ? `${sanitizeNome(nome).split(" ")[0]},` : "Olá,";
   const lines = [
     `${oi} sua análise estratégica da Futurah está pronta.`,
     "",
@@ -144,7 +153,7 @@ export async function enviarEmailAnalisePronta(
 
   const from = process.env.RESEND_FROM_EMAIL || DEFAULT_FROM;
   const subject = args.nome
-    ? `${args.nome.split(" ")[0]}, sua análise estratégica está pronta`
+    ? `${sanitizeNome(args.nome).split(" ")[0]}, sua análise estratégica está pronta`
     : "Sua análise estratégica da Futurah está pronta";
 
   try {

@@ -43,13 +43,27 @@ export function AnaliseCTA({
           typeof window !== "undefined"
             ? window.__FUTURAH_ANALISE_SLUG__
             : undefined;
-        m.trackClick({
-          url: href,
-          label: "agendar_sessao_estrategica",
-          target: location,
-          event: "analise_cta_click",
-          extra: slug ? { slug, location } : { location },
-        });
+        // Só dispara `analise_cta_click` quando estamos numa página de análise
+        // gerada (`/analise/[slug]` setou a flag). Em propostas estáticas
+        // (Haytarzan, Augusto, Carlos) cai em `link_click` pra não poluir
+        // a métrica do funil de análises.
+        if (slug) {
+          m.trackClick({
+            url: href,
+            label: "agendar_sessao_estrategica",
+            target: location,
+            event: "analise_cta_click",
+            extra: { slug, location },
+          });
+        } else {
+          m.trackClick({
+            url: href,
+            label: "agendar_sessao_estrategica",
+            target: location,
+            event: "link_click",
+            extra: { location },
+          });
+        }
       })
       .catch(() => {
         // Silencioso: se o SDK quebra, o link continua funcionando.

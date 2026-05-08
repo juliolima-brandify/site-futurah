@@ -80,14 +80,19 @@ export default async function AnaliseSlugPage({ params, searchParams }: PageProp
 
   const data = analise.conteudo as AnaliseData;
 
+  // Tracker renderizado dentro do `<main>` da análise (via prop `tracker`)
+  // pra que as sentinelas absolute (50%/90%) ancorem só no conteúdo da
+  // análise, sem incluir Header/Footer/mini-FAQ.
   return (
-    <div style={{ position: "relative" }}>
-      <AnaliseTracker
-        slug={slug}
-        variante={data.variante}
-        modelo={data.modelo ?? "cash_on_delivery"}
-      />
-      <PageProposta data={data} />
-    </div>
+    <PageProposta
+      data={data}
+      tracker={
+        <AnaliseTracker
+          slug={slug}
+          variante={data.variante}
+          modelo={data.modelo ?? "cash_on_delivery"}
+        />
+      }
+    />
   );
 }
