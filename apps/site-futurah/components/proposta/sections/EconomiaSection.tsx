@@ -1,7 +1,11 @@
 import type { EconomiaPrevistaData } from "../types";
+import { resolveAgendaUrl, isExternalAgenda } from "../agendaUrl";
+import { AnaliseCTA } from "../AnaliseCTA";
 
 interface Props {
   data: EconomiaPrevistaData;
+  /** URL da agenda (Calendly etc.) — vinda do `AnaliseData.agendaUrl` */
+  agendaUrl?: string;
 }
 
 function formatBRL(valor: number) {
@@ -12,9 +16,11 @@ function formatBRL(valor: number) {
   });
 }
 
-export function EconomiaSection({ data }: Props) {
+export function EconomiaSection({ data, agendaUrl }: Props) {
   const temFuncionarios = data.funcionarios.length > 0;
   const temPlataformas = data.plataformas.length > 0;
+  const ctaHref = resolveAgendaUrl(agendaUrl, data.cta.href);
+  const ctaExternal = isExternalAgenda(ctaHref);
 
   return (
     <section className="w-full bg-brand-background px-4 md:px-8 lg:px-12 py-20 lg:py-28">
@@ -163,13 +169,15 @@ export function EconomiaSection({ data }: Props) {
               {data.cta.subtitulo}
             </p>
           )}
-          <a
-            href={data.cta.href ?? "#contato"}
+          <AnaliseCTA
+            href={ctaHref}
+            location="economia"
+            external={ctaExternal}
             className="inline-flex items-center gap-2 bg-brand-title text-white px-8 py-4 rounded-2xl font-medium text-base hover:bg-brand-button-hover transition-colors"
           >
             {data.cta.botao}
             <span aria-hidden="true">→</span>
-          </a>
+          </AnaliseCTA>
         </div>
       </div>
     </section>

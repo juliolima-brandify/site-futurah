@@ -200,6 +200,14 @@ export interface AnaliseData {
   /** Modelo comercial usado na proposta. */
   modelo?: ModeloProposta;
   variante: VarianteAnalise;
+  /**
+   * URL da agenda (Calendly etc.) usada nos CTAs da página.
+   * Snapshot imutável: setado server-side na hora de salvar a análise,
+   * a partir de `process.env.NEXT_PUBLIC_AGENDA_URL`. Trocar a URL global
+   * depois NÃO altera análises já publicadas.
+   * Não é gerada pela IA.
+   */
+  agendaUrl?: string;
   /** Metadata de página (title, description) */
   meta: {
     title: string;

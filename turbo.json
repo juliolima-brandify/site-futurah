@@ -9,12 +9,14 @@
         "PAYLOAD_SECRET",
         "DATABASE_URL",
         "BLOB_READ_WRITE_TOKEN",
-        "OPENAI_API_KEY",
-        "OPENAI_MODEL",
+        "AI_GATEWAY_API_KEY",
+        "AI_GATEWAY_MODEL",
         "TRACKER_API_URL",
         "TRACKER_API_TOKEN",
         "LEADS_INGEST_TOKEN",
         "LEADS_INGEST_URL",
+        "RESEND_API_KEY",
+        "RESEND_FROM_EMAIL",
         "NEXTJS_ENV"
       ]
     },

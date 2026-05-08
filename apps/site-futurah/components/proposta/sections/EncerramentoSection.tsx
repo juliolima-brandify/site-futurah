@@ -1,7 +1,11 @@
 import type { EncerramentoData } from "../types";
+import { resolveAgendaUrl, isExternalAgenda } from "../agendaUrl";
+import { AnaliseCTA } from "../AnaliseCTA";
 
 interface Props {
   data: EncerramentoData;
+  /** URL da agenda (Calendly etc.) — vinda do `AnaliseData.agendaUrl` */
+  agendaUrl?: string;
 }
 
 function renderTitulo(titulo: string) {
@@ -12,7 +16,13 @@ function renderTitulo(titulo: string) {
   return { __html: html };
 }
 
-export function EncerramentoSection({ data }: Props) {
+export function EncerramentoSection({ data, agendaUrl }: Props) {
+  const ctaHref = resolveAgendaUrl(agendaUrl);
+  const ctaExternal = isExternalAgenda(ctaHref);
+  // Se a resolução caiu em mailto (sem agenda configurada), usamos só o
+  // email logo abaixo — não duplicar botão.
+  const temAgenda = ctaExternal;
+
   return (
     <section
       id="contato"
@@ -30,6 +40,17 @@ export function EncerramentoSection({ data }: Props) {
           {data.body}
         </p>
         <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+          {temAgenda && (
+            <AnaliseCTA
+              href={ctaHref}
+              location="encerramento"
+              external
+              className="inline-flex items-center gap-2 bg-brand-title text-white px-8 py-4 rounded-2xl font-medium text-base hover:bg-brand-button-hover transition-colors"
+            >
+              Agendar Sessão Estratégica
+              <span aria-hidden="true">→</span>
+            </AnaliseCTA>
+          )}
           <a
             href={`mailto:${data.emailContato}`}
             className="text-sm font-medium text-brand-title underline underline-offset-4 hover:text-brand-button-hover transition-colors"

@@ -39,8 +39,10 @@ export function PageProposta({ data }: Props) {
         {!esconderEscopo && <EscopoSection data={data.escopo} />}
         <PotencialSection data={data.potencial} />
         {ofertaNoFinal && <FrentesSection data={data.frentes} />}
-        {data.economiaPrevista && <EconomiaSection data={data.economiaPrevista} />}
-        <EncerramentoSection data={data.encerramento} />
+        {data.economiaPrevista && (
+          <EconomiaSection data={data.economiaPrevista} agendaUrl={data.agendaUrl} />
+        )}
+        <EncerramentoSection data={data.encerramento} agendaUrl={data.agendaUrl} />
         <TeamTestimonialSection />
         {data.miniFaq && <MiniFaqSection data={data.miniFaq} />}
       </main>

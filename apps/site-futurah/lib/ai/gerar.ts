@@ -1,21 +1,23 @@
 import { eq } from "drizzle-orm";
+import { generateObject } from "ai";
 import {
   db,
   analises,
   type EquipeAnalise,
   type PlataformasAnalise,
 } from "@/lib/db";
-import { getOpenAI, OPENAI_MODEL } from "./openai";
+import { analiseModel } from "./gateway";
+import { analiseGeradaSchema } from "./schema";
 import { buildPrompt } from "./prompt-analise";
 import { calcularEconomia } from "./economia";
 import type { AnaliseData } from "@/components/proposta/types";
 
 /**
- * Gera o conteúdo da análise via OpenAI e grava no banco.
+ * Gera o conteúdo da análise via Vercel AI Gateway e grava no banco.
  * Idempotente: se já existe `conteudo`, não faz nada.
  *
- * Roda em background (fire-and-forget) — chamado após POST /api/aplicacao.
- * Enquanto não há scraping real, a IA trabalha só com os dados do wizard.
+ * Disparada via `after()` em /api/aplicacao — roda fora do response cycle
+ * mas dentro do budget da função serverless.
  */
 export async function gerarAnaliseEmBackground(analiseId: string): Promise<void> {
   const [row] = await db
@@ -46,56 +48,39 @@ export async function gerarAnaliseEmBackground(analiseId: string): Promise<void>
       plataformas,
     });
 
-    const client = getOpenAI();
-    const completion = await client.chat.completions.create({
-      model: OPENAI_MODEL,
-      response_format: { type: "json_object" },
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: user },
-      ],
+    const { object: parsed } = await generateObject({
+      model: analiseModel(),
+      schema: analiseGeradaSchema,
+      system,
+      prompt: user,
       temperature: 0.7,
     });
 
-    const raw = completion.choices[0]?.message?.content;
-    if (!raw) throw new Error("OpenAI retornou resposta vazia");
-
-    const parsed = JSON.parse(raw) as Partial<AnaliseData>;
-
-    // Cálculo programático da economia — não deixamos a IA alucinar números.
     const economia = calcularEconomia(equipe, plataformas);
 
+    // Snapshot imutável da URL da agenda (Calendly etc.). Lemos da env aqui
+    // pra que análises antigas não fiquem com link quebrado se a URL global
+    // for trocada depois. Sem env -> CTA cai em fallback no client.
+    const agendaUrl = process.env.NEXT_PUBLIC_AGENDA_URL?.trim() || undefined;
+
     const conteudo: AnaliseData = {
-      modelo: parsed.modelo ?? "cash_on_delivery",
-      variante: parsed.variante ?? "empresa",
-      meta: parsed.meta ?? {
-        title: `Análise estratégica | @${row.instagramHandle}`,
-        description: "Análise personalizada gerada pela Futurah & Co.",
-      },
-      hero: parsed.hero!,
-      retrato: parsed.retrato!,
-      diagnostico: parsed.diagnostico!,
-      tese: parsed.tese!,
-      frentes: parsed.frentes!,
-      bancoIdeias: parsed.bancoIdeias!,
-      fases: parsed.fases!,
-      escopo: parsed.escopo!,
-      potencial: parsed.potencial!,
-      encerramento: parsed.encerramento!,
-      miniFaq: parsed.miniFaq,
-      economiaPrevista: economia ?? parsed.economiaPrevista,
+      ...parsed,
+      agendaUrl,
+      economiaPrevista: economia
+        ? {
+            ...economia,
+            cta: { ...economia.cta, href: agendaUrl ?? economia.cta.href },
+          }
+        : undefined,
     };
 
-    validateConteudo(conteudo);
-
-    // TODO(fase 4): mudar para "pendente_revisao" quando o admin de revisão existir.
-    // Por enquanto publica direto.
+    // Análise vai pra revisão humana antes de publicar (Fase 4 / B5).
+    // Quando admin aprova em /admin/analises, status muda pra 'publicada'.
     await db
       .update(analises)
       .set({
         conteudo,
-        status: "publicada",
-        publishedAt: new Date(),
+        status: "pendente_revisao",
         updatedAt: new Date(),
       })
       .where(eq(analises.id, analiseId));
@@ -112,26 +97,6 @@ export async function gerarAnaliseEmBackground(analiseId: string): Promise<void>
         .where(eq(analises.id, analiseId));
     } catch (updateErr) {
       console.error("[ai/gerar] falha ao marcar 'falhou':", updateErr);
-    }
-  }
-}
-
-function validateConteudo(conteudo: AnaliseData): void {
-  const required = [
-    "hero",
-    "retrato",
-    "diagnostico",
-    "tese",
-    "frentes",
-    "bancoIdeias",
-    "fases",
-    "escopo",
-    "potencial",
-    "encerramento",
-  ] as const;
-  for (const key of required) {
-    if (!conteudo[key]) {
-      throw new Error(`Seção obrigatória ausente no conteudo: ${key}`);
     }
   }
 }

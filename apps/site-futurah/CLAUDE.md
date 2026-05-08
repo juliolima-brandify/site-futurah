@@ -27,8 +27,11 @@ node --import tsx/esm ./node_modules/payload/dist/bin/index.js generate:importma
 - `DATABASE_URL` — conn string do Postgres com permissão `CREATE SCHEMA`. Região do Supabase Pooler está em Dashboard → Settings → Database (esta instalação usa `us-west-2`).
 - `PAYLOAD_SECRET` — hex 64-char (`node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`). Build quebra com throw se ausente.
 - `BLOB_READ_WRITE_TOKEN` — token do Vercel Blob Store (uploads de `media`). Vercel injeta automaticamente quando o Blob é conectado ao projeto.
-- `OPENAI_API_KEY` — chave OpenAI usada pelo pipeline de geração da análise (`lib/ai/`). Sem ela, `POST /api/aplicacao` aceita a submissão mas a geração falha em runtime e a análise termina em `status='falhou'`. Lazy-loaded (só exige no 1º uso).
-- `OPENAI_MODEL` — opcional. Default `gpt-4.1-mini`. Troca pra `gpt-4.1`/`gpt-4o` se quiser qualidade maior (custo/latência sobem).
+- `AI_GATEWAY_API_KEY` — chave do **Vercel AI Gateway** usada pelo pipeline de geração (`lib/ai/`). Em deploy Vercel, o gateway autentica via OIDC token automaticamente — esta var só é obrigatória em **dev local**. Sem ela em dev, `POST /api/aplicacao` aceita a submissão mas a geração falha e a análise termina em `status='falhou'`. Pegar a chave em Vercel Dashboard → AI Gateway.
+- `AI_GATEWAY_MODEL` — opcional. Default `openai/gpt-4.1-mini`. Precisa do prefixo do provider (ex: `anthropic/claude-sonnet-4-6`, `openai/gpt-4o`). Trocar provider/modelo é só editar esta var.
+- `NEXT_PUBLIC_AGENDA_URL` — **opcional**. URL da agenda comercial (Calendly, Cal.com etc.) usada nos CTAs da página `/analise/[slug]`. Lida na hora da geração e gravada como snapshot imutável em `conteudo.agendaUrl` — trocar a var depois NÃO altera análises antigas. Sem ela: CTA de Encerramento cai em `mailto:contato@futurah.co` e CTA de Economia usa o `cta.href` do schema.
+- `RESEND_API_KEY` — **opcional**. API key do Resend pra disparo de email quando análise é aprovada no admin. Sem ela, aprovação segue funcionando mas o lead só recebe a análise se acessar o link direto. Pegar em https://resend.com/api-keys.
+- `RESEND_FROM_EMAIL` — **opcional**. Endereço/nome do remetente (ex: `Futurah <analise@futurah.co>`). Default: `Futurah <analise@futurah.co>`. Domínio precisa estar verificado no Resend.
 
 ## Arquitetura
 
@@ -39,15 +42,18 @@ O projeto é deployado na **Vercel**, team `admbrandify-gmailcoms-projects` (`te
 - `DATABASE_URL` — Supabase pooler us-west-2
 - `PAYLOAD_SECRET` — hex 64-char (mesmo valor do `.env.local`; **não regenerar sem coordenar**, invalida sessões)
 - `BLOB_READ_WRITE_TOKEN` — injetado automaticamente pelo Vercel Blob Store `site-futurah-media` (region iad1), conectado via integration em 2026-04-23
-- `OPENAI_API_KEY` — adicionar manualmente em Settings → Environment Variables. Rotacionar direto pela OpenAI Dashboard; editar a var e **fazer Redeploy** (env só pega no próximo build).
+- `AI_GATEWAY_API_KEY` — **opcional em produção** (OIDC do Vercel autentica o gateway sozinho dentro do deploy). Setar só se quiser usar a mesma chave em dev local. Pegar em Vercel Dashboard → AI Gateway. Rotacionar lá e fazer Redeploy se quiser invalidar a antiga.
+- `AI_GATEWAY_MODEL` — opcional. Default `openai/gpt-4.1-mini`. Sem custo de redeploy pra trocar provider — só editar a var (env é lida em runtime).
 - `NEXT_PUBLIC_TRACKER_ENDPOINT` — `https://t.futurah.co/e` (consumido pelo `<TrackerBoundary />` do site).
 - `TRACKER_API_URL` — `https://t.futurah.co` (consumido pelo dashboard `/admin/tracking` server-side).
 - `TRACKER_API_TOKEN` — bearer pra ler `/api/utm-summary` no Worker (sincronizado com o secret `API_READ_TOKEN` no Worker via `wrangler secret put`).
 - `LEADS_INGEST_TOKEN` — bearer fixo aceito por `/api/leads/ingest`. **Mesmo valor** está setado no projeto `augustofelipe` (que escreve). Rotacionar = atualizar nos dois projetos em sincronia. Listar/checar com `npx vercel env ls --scope=admbrandify-gmailcoms-projects`.
+- `NEXT_PUBLIC_AGENDA_URL` — opcional. URL da agenda do CTA da análise. Coberto pelo wildcard `NEXT_PUBLIC_*` no `turbo.json` (não precisa listar individualmente).
+- `RESEND_API_KEY` + `RESEND_FROM_EMAIL` — opcionais. Email transacional pra notificar lead quando análise é aprovada no admin (`/admin/analises`).
 
 **Gotchas do build em monorepo Turbo 2 strict** (já consertados no repo, ler antes de mexer):
 - `package.json` raiz precisa de `"packageManager"` (Turbo 2 strict). Sem isso: `Could not resolve workspaces`.
-- `turbo.json` precisa listar **todas** as env vars usadas pelo build em `tasks.build.env` (`NEXT_PUBLIC_*`, `PAYLOAD_SECRET`, `DATABASE_URL`, `BLOB_READ_WRITE_TOKEN`, `OPENAI_API_KEY`, `OPENAI_MODEL`, `TRACKER_API_URL`, `TRACKER_API_TOKEN`, `NEXTJS_ENV`). Sem isso, vars existem no Vercel mas não chegam dentro do build → falha em runtime "PAYLOAD_SECRET nao definido" durante "Collecting page data".
+- `turbo.json` precisa listar **todas** as env vars usadas pelo build em `tasks.build.env` (`NEXT_PUBLIC_*`, `PAYLOAD_SECRET`, `DATABASE_URL`, `BLOB_READ_WRITE_TOKEN`, `AI_GATEWAY_API_KEY`, `AI_GATEWAY_MODEL`, `TRACKER_API_URL`, `TRACKER_API_TOKEN`, `NEXTJS_ENV`). Sem isso, vars existem no Vercel mas não chegam dentro do build → falha em runtime "PAYLOAD_SECRET nao definido" durante "Collecting page data".
 - Next 15 strict typecheck atravessa todo `*.ts` no projeto, mesmo arquivos não importados — qualquer resíduo (ex: `open-next.config.ts` que importava pacote desinstalado) quebra build. Manter o tree limpo.
 
 ### Roteamento — Route Groups
@@ -165,14 +171,14 @@ Layout **typeform** (uma pergunta por tela, centralizado, sem sidebar). Steps di
 Enter avança, `autoFocus` nos inputs. Validação por step em `canAdvance` — botão "Continuar" fica desabilitado sem resposta.
 
 #### Ingestão — `POST /api/aplicacao` (`app/api/aplicacao/route.ts`)
-Valida `email` e `instagramHandle`, normaliza handle (remove `@`/URL), gera `slug` via `nanoid(22)`, INSERT em `analises` (status `pendente_dados`, tipo `express`), dispara `gerarAnaliseEmBackground(id)` **fire-and-forget** (não aguarda), retorna `{ id, slug }`. Wizard redireciona para `/aplicacao/recebido/[slug]`.
+Valida `email` e `instagramHandle`, normaliza handle (remove `@`/URL), gera `slug` via `nanoid(22)`, INSERT em `analises` (status `pendente_dados`, tipo `express`), agenda `gerarAnaliseEmBackground(id)` via **`after()`** do `next/server` (roda fora do response cycle mas dentro do budget da função serverless — sem `after()`, Vercel pode cortar antes do gateway responder). Retorna `{ id, slug }`. Wizard redireciona para `/aplicacao/recebido/[slug]`.
 
 #### Geração — `lib/ai/gerar.ts`
 Orquestrador assíncrono. Fluxo:
 1. Lê a row; se já tem `conteudo`, é idempotente (skip).
 2. Muda status → `gerando`.
 3. Monta prompt (`lib/ai/prompt-analise.ts`) descrevendo o lead com labels humanas e o shape esperado de `AnaliseData`.
-4. Chama OpenAI (`response_format: json_object`, modelo = `OPENAI_MODEL` ou `gpt-4.1-mini`).
+4. Chama o **Vercel AI Gateway** via `generateObject({ model: gateway('openai/gpt-4.1-mini'), schema: analiseGeradaSchema, … })`. Modelo configurável via `AI_GATEWAY_MODEL` (precisa do prefixo do provider). O zod schema (`lib/ai/schema.ts`) valida o output em runtime — não há mais `JSON.parse` manual.
 5. Parse JSON, valida seções obrigatórias (`validateConteudo`).
 6. **Calcula `economiaPrevista` programaticamente** em `lib/ai/economia.ts` — cruza `equipe.cargos` e `plataformas.items` com o catálogo (`lib/ai/catalogo.ts`) para produzir a tabela "custo atual vs projetado + total de economia". Não delega números à IA (evita alucinação).
 7. Salva `conteudo` + status → `publicada`, `publishedAt = now()`.
@@ -190,10 +196,8 @@ Se falhar em qualquer etapa, grava `status='falhou'` + `revisorNotas` com a mens
 - **Admin de revisão humana** (Payload custom view) — B5 / Fase 4.
 - **Stripe** pra `tipo='completa'` — B7. Hoje só `express` é gerado (grátis).
 - **`tenant_id` em `analises`** — B6. Schema atual é sem tenant; análises não são isoladas por cliente da agência.
-- **Serverless fire-and-forget**: `gerarAnaliseEmBackground` é disparado sem `await`. Em Vercel, a função serverless pode ser encerrada antes da OpenAI responder (~10-30s). Trocar por `after()` do Next 15 (`import { after } from 'next/server'`) resolve. Sintoma: análise fica eternamente em `gerando`. Ver logs `[ai/gerar]` no painel Vercel.
-- **Rate-limit / antispam** em `/api/aplicacao` — H1. Bot submitando queima token OpenAI.
+- **Rate-limit / antispam** em `/api/aplicacao` — H1. Bot submitando queima crédito do AI Gateway.
 - **Tracking em `analise_eventos`** — H4. Tabela + índice existem; endpoint `POST /api/analise-eventos` não.
-- **Validação zod runtime** em `AnaliseData` — hoje a validação é estrutural (existência de chaves obrigatórias), não profunda.
 
 Ver [`ANALISE_PLAN.md`](./ANALISE_PLAN.md) para o plano priorizado completo.
 
@@ -203,10 +207,11 @@ Todo o código de geração fica aqui, server-only.
 
 | Arquivo | Responsabilidade |
 |---|---|
-| `openai.ts` | Cliente OpenAI lazy (só instancia no 1º uso). Exporta `getOpenAI()` + `OPENAI_MODEL`. |
+| `gateway.ts` | Cliente do **Vercel AI Gateway** via `@ai-sdk/gateway`. Exporta `analiseModel()` + `ANALISE_MODEL`. Em prod (deploy Vercel) autentica via OIDC; em dev local exige `AI_GATEWAY_API_KEY`. |
+| `schema.ts` | Schema **zod** do `AnaliseData` (sem `economiaPrevista`, que é calculado em código). Source-of-truth do output da IA — usado pelo `generateObject` pra estruturar a chamada e validar runtime. |
 | `catalogo.ts` | **Catálogo de substituição** — source of truth do "o que a Futurah substitui". Dois maps: `CATALOGO_CARGOS` (10 cargos: sdr, atendente-whatsapp, agendadora, suporte-n1, qualificador, social-media, gestor-trafego, webdesigner, financeiro-op, recepcionista) e `CATALOGO_PLATAFORMAS` (19 SaaS agrupados em CRM/Atendimento/Agendamento/WhatsApp/Email). Cada entry tem `{ label, substituivel: boolean, como/alternativa: string }`. Também `CUSTO_ESTIMADO_CARGO` e `CUSTO_ESTIMADO_PLATAFORMA` (pontos de referência em R$). |
 | `economia.ts` | `calcularEconomia(equipe, plataformas)` determinístico — monta `EconomiaPrevistaData` cruzando respostas do wizard com o catálogo. Fator de escala por headcount e ajuste por faixa de custo. Totaliza `custoAtualMensal`/`custoProjetadoMensal`/`economiaMensal`/`economiaAnual` + CTA para Sessão Estratégica. |
-| `prompt-analise.ts` | `buildPrompt(input)` retorna `{ system, user }`. System = persona Futurah + shape de `AnaliseData` inline. User = dados do lead com labels humanizadas (ex: `"Fase de Tração (R$ 10k a R$ 50k/mês, já vende...)"`). **Instrui a IA a não gerar `economiaPrevista`** (calculado em code). |
+| `prompt-analise.ts` | `buildPrompt(input)` retorna `{ system, user }`. System = persona Futurah + regras editoriais (tom, marcações `{{highlight}}`/`{{italic}}`, não inventar dados de IG). User = dados do lead com labels humanizadas (ex: `"Fase de Tração (R$ 10k a R$ 50k/mês, já vende...)"`). O **shape** vem do zod schema (`schema.ts`), não do prompt. |
 | `gerar.ts` | `gerarAnaliseEmBackground(id)` — orquestrador descrito acima. |
 
 **Como estender o catálogo** (ex: adicionar o cargo "copywriter"):
@@ -270,7 +275,7 @@ Server-rendered (RSC), gated por `requireSuperadmin()` (Payload). Lê do Worker 
 5. **`importMap.js` precisa estar populado para o `/admin` funcionar em runtime.** Se ficar vazio (`export const importMap = {}`), o `/admin` responde mas crasha em SSR com `TypeError: Cannot read properties of undefined (reading 'call')` no `webpack-runtime.js` — o plugin multi-tenant tenta consumir entries (TenantSelectionProvider, TenantSelector, etc.) e encontra `undefined`. **Fix**: rodar `npm run dev` uma vez — o próprio dev server regenera o arquivo com todas as entries necessárias (Lexical features, multi-tenant, Vercel Blob client uploads). O CLI `generate:importmap` standalone (via `node --import tsx/esm …`) tende a não popular nada; confiar no `npm run dev`.
 6. **Layout split entre site e admin é obrigatório**. O root `app/layout.tsx` **não pode** importar `globals.css` nem aplicar classes globais (`dark`, fontes, etc.) — qualquer `@tailwind base` ou `body { color }` vaza pro admin e quebra a UI do Payload (inputs pretos em fundo claro, labels invisíveis). Estilos do site moram em `app/(site)/layout.tsx`, embrulhados num `<div>` com classes/fontes.
 7. **Access control defensivo**: ao adicionar uma nova Collection tenant-scoped, copiar o padrão de `collections/Posts.ts`/`Categories.ts`/`Authors.ts` — `read/create/update/delete: ({req}) => !!req.user`. O filtro de tenant do plugin multi-tenant **só** é aplicado quando `req.user` existe, então `read: () => true` vaza dados entre tenants via REST anônimo. Site público sempre via Local API com `overrideAccess: true`.
-8. **Fire-and-forget em serverless (pipeline de análise)**: `POST /api/aplicacao` dispara `gerarAnaliseEmBackground(id).catch(...)` sem `await`. Em dev funciona; em Vercel, a função serverless pode ser **encerrada antes da OpenAI responder** (~10-30s), deixando a análise eternamente em `gerando`. **Fix**: trocar por `import { after } from 'next/server'` + `after(() => gerarAnaliseEmBackground(id))` — garante execução pós-response dentro do budget da função. Sintoma em prod: análise publicada nunca aparece na página de espera; logs `[ai/gerar]` no Vercel param no meio.
+8. **Geração da análise via `after()`**: `POST /api/aplicacao` agenda `gerarAnaliseEmBackground(id)` via `after()` do `next/server` — roda fora do response cycle mas dentro do budget da função serverless. Não trocar por `await` (deixaria o cliente esperando ~30s) nem voltar pra fire-and-forget puro (Vercel pode cortar antes do gateway responder).
 
 ### Bootstrap de DB novo (ou recriar do zero)
 
