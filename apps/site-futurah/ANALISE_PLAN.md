@@ -3,6 +3,8 @@
 > **Status (2026-04-23):** diagnóstico inicial entregue por arquiteto sênior após migração Payload 3 concluída. Pontas do funil (wizard + render) estão implementadas; miolo (ingestão, pipeline, admin, pagamento, tracking) **estava ausente**. Este doc foi a fonte do plano de implementação executado em 2026-04-24.
 >
 > **Atualização (2026-04-24):** ingestão + geração via OpenAI + espera + entrega **implementadas end-to-end**. O miolo agora existe (API de ingestão, gerador `lib/ai/`, página de recebido, wizard refeito em typeform). Ainda pendente: scraping real, admin de revisão, Stripe, tenant_id em `analises`, hardening (rate-limit, tracking `analise_eventos`, zod runtime). Ver seção 3 pra blockers resolvidos/pendentes e seção **7 — Pós-implementação** no final.
+>
+> **Atualização (2026-05-06):** migrado pra **Vercel AI Gateway** (`@ai-sdk/gateway` + `generateObject`). Schema zod (`lib/ai/schema.ts`) virou source-of-truth do output da IA — resolve **B4** (validação runtime). `H8` resolvido com `after()` do `next/server`. Provider/modelo agora trocável via `AI_GATEWAY_MODEL` sem mexer em código. Em prod, OIDC do Vercel autentica o gateway sozinho — `OPENAI_API_KEY` foi descontinuada.
 
 Ver também:
 - [`CLAUDE.md`](./CLAUDE.md) — seção "Fluxo de Análise (pipeline interno)" e "Pipeline de IA (`lib/ai/`)"
@@ -125,8 +127,8 @@ Legenda: ✅ resolvido · 🟡 parcial · 🔴 pendente.
 | **B1** | ✅ | `POST /api/aplicacao` — cria row `pendente_dados`, gera slug `nanoid(22)`, valida email + handle, dispara geração em background | `app/api/aplicacao/route.ts` | **Sem** resolução de `tenant_id` ainda (depende de B6). Sem PATCH incremental — wizard envia tudo no submit final. |
 | **B2** | ✅ | Reconciliar campos wizard × schema — schema ganhou `momento`, `gargalo`, `velocidade`, `equipe` (jsonb), `plataformas` (jsonb). Email é coletado no wizard (step dedicado quando caminho 2). | `components/sections/ApplicationWizard.tsx`, `lib/db/schema.ts`, migrations 0002/0003 | Colunas antigas (`objetivo`, `monetiza_hoje`, `tempo_disponivel`) ficaram no schema como deprecadas — não removidas. |
 | **B3** | 🔴 | Webhook de pipeline — `POST /api/pipeline/webhook` autenticado via `PIPELINE_WEBHOOK_SECRET`, aceita transições `scraping/gerando/pendente_revisao` com `dadosScraped`/`conteudo` | `app/api/pipeline/webhook/route.ts` | **Pendente**. Hoje a IA gera só com dados do wizard. Scraping real fica como próxima iteração. |
-| **B4** | 🟡 | Validação do `conteudo` — hoje `validateConteudo` em `lib/ai/gerar.ts` checa só existência das seções obrigatórias. Zod runtime profundo ainda não existe. | `lib/ai/gerar.ts` | Cobertura suficiente pra MVP. Zod completo fica pro sprint de hardening. |
-| **B5** | 🔴 | Custom admin view de análises | `app/(payload)/admin/custom/analises/page.tsx` | **Pendente** (Fase 4 Payload). Hoje geração publica direto (status='publicada'), sem revisão humana. `TODO(fase 4)` marcado em `lib/ai/gerar.ts:88`. |
+| **B4** | ✅ | Validação do `conteudo` — `generateObject` do Vercel AI SDK valida o output contra `analiseGeradaSchema` (`lib/ai/schema.ts`) em runtime. Type-safe end-to-end. | `lib/ai/schema.ts`, `lib/ai/gerar.ts` | Schema zod completo (sem `economiaPrevista`, que é calculado em código). |
+| **B5** | ✅ | Custom admin view de análises | `app/admin/analises/`, `app/api/admin/analises/[id]/{aprovar,rejeitar}/route.ts` | Análises geradas saem como `pendente_revisao`; superadmin aprova/rejeita em `/admin/analises`. Aprovar dispara email transacional via Resend (N2). Sidebar nativa do Payload fica como TODO (importMap regen). |
 | **B6** | 🔴 | `tenant_id` em `analises` + `analise_eventos` | `lib/db/schema.ts` | **Pendente**. Sem isolamento multi-tenant nas análises ainda. `tenant_id` ausente não bloqueia o MVP (só existe um tenant — `futurah`). |
 | **B7** | 🔴 | Stripe (só `completa`) | vários | **Pendente**. Hoje só `express` é gerado (grátis). |
 
@@ -134,24 +136,24 @@ Legenda: ✅ resolvido · 🟡 parcial · 🔴 pendente.
 
 | ID | Status | Item |
 |---|---|---|
-| **H1** | 🔴 | Rate-limit em `/api/aplicacao` (Upstash ou in-memory por IP+email). **Crítico** — cada submissão consome token OpenAI. |
+| **H1** | ✅ | Rate-limit in-memory em `/api/aplicacao` — 5/h por IP, 2/24h por email. Resposta 429 com `Retry-After`. `lib/rate-limit.ts`. Migrar pra Upstash se escalar horizontal. |
 | **H2** | ✅ | Slug seguro — `nanoid(22)` em `app/api/aplicacao/route.ts`. |
 | **H3** | 🔴 | Access control no webhook — depende de B3 existir primeiro. |
-| **H4** | 🔴 | `analise_eventos` endpoint + pixel no `/analise/[slug]`. Tabela e índice existem, nada popula. |
+| **H4** | ✅ | Tracking de leitura via tracker-worker existente (`t.futurah.co`). `AnaliseTracker` (client) dispara `analise_view` + `analise_scroll_50/90` (IntersectionObserver). `AnaliseCTA` instrumenta os dois CTAs com `analise_cta_click` (pointerdown + auxclick). Reusa `siteId='futurah'`. Tabela `analise_eventos` em Postgres NÃO foi populada — eventos vão pro Analytics Engine via Worker. |
 | **H5** | 🔴 | Idempotência — unique parcial `(email, instagram_handle)` onde `status <> 'falhou'`. |
 | **H6** | 🟡 | Error state no wizard — `submitError` implementado; página `/aplicacao/recebido/[slug]` tem copy para `falhou`. Retry ainda não. |
 | **H7** | 🔴 | RLS no `public`. |
-| **H8** | 🔴 | **Serverless fire-and-forget** — `gerarAnaliseEmBackground` pode ser cortado antes da OpenAI responder em Vercel. Fix: trocar por `after()` do Next 15. **Crítico pra prod**. |
+| **H8** | ✅ | `after()` do `next/server` aplicado em `app/api/aplicacao/route.ts` — geração roda fora do response cycle mas dentro do budget da função serverless. |
 
 ### Nice-to-have
 
 | ID | Status | Item |
 |---|---|---|
-| **N1** | ✅ | Página "aguarde" — `/aplicacao/recebido/[slug]` com polling a cada 3s. |
-| **N2** | 🔴 | Email transacional via Resend. |
+| **N1** | ✅ | Página "aguarde" — `/aplicacao/recebido/[slug]` com polling a cada 3s. Polling para em `pendente_revisao` (lead recebe email do admin quando aprovado). |
+| **N2** | ✅ | Email transacional via Resend. Disparado quando admin clica "Aprovar" em `/admin/analises`. Helper em `lib/email/resend.ts`. Skip silencioso (`console.warn`) se `RESEND_API_KEY` ausente. |
 | **N3** | 🔴 | Dashboard de métricas no admin. |
 | **N4** | 🔴 | Logs estruturados (pino). Hoje `console.error` com prefixos `[API]` e `[ai/gerar]`. |
-| **N5** | 🔴 | Preview da análise em `pendente_revisao` (depende de B5). |
+| **N5** | ✅ | Preview da análise em `pendente_revisao` via `/analise/[slug]?preview=1` — só funciona quando request vem de superadmin autenticado (gate por `payload.auth({ headers })`). |
 
 ## 4. Recomendação de ordem — sprints (revisada 2026-04-24)
 
@@ -161,14 +163,14 @@ Original `B2 → B6 → B1`. Executado como **`B2 → B1`** (sem B6 — `tenant_
 ### Sprint 2 — pipeline end-to-end 🟡 PARCIAL
 Original `B3 + B4 + H3`. **Divergência**: em vez de pipeline externo com webhook (B3), o gerador foi integrado diretamente ao repo (`lib/ai/` + `gerarAnaliseEmBackground`) consumindo OpenAI direto. Scraping real ainda ausente. B3 + H3 ficam como próxima iteração se quisermos trazer scraping do Instagram pra dentro do pipeline. B4 resolvido só parcialmente (validação leve em `validateConteudo`).
 
-### Sprint 3 — revisão humana no admin 🔴 PENDENTE
-`B5 + N5`. Não iniciado. Sem isso, toda análise gerada publica direto (risco de marca). Bloqueador pra abrir tráfego pago.
+### Sprint 3 — revisão humana no admin ✅ CONCLUÍDO
+`B5 + N5`. Admin em `/admin/analises` (server-rendered, `requireSuperadmin`), endpoints `aprovar`/`rejeitar`. Análises geradas saem como `pendente_revisao` em vez de `publicada`. Lead vê copy "em revisão" e espera email.
 
-### Sprint 4 — hardening 🔴 PENDENTE (urgente)
-`H1 (rate-limit)`, `H8 (after() do Next)`, `H4 (tracking)`, `H5 (idempotência)`, `N4 (logs)`. **`H8` é o mais urgente** — sem isso, análises podem ficar travadas em `gerando` em prod quando a função serverless é encerrada antes da OpenAI responder. `H1` também crítico se for abrir tráfego (custo OpenAI).
+### Sprint 4 — hardening 🟡 QUASE
+`H8` ✅, `H1` ✅, `H4` ✅. Pendentes: `H5 (idempotência)`, `N4 (logs)`, `H7 (RLS)`.
 
 ### Sprint 5 — monetização `completa` 🔴 PENDENTE
-`B7 + N2`. Opcional — só se quiser lançar `completa` pago. `express` grátis como isca já está no ar.
+`B7`. Opcional — só se quiser lançar `completa` pago. `express` grátis como isca já está no ar. (`N2` saiu daqui — virou parte do Sprint 3.)
 
 ### Sprint 6 — scraping real (novo)
 `B3 + H3` + integração real com Instagram scraping (n8n, Apify, etc). Promove o `dadosScraped` de `null` pra conteúdo real, aumentando a qualidade da análise gerada. Fica como sprint dedicado porque envolve decisão de stack externo.
@@ -210,3 +212,24 @@ Original `B3 + B4 + H3`. **Divergência**: em vez de pipeline externo com webhoo
 
 ### Catálogo extensível
 Adicionar um cargo/plataforma ao catálogo leva 3 passos (editar `lib/ai/catalogo.ts` + `ApplicationWizard.tsx`). Detalhe documentado no `CLAUDE.md` → seção "Pipeline de IA".
+
+## 8. Pós-implementação (2026-05-08)
+
+### O que foi entregue nesta rodada
+- **Calendly no CTA** (não estava no plan formal): `AnaliseData.agendaUrl` é setado server-side em `gerar.ts` lendo `NEXT_PUBLIC_AGENDA_URL` na hora de salvar (snapshot imutável por análise). `EconomiaSection` e `EncerramentoSection` resolvem a URL via `components/proposta/agendaUrl.ts`. `AnaliseCTA` (client component) wrapeia `<a>` com tracking. Sem env: CTA cai em `mailto:contato@futurah.co`.
+- **H1**: rate-limit in-memory (5/h por IP, 2/24h por email) em `/api/aplicacao` via `lib/rate-limit.ts`. 429 com `Retry-After`.
+- **B5 + N5**: admin de revisão `/admin/analises` (RSC, `requireSuperadmin`) com listagem de pendentes, preview e botões aprovar/rejeitar. Endpoints `POST /api/admin/analises/[id]/{aprovar,rejeitar}`. Análises agora saem como `pendente_revisao` (não publicada direto).
+- **N2**: email transacional via Resend disparado quando admin aprova. Helper `lib/email/resend.ts` usa SDK oficial. Sem `RESEND_API_KEY`: `console.warn` + segue (não quebra admin).
+- **H4**: tracking via `@futurah/tracker-sdk` em `/analise/[slug]`. Eventos: `analise_view`, `analise_scroll_50`, `analise_scroll_90`, `analise_cta_click`. Reusa `siteId='futurah'` da config global.
+
+### Commits
+- `8ca4138f` — chore(site-futurah): consolidar migração AI Gateway (WIP pré-existente)
+- `9db2775e` — feat(analise): CTAs apontam pra agenda comercial via NEXT_PUBLIC_AGENDA_URL
+- `b76f1f97` — feat(analise): rate-limit em /api/aplicacao
+- `2b225e32` — feat(analise): admin de revisão humana + email transacional Resend
+- `92ddb17f` — feat(analise): tracking via tracker-worker em /analise/[slug] + Resend SDK
+
+### TODOs deixados
+- `NEXT_PUBLIC_AGENDA_URL` — URL real da agenda (Calendly/Cal.com) precisa ser setada na Vercel pra prod e em `.env.local` pra dev.
+- `RESEND_API_KEY` + `RESEND_FROM_EMAIL` — pegar key no Resend e configurar domínio verificado.
+- Sidebar nativa do Payload com link pra `/admin/analises` — depende de regen do `importMap.js` via `npm run dev`. Fica como TODO. Por ora o link aparece no nav do `/admin/tracking`.
