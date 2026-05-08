@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { nanoid } from "nanoid";
 import { db, analises, type EquipeAnalise, type PlataformasAnalise } from "@/lib/db";
 import { gerarAnaliseEmBackground } from "@/lib/ai/gerar";
@@ -74,11 +74,15 @@ export async function POST(request: Request) {
       })
       .returning({ id: analises.id, slug: analises.slug });
 
-    // Dispara geração em background — não aguarda.
-    // Enquanto o pipeline de scraping real não existe, a IA gera direto
-    // a partir dos dados do wizard.
-    gerarAnaliseEmBackground(row.id).catch((err) => {
-      console.error("[API] /aplicacao geracao background:", err);
+    // Dispara geração após a resposta — `after()` mantém a função serverless
+    // viva até o callback terminar (sem isso, Vercel pode cortar antes da
+    // OpenAI/gateway responder e a análise trava em 'gerando').
+    after(async () => {
+      try {
+        await gerarAnaliseEmBackground(row.id);
+      } catch (err) {
+        console.error("[API] /aplicacao geracao background:", err);
+      }
     });
 
     return NextResponse.json({ id: row.id, slug: row.slug });

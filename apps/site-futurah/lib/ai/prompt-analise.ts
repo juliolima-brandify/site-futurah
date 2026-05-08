@@ -11,107 +11,15 @@ export interface PromptInput {
   plataformas: PlataformasAnalise | null;
 }
 
-const SHAPE_INSTRUCTIONS = `
-Você devolve JSON válido com ESTA estrutura (sem comentários):
-
-{
-  "modelo": "cash_on_delivery",
-  "variante": "empresa",
-  "meta": { "title": string, "description": string },
-  "hero": {
-    "badge": string,
-    "titulo": string,
-    "subtitulo": string,
-    "ctaAncora": string (opcional),
-    "rodape": string (opcional)
-  },
-  "retrato": {
-    "eyebrow": string,
-    "titulo": string,
-    "subtitulo": string,
-    "stats": [{ "num": string, "label": string }] (3-4 itens),
-    "fechamento": string (opcional)
-  },
-  "diagnostico": {
-    "eyebrow": string,
-    "titulo": string,
-    "subtitulo": string,
-    "cards": [{ "titulo": string, "body": string }] (3 itens)
-  },
-  "tese": {
-    "eyebrow": string,
-    "titulo": string (pode usar {{highlight}}texto{{/highlight}} para destacar),
-    "body": string
-  },
-  "frentes": {
-    "eyebrow": string,
-    "titulo": string,
-    "subtitulo": string,
-    "layout": "stack",
-    "cards": [{
-      "numero": "01" | "02" | "03",
-      "pillLabel": string,
-      "pillTone": "lime" | "dark",
-      "titulo": string,
-      "body": string,
-      "bullets": [string, string, string, string],
-      "destaque": boolean (opcional)
-    }] (2-3 cards)
-  },
-  "bancoIdeias": {
-    "eyebrow": string,
-    "titulo": string,
-    "subtitulo": string,
-    "categorias": [{
-      "numero": "01" | "02" | "03",
-      "titulo": string,
-      "itens": [string, string, string, string]
-    }] (2-3 categorias)
-  },
-  "fases": {
-    "eyebrow": string,
-    "titulo": string,
-    "subtitulo": string,
-    "fases": [{
-      "phase": "Fase 01" | "Fase 02" | "Fase 03",
-      "weeks": string (ex: "Semanas 1-4"),
-      "title": string,
-      "bullets": [string, string, string]
-    }] (3 fases)
-  },
-  "escopo": {
-    "eyebrow": string,
-    "titulo": string,
-    "subtitulo": string,
-    "itens": [string] (4-6 itens)
-  },
-  "potencial": {
-    "eyebrow": string,
-    "titulo": string,
-    "subtitulo": string,
-    "cards": [{
-      "eyebrow": string,
-      "titulo": string,
-      "body": string,
-      "potencialLabel": string,
-      "potencialValor": string,
-      "destaque": boolean (opcional)
-    }] (3 cards, um com destaque: true),
-    "observacao": string (opcional)
-  },
-  "encerramento": {
-    "eyebrow": string,
-    "titulo": string (pode usar {{italic}}texto{{/italic}}),
-    "body": string,
-    "emailContato": "contato@futurah.co"
-  }
-}
-
-Regras:
+const REGRAS = `
+Regras editoriais:
 - Português BR, tom consultivo e direto (não vendedor agressivo).
 - Nunca invente dados específicos do Instagram que você não sabe (nº de seguidores, posts reais).
 - Use as informações do wizard como verdade de base.
-- Não gere a seção "economiaPrevista" — ela é calculada programaticamente.
+- Em "encerramento.emailContato" use sempre "contato@futurah.co".
+- Em "tese.titulo" você pode marcar destaque com {{highlight}}texto{{/highlight}}.
+- Em "encerramento.titulo" você pode marcar itálico com {{italic}}texto{{/italic}}.
+- A seção "economiaPrevista" é calculada em código — não a gere.
 `.trim();
 
 function descrevMomento(momento: string): string {
@@ -195,7 +103,7 @@ export function buildPrompt(input: PromptInput): { system: string; user: string 
 
 Tom: consultivo, direto, sem bullshit. Números conservadores. Não prometa milagres.
 
-${SHAPE_INSTRUCTIONS}`;
+${REGRAS}`;
 
   const cargosLista = input.equipe?.cargos
     .map((c) => CATALOGO_CARGOS[c]?.label ?? c)
