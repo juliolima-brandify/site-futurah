@@ -10,7 +10,82 @@ import { analiseModel } from "./gateway";
 import { analiseGeradaSchema } from "./schema";
 import { buildPrompt } from "./prompt-analise";
 import { calcularEconomia } from "./economia";
-import type { AnaliseData } from "@/components/proposta/types";
+import type { AnaliseData, PilarData } from "@/components/proposta/types";
+
+/**
+ * Pilares "comportamentais" derivados das respostas do wizard. Não dependem
+ * da IA — calculamos pra evitar alucinação e garantir consistência visual
+ * no radar (sempre 2 pilares com score "âncora").
+ */
+function derivarPilaresComportamentais(
+  momento: string,
+  velocidade: string,
+): PilarData[] {
+  const maturidadeMap: Record<string, { score: number; descricao: string }> = {
+    validacao: {
+      score: 3,
+      descricao:
+        "Negócio em validação (< R$ 10k/mês). Estrutura ainda em formação — primeiros clientes em andamento.",
+    },
+    tracao: {
+      score: 6,
+      descricao:
+        "Fase de tração (R$ 10-50k/mês). Vende com consistência mas precisa de processo pra crescer mais rápido.",
+    },
+    escala: {
+      score: 8,
+      descricao:
+        "Fase de escala (> R$ 50k/mês). Operação madura — agora é sobre previsibilidade, lucro e processos.",
+    },
+  };
+
+  const velocidadeMap: Record<string, { score: number; descricao: string }> = {
+    prioridade: {
+      score: 9,
+      descricao:
+        "Pronto pra começar — é prioridade total. Pré-condição forte pra plano de aceleração de 90 dias.",
+    },
+    validar: {
+      score: 6,
+      descricao:
+        "Quer começar mas precisa validar o investimento primeiro. Sessão Estratégica resolve isso.",
+    },
+    pesquisando: {
+      score: 2,
+      descricao:
+        "Em modo pesquisa de mercado. Sem urgência — qualquer plano fica como referência futura.",
+    },
+  };
+
+  const m = maturidadeMap[momento] ?? maturidadeMap.tracao;
+  const v = velocidadeMap[velocidade] ?? velocidadeMap.validar;
+
+  return [
+    {
+      chave: "maturidade",
+      nome: "Maturidade do Negócio",
+      score: m.score,
+      descricao: m.descricao,
+      grupo: "comportamental",
+    },
+    {
+      chave: "velocidade",
+      nome: "Velocidade de Execução",
+      score: v.score,
+      descricao: v.descricao,
+      grupo: "comportamental",
+    },
+  ];
+}
+
+const GRUPO_POR_CHAVE: Record<string, "dor" | "stack"> = {
+  aquisicao: "dor",
+  posicionamento: "dor",
+  "processo-comercial": "dor",
+  "capacidade-operacional": "dor",
+  "stack-plataformas": "stack",
+  "automacao-ia": "stack",
+};
 
 // OpenAI strict mode exige todo campo no `required`, então o schema usa
 // `.nullable()` em vez de `.optional()`. Normalizamos `null` -> ausência
@@ -78,10 +153,25 @@ export async function gerarAnaliseEmBackground(analiseId: string): Promise<void>
     // for trocada depois. Sem env -> CTA cai em fallback no client.
     const agendaUrl = process.env.NEXT_PUBLIC_AGENDA_URL?.trim() || undefined;
 
-    const cleaned = stripNulls(parsed) as Omit<AnaliseData, "agendaUrl" | "economiaPrevista">;
+    const cleaned = stripNulls(parsed) as Omit<
+      AnaliseData,
+      "agendaUrl" | "economiaPrevista" | "pilares"
+    > & { pilares?: { pilares: Array<Omit<PilarData, "grupo">> } };
+
+    // Merge: 2 comportamentais (derivados em código) + 6 da IA (anotados com grupo).
+    const pilaresComportamentais = derivarPilaresComportamentais(
+      row.momento ?? "",
+      row.velocidade ?? "",
+    );
+    const pilaresIA: PilarData[] = (cleaned.pilares?.pilares ?? []).map((p) => ({
+      ...p,
+      grupo: GRUPO_POR_CHAVE[p.chave] ?? "dor",
+    }));
+
     const conteudo: AnaliseData = {
       ...cleaned,
       agendaUrl,
+      pilares: { pilares: [...pilaresComportamentais, ...pilaresIA] },
       economiaPrevista: economia
         ? {
             ...economia,
@@ -90,13 +180,14 @@ export async function gerarAnaliseEmBackground(analiseId: string): Promise<void>
         : undefined,
     };
 
-    // Análise vai pra revisão humana antes de publicar (Fase 4 / B5).
-    // Quando admin aprova em /admin/analises, status muda pra 'publicada'.
+    // Publica direto (sem revisão humana). Análise é mais geral/teaser
+    // — o plano de ação completo fica gated atrás da Sessão Estratégica.
     await db
       .update(analises)
       .set({
         conteudo,
-        status: "pendente_revisao",
+        status: "publicada",
+        publishedAt: new Date(),
         updatedAt: new Date(),
       })
       .where(eq(analises.id, analiseId));

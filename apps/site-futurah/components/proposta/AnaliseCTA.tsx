@@ -13,7 +13,7 @@ import { useCallback } from "react";
 type Props = {
   href: string;
   /** Onde o CTA está renderizado (pra segmentar no dashboard de tracking). */
-  location: "economia" | "encerramento";
+  location: "economia" | "encerramento" | "teaser";
   external?: boolean;
   className?: string;
   style?: React.CSSProperties;

@@ -22,11 +22,11 @@ const COPY_POR_STATUS: Record<Status, { titulo: string; body: string }> = {
   },
   gerando: {
     titulo: 'Gerando sua análise estratégica',
-    body: 'Nossa IA está cruzando seus dados com o catálogo de substituição da Futurah. Quase lá.',
+    body: 'Nossa IA está cruzando seus dados com o catálogo de substituição da Futurah. Em poucos segundos sua análise aparece aqui.',
   },
   pendente_revisao: {
-    titulo: 'Sua análise está pronta e em revisão final',
-    body: 'Nossa equipe está revisando antes de liberar. Você vai receber o link por email em até algumas horas — fique de olho na caixa de entrada (e no spam, por garantia).',
+    titulo: 'Finalizando os últimos detalhes',
+    body: 'Quase pronto. Sua análise aparece nesta tela em instantes.',
   },
   publicada: {
     titulo: 'Pronto. Abrindo sua análise.',
@@ -67,9 +67,7 @@ export default function AguardandoAnalise({ slug }: { slug: string }) {
           return;
         }
 
-        if (data.status === 'falhou' || data.status === 'pendente_revisao') {
-          // Para de pollar: pendente_revisao não é mais auto-liberada,
-          // o lead recebe link por email quando admin aprovar.
+        if (data.status === 'falhou') {
           return;
         }
 
@@ -93,11 +91,9 @@ export default function AguardandoAnalise({ slug }: { slug: string }) {
 
   return (
     <div className="bg-white border border-black/5 rounded-[28px] shadow-[0_20px_60px_rgba(0,0,0,0.06)] px-8 py-12 md:px-12 md:py-16 flex flex-col items-center text-center gap-6">
-      {status !== 'falhou' &&
-        status !== 'publicada' &&
-        status !== 'pendente_revisao' && (
-          <div className="w-14 h-14 border-4 border-black/10 border-t-[#0B2FFF] rounded-full animate-spin" />
-        )}
+      {status !== 'falhou' && status !== 'publicada' && (
+        <div className="w-14 h-14 border-4 border-black/10 border-t-[#0B2FFF] rounded-full animate-spin" />
+      )}
       <div className="space-y-3 max-w-[520px]">
         <h1 className="text-[28px] md:text-[32px] font-medium text-[#111] leading-tight">
           {copy.titulo}

@@ -86,6 +86,7 @@ export default async function AnaliseSlugPage({ params, searchParams }: PageProp
   return (
     <PageProposta
       data={data}
+      modoTeaser
       tracker={
         <AnaliseTracker
           slug={slug}

@@ -148,7 +148,7 @@ Fonte padrão: **Neue Haas Grotesk Display** (carregada localmente via `lib/font
 
 ### Fluxo de Análise (pipeline interno)
 
-**Estado (2026-04-24):** fluxo **end-to-end funcional** — wizard estilo typeform → API → OpenAI → `/analise/[slug]`.
+**Estado (2026-05-11):** fluxo **end-to-end funcional, publicação direta sem revisão humana** — wizard estilo typeform → API → AI Gateway → `/analise/[slug]` em modo teaser (radar de pilares + economia + CTA pra Sessão Estratégica). Resultado aparece na própria página de espera após ~10-30s, sem email.
 
 #### Entradas (dois caminhos)
 1. **Home** → `components/sections/Contact.tsx` coleta `nome + email + site/@` → `POST /api/contact` (grava em `leads` do Payload) → `router.push('/aplicacao?name=&email=&social=')`.
@@ -179,27 +179,37 @@ Valida `email` e `instagramHandle`, normaliza handle (remove `@`/URL), gera `slu
 Orquestrador assíncrono. Fluxo:
 1. Lê a row; se já tem `conteudo`, é idempotente (skip).
 2. Muda status → `gerando`.
-3. Monta prompt (`lib/ai/prompt-analise.ts`) descrevendo o lead com labels humanas e o shape esperado de `AnaliseData`.
+3. Monta prompt (`lib/ai/prompt-analise.ts`) descrevendo o lead com labels humanas e o shape esperado de `AnaliseData` (inclui o briefing dos 6 pilares — ver "Pilares" abaixo).
 4. Chama o **Vercel AI Gateway** via `generateObject({ model: gateway('openai/gpt-4.1-mini'), schema: analiseGeradaSchema, … })`. Modelo configurável via `AI_GATEWAY_MODEL` (precisa do prefixo do provider). O zod schema (`lib/ai/schema.ts`) valida o output em runtime — não há mais `JSON.parse` manual.
-5. Parse JSON, valida seções obrigatórias (`validateConteudo`).
-6. **Calcula `economiaPrevista` programaticamente** em `lib/ai/economia.ts` — cruza `equipe.cargos` e `plataformas.items` com o catálogo (`lib/ai/catalogo.ts`) para produzir a tabela "custo atual vs projetado + total de economia". Não delega números à IA (evita alucinação).
-7. Salva `conteudo` + status → `publicada`, `publishedAt = now()`.
+5. **Calcula `economiaPrevista` programaticamente** em `lib/ai/economia.ts` — cruza `equipe.cargos` e `plataformas.items` com o catálogo (`lib/ai/catalogo.ts`) para produzir a tabela "custo atual vs projetado + total de economia". Não delega números à IA (evita alucinação).
+6. **Deriva 2 pilares comportamentais** (Maturidade, Velocidade) programaticamente a partir de `momento` / `velocidade` do wizard — sem IA, sem alucinação. Merge com os 6 pilares gerados pela IA → total de 8 pilares em `conteudo.pilares.pilares`.
+7. Salva `conteudo` + status → `publicada` direto (`publishedAt = now()`). **Sem revisão humana no caminho.**
 
 Se falhar em qualquer etapa, grava `status='falhou'` + `revisorNotas` com a mensagem.
 
-> ⚠ **TODO Fase 4**: quando o admin de revisão existir, trocar `publicada` → `pendente_revisao` em `lib/ai/gerar.ts` (marcado com `TODO(fase 4)`).
-
 #### Espera + entrega
-- `/aplicacao/recebido/[slug]` — client component com polling a cada 3s em `/api/aplicacao/[slug]/status`. Copy adaptativa por status (`pendente_dados`/`scraping`/`gerando`/`pendente_revisao`/`publicada`/`falhou`). Quando `publicada`, redireciona pra `/analise/[slug]`.
-- `/analise/[slug]` — server component que `SELECT WHERE slug=$1 AND status='publicada'`, renderiza `<PageProposta data={conteudo} />`. `noindex` via robots meta (slug é o token).
+- `/aplicacao/recebido/[slug]` — client component com polling a cada 3s em `/api/aplicacao/[slug]/status`. Copy adaptativa por status (`pendente_dados`/`scraping`/`gerando`/`publicada`/`falhou`). Quando `publicada`, redireciona pra `/analise/[slug]`. Polling segue até `publicada` ou `falhou` — desde 2026-05-11, `pendente_revisao` não acontece mais no caminho normal.
+- `/analise/[slug]` — server component que `SELECT WHERE slug=$1 AND status='publicada'`, renderiza `<PageProposta data={conteudo} modoTeaser />`. `noindex` via robots meta (slug é o token).
+
+#### Modo teaser (`PageProposta modoTeaser`)
+Quando renderizada por `/analise/[slug]`, a `PageProposta` recebe `modoTeaser`. Isso muda a ordem das seções e esconde as partes "como resolver" pra criar abertura comercial:
+
+**Mostra**: Hero → `ValorNaMesaSection` (callout "R$ X na mesa") → Retrato → Diagnostico → `MaturidadeSlider` → `RadarPilares` → `PilaresCards` → Tese → Economia → `CtaTeaserSection` → Encerramento → TeamTestimonial → MiniFaq.
+
+**Esconde**: Frentes, BancoIdeias, Fases, Escopo, Potencial. Essas só aparecem em propostas estáticas (`/proposta-haytarzan`, `/proposta-augusto-felipe`, `/proposta-carlos-damiao`), que não usam `modoTeaser`.
+
+Componentes novos (todos em `components/proposta/sections/`):
+- `ValorNaMesaSection` — callout vermelho com `economiaPrevista.totais.economiaMensal`.
+- `MaturidadeSlider` — slider gradiente vermelho→amarelo→verde com posição derivada do score do pilar `maturidade`.
+- `RadarPilares` — radar SVG octogonal (8 pilares), grid concêntrico, polígono de score colorido por faixa (≤4 vermelho, 5-7 amarelo, ≥8 verde). Sem libs externas — SVG inline server-rendered.
+- `PilaresCards` — lista de 8 cards (bolinha + nome + descrição + pill `N/10`).
+- `CtaTeaserSection` — bloco escuro "Plano de ação completo na Sessão Estratégica" com CTA pra `agendaUrl`. Instrumentado via `AnaliseCTA location="teaser"`.
 
 #### O que ainda falta
 - **Scraping real do Instagram**: IA hoje só tem os dados do wizard; `dados_scraped` fica `null`. Pipeline externo (n8n/worker Python) ainda não existe — B3 do gap plan.
-- **Admin de revisão humana** (Payload custom view) — B5 / Fase 4.
 - **Stripe** pra `tipo='completa'` — B7. Hoje só `express` é gerado (grátis).
 - **`tenant_id` em `analises`** — B6. Schema atual é sem tenant; análises não são isoladas por cliente da agência.
-- **Rate-limit / antispam** em `/api/aplicacao` — H1. Bot submitando queima crédito do AI Gateway.
-- **Tracking em `analise_eventos`** — H4. Tabela + índice existem; endpoint `POST /api/analise-eventos` não.
+- **Tracking em `analise_eventos`** — H4 (Postgres). Tabela + índice existem mas não populadas; tracking real vai pro Analytics Engine via tracker-worker.
 
 Ver [`ANALISE_PLAN.md`](./ANALISE_PLAN.md) para o plano priorizado completo.
 
@@ -210,11 +220,11 @@ Todo o código de geração fica aqui, server-only.
 | Arquivo | Responsabilidade |
 |---|---|
 | `gateway.ts` | Cliente do **Vercel AI Gateway** via `@ai-sdk/gateway`. Exporta `analiseModel()` + `ANALISE_MODEL`. Em prod (deploy Vercel) autentica via OIDC; em dev local exige `AI_GATEWAY_API_KEY`. |
-| `schema.ts` | Schema **zod** do `AnaliseData` (sem `economiaPrevista`, que é calculado em código). Source-of-truth do output da IA — usado pelo `generateObject` pra estruturar a chamada e validar runtime. |
+| `schema.ts` | Schema **zod** do `AnaliseData` (sem `economiaPrevista`, calculado em código). Inclui `pilaresSchema` — 6 pilares com enum estrito de chaves (`aquisicao`, `posicionamento`, `processo-comercial`, `capacidade-operacional`, `stack-plataformas`, `automacao-ia`), score 0-10 inteiro, descrição curta. Maturidade/Velocidade NÃO estão no schema — são derivados em `gerar.ts`. Source-of-truth do output da IA — usado pelo `generateObject` pra estruturar a chamada e validar runtime. |
 | `catalogo.ts` | **Catálogo de substituição** — source of truth do "o que a Futurah substitui". Dois maps: `CATALOGO_CARGOS` (10 cargos: sdr, atendente-whatsapp, agendadora, suporte-n1, qualificador, social-media, gestor-trafego, webdesigner, financeiro-op, recepcionista) e `CATALOGO_PLATAFORMAS` (19 SaaS agrupados em CRM/Atendimento/Agendamento/WhatsApp/Email). Cada entry tem `{ label, substituivel: boolean, como/alternativa: string }`. Também `CUSTO_ESTIMADO_CARGO` e `CUSTO_ESTIMADO_PLATAFORMA` (pontos de referência em R$). |
 | `economia.ts` | `calcularEconomia(equipe, plataformas)` determinístico — monta `EconomiaPrevistaData` cruzando respostas do wizard com o catálogo. Fator de escala por headcount e ajuste por faixa de custo. Totaliza `custoAtualMensal`/`custoProjetadoMensal`/`economiaMensal`/`economiaAnual` + CTA para Sessão Estratégica. |
-| `prompt-analise.ts` | `buildPrompt(input)` retorna `{ system, user }`. System = persona Futurah + regras editoriais (tom, marcações `{{highlight}}`/`{{italic}}`, não inventar dados de IG). User = dados do lead com labels humanizadas (ex: `"Fase de Tração (R$ 10k a R$ 50k/mês, já vende...)"`). O **shape** vem do zod schema (`schema.ts`), não do prompt. |
-| `gerar.ts` | `gerarAnaliseEmBackground(id)` — orquestrador descrito acima. |
+| `prompt-analise.ts` | `buildPrompt(input)` retorna `{ system, user }`. System = persona Futurah + regras editoriais + `PILARES_BRIEF` (critérios de calibração por gargalo/momento pra cada um dos 6 pilares — força que ≥1 pilar de "dor" fique ≤4 e automação-IA sempre ≤5, pra criar abertura comercial). User = dados do lead com labels humanizadas. O **shape** vem do zod schema (`schema.ts`), não do prompt. |
+| `gerar.ts` | `gerarAnaliseEmBackground(id)` — orquestrador. Inclui `derivarPilaresComportamentais(momento, velocidade)` que produz 2 pilares âncora sem IA (Maturidade: validação=3/tração=6/escala=8; Velocidade: pesquisando=2/validar=6/prioridade=9). Merge com 6 pilares da IA → 8 totais. Publica direto com `status='publicada'` (sem revisão humana). |
 
 **Como estender o catálogo** (ex: adicionar o cargo "copywriter"):
 1. Adicionar entry em `CATALOGO_CARGOS` (`lib/ai/catalogo.ts`) com `substituivel`/`como`.
@@ -224,11 +234,15 @@ Todo o código de geração fica aqui, server-only.
 
 Mesmo fluxo para plataformas.
 
-## Painel `/admin/analises` — revisão humana de análises
+## Painel `/admin/analises` — revisão humana de análises (órfão desde 2026-05-11)
+
+> **Status (2026-05-11):** desde a mudança pra publicação direta, este painel **saiu do caminho crítico**. Análises geradas via `/aplicacao` publicam direto (não passam mais por `pendente_revisao`). O painel segue funcional, mas a fila fica vazia exceto por rows legadas. Endpoints `aprovar`/`rejeitar` continuam operacionais pra essas legadas. Decisão: manter como código stand-by, sem remover.
 
 Server-rendered (RSC), gated por `requireSuperadmin()` (Payload). Lista análises com `status='pendente_revisao'` ordenadas por `created_at desc`. Cada uma tem botões "Aprovar" / "Rejeitar" e link de pré-visualização (`/analise/[slug]?preview=1`).
 
-**Fluxo:** wizard → `POST /api/aplicacao` → `gerarAnaliseEmBackground` salva como `pendente_revisao` (não publica direto) → admin entra em `/admin/analises`, revisa e aprova/rejeita → `POST /api/admin/analises/[id]/aprovar` muda status pra `publicada` + dispara email Resend pro lead (não bloqueante via `after()`); rejeitar grava `revisor_notas` e marca `falhou`.
+**Fluxo antigo (até 2026-05-10):** wizard → `POST /api/aplicacao` → `gerarAnaliseEmBackground` salva como `pendente_revisao` → admin entra em `/admin/analises`, revisa e aprova/rejeita → `POST /api/admin/analises/[id]/aprovar` muda status pra `publicada` + dispara email Resend pro lead; rejeitar grava `revisor_notas` e marca `falhou`.
+
+**Fluxo atual (desde 2026-05-11):** wizard → `POST /api/aplicacao` → `gerarAnaliseEmBackground` salva direto como `publicada` (sem passar por revisão). Resultado aparece na própria `/aplicacao/recebido/[slug]` após polling detectar `publicada` (~10-30s). Email Resend não dispara mais no fluxo normal.
 
 **Estrutura** (`app/admin/analises/`):
 - `page.tsx` — lista server-rendered.

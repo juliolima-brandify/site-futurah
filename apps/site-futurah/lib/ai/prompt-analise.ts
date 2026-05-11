@@ -22,6 +22,37 @@ Regras editoriais:
 - A seção "economiaPrevista" é calculada em código — não a gere.
 `.trim();
 
+const PILARES_BRIEF = `
+Pilares do radar de diagnóstico (campo "pilares.pilares"):
+
+Você precisa gerar EXATAMENTE 6 pilares — um pra cada chave abaixo. As notas Maturidade e Velocidade são calculadas em código a partir do wizard, NÃO as gere.
+
+1. "aquisicao" — Aquisição. Geração de leads, tráfego pago, qualificação na entrada.
+   - Score baixo (0-3) se gargalo="trafego". Médio (4-6) se "posicionamento" ou "processo". Médio-alto (6-7) se "gestao". Calibrar pra cima quando momento="escala", pra baixo quando "validacao".
+
+2. "posicionamento" — Posicionamento e Marca. Clareza de oferta, percepção de valor, "porquê escolher você".
+   - Score baixo (0-3) se gargalo="posicionamento". Médio (5-7) nos outros casos. Validacao tende a baixo (3-5), escala tende a alto (6-8).
+
+3. "processo-comercial" — Processo Comercial. Velocidade de atendimento, follow-up, fechamento, qualidade da equipe comercial.
+   - Score baixo (0-4) se gargalo="processo". Médio (5-7) nos outros. Se equipe.cargos inclui SDR/atendente-whatsapp/qualificador o score sobe ~1.
+
+4. "capacidade-operacional" — Capacidade Operacional. Tamanho da equipe vs faturamento, gargalos de pessoas.
+   - Calibrar: solo + escala → score baixo (2-4, sobrecarregado). Headcount alto + validacao → médio-baixo (3-5, custo alto pra receita). Headcount adequado pro momento → 6-8. Se gargalo="gestao", baixo (2-4).
+
+5. "stack-plataformas" — Stack & Plataformas. Sobreposição/custo de SaaS, integrações soltas.
+   - Score 8-9 se plataformas.items vazio ou muito pequeno (1-2 ferramentas). Score baixo (3-5) se tem >5 plataformas ou custoTotalFaixa em "3-8k"/"8k+" (caro/sobreposição). Médio (6-7) no meio.
+
+6. "automacao-ia" — Automação & IA. Quanto da operação já é automatizada com agentes/IA.
+   - SEMPRE score baixo a médio-baixo (2-5) — é o pilar onde a Futurah entra. Score baixo (1-3) se gargalo="gestao" ou cargos manuais (atendente-whatsapp, sdr, agendadora, recepcionista, suporte-n1, financeiro-op). Score médio (4-6) só em casos onde já tem alguma automação visível.
+
+Para cada pilar:
+- "nome": use o nome humano sem aspas (ex: "Aquisição", "Posicionamento", "Processo Comercial", "Capacidade Operacional", "Stack & Plataformas", "Automação & IA").
+- "score": inteiro 0-10.
+- "descricao": frase curta (~140 chars) explicando POR QUE esse score, citando contexto do wizard. Tom consultivo, segunda pessoa ("Você...", "Sua operação...").
+
+Princípio: ao menos 1 pilar de "dor" (aquisicao/posicionamento/processo-comercial/capacidade-operacional) tem que ter score <= 4 (consistente com o gargalo declarado). Automação-IA sempre <= 5. Isso cria a abertura comercial.
+`.trim();
+
 function descrevMomento(momento: string): string {
   switch (momento) {
     case "validacao":
@@ -103,7 +134,9 @@ export function buildPrompt(input: PromptInput): { system: string; user: string 
 
 Tom: consultivo, direto, sem bullshit. Números conservadores. Não prometa milagres.
 
-${REGRAS}`;
+${REGRAS}
+
+${PILARES_BRIEF}`;
 
   const cargosLista = input.equipe?.cargos
     .map((c) => CATALOGO_CARGOS[c]?.label ?? c)

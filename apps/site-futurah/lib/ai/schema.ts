@@ -136,6 +136,33 @@ const encerramentoSchema = z.object({
   disclaimer: z.string().nullable(),
 });
 
+const pilarChaveIASchema = z.enum([
+  "aquisicao",
+  "posicionamento",
+  "processo-comercial",
+  "capacidade-operacional",
+  "stack-plataformas",
+  "automacao-ia",
+]);
+
+const pilarSchema = z.object({
+  chave: pilarChaveIASchema,
+  nome: z.string().describe("Nome humano do pilar (ex: 'Aquisição', 'Posicionamento')"),
+  score: z.number().int().min(0).max(10).describe("Nota inteira 0-10"),
+  descricao: z
+    .string()
+    .describe("Frase curta (~140 chars) explicando o score com base nas respostas do lead"),
+});
+
+const pilaresSchema = z.object({
+  pilares: z
+    .array(pilarSchema)
+    .length(6)
+    .describe(
+      "Exatamente 6 pilares, um pra cada chave do enum. Maturidade/Velocidade são calculados em código.",
+    ),
+});
+
 const miniFaqItemSchema = z.object({
   pergunta: z.string(),
   resposta: z.string(),
@@ -167,6 +194,7 @@ export const analiseGeradaSchema = z.object({
   fases: fasesSchema,
   escopo: escopoSchema,
   potencial: potencialSchema,
+  pilares: pilaresSchema,
   encerramento: encerramentoSchema,
   miniFaq: miniFaqSchema.nullable(),
 });

@@ -5,6 +5,8 @@
 > **Atualização (2026-04-24):** ingestão + geração via OpenAI + espera + entrega **implementadas end-to-end**. O miolo agora existe (API de ingestão, gerador `lib/ai/`, página de recebido, wizard refeito em typeform). Ainda pendente: scraping real, admin de revisão, Stripe, tenant_id em `analises`, hardening (rate-limit, tracking `analise_eventos`, zod runtime). Ver seção 3 pra blockers resolvidos/pendentes e seção **7 — Pós-implementação** no final.
 >
 > **Atualização (2026-05-06):** migrado pra **Vercel AI Gateway** (`@ai-sdk/gateway` + `generateObject`). Schema zod (`lib/ai/schema.ts`) virou source-of-truth do output da IA — resolve **B4** (validação runtime). `H8` resolvido com `after()` do `next/server`. Provider/modelo agora trocável via `AI_GATEWAY_MODEL` sem mexer em código. Em prod, OIDC do Vercel autentica o gateway sozinho — `OPENAI_API_KEY` foi descontinuada.
+>
+> **Atualização (2026-05-11):** mudança de produto — **revisão humana desligada do fluxo de lead**. IA gera → publica direto → resultado aparece na própria página de espera (sem email). Análise agora é **teaser**: mostra diagnóstico + radar de 8 pilares + economia, esconde frentes/banco/fases/escopo/potencial (essas viram CTA pra Sessão Estratégica). Schema da IA ganhou seção `pilares` (6 pilares com score 0-10); +2 pilares "comportamentais" (Maturidade, Velocidade) são derivados em código a partir das respostas do wizard, sem alucinação. `/admin/analises` segue existindo como histórico mas não tem mais fila de aprovação. Ver seção **9 — Pós-implementação (2026-05-11)**.
 
 Ver também:
 - [`CLAUDE.md`](./CLAUDE.md) — seção "Fluxo de Análise (pipeline interno)" e "Pipeline de IA (`lib/ai/`)"
@@ -32,37 +34,42 @@ Ver também:
 [ Pipeline externo: scraping IG → dadosScraped jsonb ]                          [AUSENTE / EXTERNO]
    | Ainda não existe. conteudo é gerado só com dados do wizard.
    v
-[ lib/ai/gerar.ts — geração via OpenAI ]                                        [IMPLEMENTADO]
+[ lib/ai/gerar.ts — geração via AI Gateway ]                                    [IMPLEMENTADO]
    | status: pendente_dados → gerando
-   | buildPrompt() com shape AnaliseData → chat.completions.create (json_object)
-   | Parse + validateConteudo (seções obrigatórias)
+   | buildPrompt() + generateObject(analiseGeradaSchema)
+   | Schema inclui `pilares.pilares` (array de 6 com score 0-10)
    | calcularEconomia() — determinístico, cruza catalogo com respostas do wizard
-   | Merge → conteudo.economiaPrevista
+   | derivarPilaresComportamentais() — 2 pilares âncora (Maturidade, Velocidade)
+   |   calculados em código a partir de momento/velocidade do wizard
+   | Merge → conteudo.economiaPrevista + conteudo.pilares (8 pilares totais)
    v
-[ Revisão humana → aprovar/rejeitar ]                                           [AUSENTE — TODO fase 4]
-   | Por ora publica direto (status='publicada').
-   | Troca publicada → pendente_revisao quando admin existir
-   | (marcado TODO(fase 4) em lib/ai/gerar.ts:88).
+[ Publicação direta — sem revisão humana ]                                      [IMPLEMENTADO 2026-05-11]
+   | status='publicada' + publishedAt=now() direto após gerar.
+   | (Revisão humana foi removida do caminho crítico — admin /admin/analises
+   |  segue existindo mas não tem mais fila pendente. Email Resend não dispara.)
    v
 [ Pagamento Stripe (só tipo="completa") ]                                       [AUSENTE]
    | Só tipo 'express' é gerado. stripeSessionId no schema, zero código usa.
    v
 [ /aplicacao/recebido/[slug] — espera com polling ]                             [IMPLEMENTADO]
    | AguardandoAnalise.tsx faz GET /api/aplicacao/[slug]/status a cada 3s
-   | Quando 'publicada' → router.replace(/analise/[slug])
+   | Quando 'publicada' → router.replace(/analise/[slug])  (em ~10-30s)
    | Quando 'falhou' → CTA pra contato@futurah.co
    v
-[ /analise/[slug] — app/(site)/analise/[slug]/page.tsx ]                        [IMPLEMENTADO]
+[ /analise/[slug] — modo teaser ]                                               [IMPLEMENTADO]
    | SELECT where slug=$1 AND status='publicada'
-   | Render via <PageProposta data={conteudo as AnaliseData}/>
-   | EconomiaSection renderiza antes de Encerramento (hook pro CTA)
+   | <PageProposta data={...} modoTeaser />
+   | Mostra: Hero → ValorNaMesa → Retrato → Diagnostico → MaturidadeSlider →
+   |   RadarPilares → PilaresCards → Tese → Economia → CtaTeaser → Encerramento
+   | Esconde: Frentes, BancoIdeias, Fases, Escopo, Potencial (vira CTA pra
+   |   Sessão Estratégica — cria curiosidade comercial)
    | noindex via robots meta
    v
-[ Tracking: analise_eventos ]                                                   [AUSENTE — H4]
-   | Tabela existe + índice. Nenhum endpoint populado.
+[ Tracking H4 — via tracker-worker ]                                            [IMPLEMENTADO]
+   | analise_view, analise_scroll_50/90, analise_cta_click (location: economia|encerramento|teaser)
 ```
 
-**Resumo**: o **miolo agora existe** — ingestão + geração + espera + entrega. Pendente: scraping real, admin humano, Stripe, tenant_id, hardening.
+**Resumo**: fluxo end-to-end **publica direto** com diagnóstico visual (radar de 8 pilares + callout de valor na mesa). Plano de ação completo gated atrás de Sessão Estratégica. Pendente: scraping real, Stripe, tenant_id.
 
 ## 2. Auditoria — Checklist de integridade
 
@@ -128,7 +135,7 @@ Legenda: ✅ resolvido · 🟡 parcial · 🔴 pendente.
 | **B2** | ✅ | Reconciliar campos wizard × schema — schema ganhou `momento`, `gargalo`, `velocidade`, `equipe` (jsonb), `plataformas` (jsonb). Email é coletado no wizard (step dedicado quando caminho 2). | `components/sections/ApplicationWizard.tsx`, `lib/db/schema.ts`, migrations 0002/0003 | Colunas antigas (`objetivo`, `monetiza_hoje`, `tempo_disponivel`) ficaram no schema como deprecadas — não removidas. |
 | **B3** | 🔴 | Webhook de pipeline — `POST /api/pipeline/webhook` autenticado via `PIPELINE_WEBHOOK_SECRET`, aceita transições `scraping/gerando/pendente_revisao` com `dadosScraped`/`conteudo` | `app/api/pipeline/webhook/route.ts` | **Pendente**. Hoje a IA gera só com dados do wizard. Scraping real fica como próxima iteração. |
 | **B4** | ✅ | Validação do `conteudo` — `generateObject` do Vercel AI SDK valida o output contra `analiseGeradaSchema` (`lib/ai/schema.ts`) em runtime. Type-safe end-to-end. | `lib/ai/schema.ts`, `lib/ai/gerar.ts` | Schema zod completo (sem `economiaPrevista`, que é calculado em código). |
-| **B5** | ✅ | Custom admin view de análises | `app/admin/analises/`, `app/api/admin/analises/[id]/{aprovar,rejeitar}/route.ts` | Análises geradas saem como `pendente_revisao`; superadmin aprova/rejeita em `/admin/analises`. Aprovar dispara email transacional via Resend (N2). Sidebar nativa do Payload fica como TODO (importMap regen). |
+| **B5** | ✅ (órfão desde 2026-05-11) | Custom admin view de análises | `app/admin/analises/`, `app/api/admin/analises/[id]/{aprovar,rejeitar}/route.ts` | Existe mas saiu do caminho crítico: análises publicam direto. Admin segue como histórico/leitura. Endpoints aprovar/rejeitar ficaram órfãos — operam só sobre rows legadas em `pendente_revisao`. |
 | **B6** | 🔴 | `tenant_id` em `analises` + `analise_eventos` | `lib/db/schema.ts` | **Pendente**. Sem isolamento multi-tenant nas análises ainda. `tenant_id` ausente não bloqueia o MVP (só existe um tenant — `futurah`). |
 | **B7** | 🔴 | Stripe (só `completa`) | vários | **Pendente**. Hoje só `express` é gerado (grátis). |
 
@@ -149,8 +156,8 @@ Legenda: ✅ resolvido · 🟡 parcial · 🔴 pendente.
 
 | ID | Status | Item |
 |---|---|---|
-| **N1** | ✅ | Página "aguarde" — `/aplicacao/recebido/[slug]` com polling a cada 3s. Polling para em `pendente_revisao` (lead recebe email do admin quando aprovado). |
-| **N2** | ✅ | Email transacional via Resend. Disparado quando admin clica "Aprovar" em `/admin/analises`. Helper em `lib/email/resend.ts`. Skip silencioso (`console.warn`) se `RESEND_API_KEY` ausente. |
+| **N1** | ✅ | Página "aguarde" — `/aplicacao/recebido/[slug]` com polling a cada 3s. **Atualizado 2026-05-11**: polling segue até `publicada` (não para mais em `pendente_revisao`, que deixou de existir no caminho normal). |
+| **N2** | ✅ (órfão desde 2026-05-11) | Email transacional via Resend. Antes disparava quando admin aprovava em `/admin/analises`. Agora não dispara no fluxo normal (publicação é direta). Helper `lib/email/resend.ts` segue existindo e funcional pra usos futuros. |
 | **N3** | 🔴 | Dashboard de métricas no admin. |
 | **N4** | 🔴 | Logs estruturados (pino). Hoje `console.error` com prefixos `[API]` e `[ai/gerar]`. |
 | **N5** | ✅ | Preview da análise em `pendente_revisao` via `/analise/[slug]?preview=1` — só funciona quando request vem de superadmin autenticado (gate por `payload.auth({ headers })`). |
@@ -233,3 +240,45 @@ Adicionar um cargo/plataforma ao catálogo leva 3 passos (editar `lib/ai/catalog
 - `NEXT_PUBLIC_AGENDA_URL` — URL real da agenda (Calendly/Cal.com) precisa ser setada na Vercel pra prod e em `.env.local` pra dev.
 - `RESEND_API_KEY` + `RESEND_FROM_EMAIL` — pegar key no Resend e configurar domínio verificado.
 - Sidebar nativa do Payload com link pra `/admin/analises` — depende de regen do `importMap.js` via `npm run dev`. Fica como TODO. Por ora o link aparece no nav do `/admin/tracking`.
+
+## 9. Pós-implementação (2026-05-11) — fluxo direto + teaser visual
+
+### Mudança de produto
+Decisão: **retirar a revisão humana do caminho crítico** e fazer a análise aparecer direto na própria página de espera, sem email. Ao mesmo tempo, **transformar a análise gerada num teaser visual** que mostra diagnóstico forte mas guarda o plano de ação completo pra Sessão Estratégica. Inspirado em UX de diagnósticos tipo "Diagnóstico ECOM" (agenciawedo).
+
+### O que foi entregue
+
+**Backend — publicação direta**
+- `lib/ai/gerar.ts`: status final mudou de `pendente_revisao` pra `publicada` + setar `publishedAt = now()`. Análise vai pro ar assim que IA termina.
+- `app/(site)/aplicacao/recebido/[slug]/AguardandoAnalise.tsx`: removido early-return em `pendente_revisao`. Polling continua até `publicada` (10-30s típico). Copy atualizada — sem promessa de email.
+
+**Schema da IA — pilares**
+- `lib/ai/schema.ts`: adicionado `pilaresSchema` com 6 pilares (enum estrito de chaves: `aquisicao`, `posicionamento`, `processo-comercial`, `capacidade-operacional`, `stack-plataformas`, `automacao-ia`). Cada pilar tem `chave`, `nome`, `score` (0-10 inteiro), `descricao` (~140 chars).
+- `lib/ai/prompt-analise.ts`: bloco `PILARES_BRIEF` no system com critérios de calibração por gargalo/momento/equipe/plataformas. Princípio: ao menos 1 pilar de "dor" tem score ≤ 4 e automação-IA sempre ≤ 5 (cria a abertura comercial).
+- `lib/ai/gerar.ts`: função `derivarPilaresComportamentais(momento, velocidade)` calcula 2 pilares "âncora" sem IA — Maturidade do Negócio (validação=3, tração=6, escala=8) e Velocidade de Execução (pesquisando=2, validar=6, prioridade=9). São mergidos com os 6 da IA → total de 8 pilares no radar.
+
+**Frontend — modo teaser na `PageProposta`**
+- Nova prop `modoTeaser?: boolean` (default `false` — propostas estáticas tipo `/proposta-haytarzan` seguem renderizando tudo).
+- `/analise/[slug]` passa `modoTeaser`. Ordem nova: Hero → **ValorNaMesa** → Retrato → Diagnostico → **MaturidadeSlider** → **RadarPilares** → **PilaresCards** → Tese → Economia → **CtaTeaser** → Encerramento → TeamTestimonial → MiniFaq.
+- Esconde: Frentes, BancoIdeias, Fases, Escopo, Potencial. (Substituídas pelo `CtaTeaserSection`.)
+
+**Componentes visuais novos** (`components/proposta/sections/`)
+- `ValorNaMesaSection.tsx` — callout vermelho ("Sua operação está deixando aproximadamente R$ X,XX na mesa todos os meses"). Lê `economiaPrevista.totais.economiaMensal`.
+- `MaturidadeSlider.tsx` — slider horizontal com gradiente vermelho→amarelo→verde, posicionado pelo score do pilar `maturidade`.
+- `RadarPilares.tsx` — radar SVG octogonal (8 vértices), grid concêntrico (25/50/75/100%), polígono de score, labels coloridas por faixa. Sem libs externas — SVG puro, server-rendered.
+- `PilaresCards.tsx` — lista de 8 cards (bolinha colorida + nome + descrição + pill `N/10`).
+- `CtaTeaserSection.tsx` — bloco escuro com CTA "Agendar Sessão Estratégica" instrumentado via `AnaliseCTA` com novo `location="teaser"`.
+
+**Tracking**
+- `AnaliseCTA` ganhou location `"teaser"` (além de `"economia"` e `"encerramento"`) pra segmentar cliques no dashboard.
+
+### Commits
+- (este commit) feat(analise): publicação direta + radar de pilares + modo teaser
+
+### O que ficou órfão (sem remover ainda)
+- `/admin/analises` + endpoints `aprovar`/`rejeitar` — funcionam, mas a fila de `pendente_revisao` não tem mais entradas novas.
+- Email Resend — código intacto, mas não dispara no fluxo normal.
+- Preview por superadmin via `?preview=1` — continua funcionando (gate por `payload.auth`), só não tem mais utilidade no caminho normal.
+
+### Próxima ação crítica
+Decidir se vale remover o código órfão de admin/Resend ou se mantém como infraestrutura "stand-by" pra eventual volta da revisão humana.

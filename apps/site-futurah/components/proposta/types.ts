@@ -143,6 +143,33 @@ export interface EncerramentoData {
   disclaimer?: string;
 }
 
+export type GrupoPilar = "comportamental" | "dor" | "stack";
+
+export type ChavePilar =
+  | "maturidade"
+  | "velocidade"
+  | "aquisicao"
+  | "posicionamento"
+  | "processo-comercial"
+  | "capacidade-operacional"
+  | "stack-plataformas"
+  | "automacao-ia";
+
+export interface PilarData {
+  chave: ChavePilar;
+  nome: string;
+  /** Nota inteira de 0 a 10. */
+  score: number;
+  /** ~140 chars. Explicação curta do score. */
+  descricao: string;
+  grupo: GrupoPilar;
+}
+
+export interface PilaresData {
+  /** Exatamente 8 pilares (2 comportamentais + 4 de dor + 2 de stack). */
+  pilares: PilarData[];
+}
+
 export interface MiniFaqItem {
   pergunta: string;
   resposta: string;
@@ -223,6 +250,8 @@ export interface AnaliseData {
   escopo: EscopoData;
   potencial: PotencialData;
   economiaPrevista?: EconomiaPrevistaData;
+  /** Pilares pro radar de diagnóstico visual (só usado em modoTeaser). */
+  pilares?: PilaresData;
   encerramento: EncerramentoData;
   miniFaq?: MiniFaqData;
 }
