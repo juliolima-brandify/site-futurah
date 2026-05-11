@@ -579,7 +579,7 @@ function PitchStep() {
         <span className="bg-emerald-200 px-1 box-decoration-clone">
           59 milhões de views por mês
         </span>{" "}
-        sem pagar tráfego — e crie seu primeiro vídeo viral ainda essa semana.
+        sem pagar tráfego — e construa seu primeiro viral ainda essa semana.
       </h2>
       <p className="mt-4 text-center text-neutral-500">
         Chega de postar no escuro. Chega de adivinhar o que funciona.
@@ -638,12 +638,12 @@ function PitchStep() {
       <h3 className="mt-12 text-xl md:text-2xl font-extrabold text-center leading-tight">
         Conheça o{" "}
         <span className="bg-yellow-300 px-1 box-decoration-clone">
-          Meu Primeiro Vídeo Viral
+          Construindo um Viral
         </span>
       </h3>
       <p className="mt-4 text-neutral-700">
         Um workshop direto ao ponto com tudo que você precisa pra criar o seu
-        primeiro vídeo viral — do processo criativo até a publicação.
+        primeiro viral — do processo criativo até a publicação.
       </p>
       <p className="mt-3 text-neutral-700">
         Não é teoria. É o processo real de quem chegou a 59 milhões de views
@@ -756,7 +756,7 @@ function PitchStep() {
           ou 2x R$ 24,50 sem juros
         </p>
         <div className="mt-6">
-          <CheckoutCTA label="Quero meu primeiro vídeo viral" />
+          <CheckoutCTA label="Quero construir meu viral" />
         </div>
         <p className="mt-3 text-xs text-neutral-500">
           🔒 Pagamento seguro · Pix, cartão ou boleto
@@ -786,7 +786,7 @@ function PitchStep() {
           solução.
         </p>
         <p className="mt-3 text-neutral-700">
-          A única diferença entre você hoje e você com o primeiro vídeo viral é
+          A única diferença entre você hoje e você com o primeiro viral é
           esse passo.
         </p>
         <p className="mt-3 text-neutral-700">
@@ -794,7 +794,7 @@ function PitchStep() {
           começa hoje.
         </p>
         <div className="mt-6">
-          <CheckoutCTA label="Quero meu primeiro vídeo viral" />
+          <CheckoutCTA label="Quero construir meu viral" />
         </div>
         <p className="mt-3 text-xs text-neutral-500 italic">
           R$ 47 · Acesso imediato · Garantia de 7 dias
