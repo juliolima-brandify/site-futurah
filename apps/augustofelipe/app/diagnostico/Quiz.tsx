@@ -3,7 +3,9 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-type Step = "intro" | 1 | 2 | 3 | "lead" | "result" | "pitch";
+type Step = "intro" | 1 | 2 | 3 | "lead" | "result" | "pitch" | "waitlist";
+
+type QuizMode = "pitch" | "waitlist";
 
 type Question = {
   pre: string;
@@ -804,9 +806,195 @@ function PitchStep() {
   );
 }
 
-export default function Quiz() {
+function WaitlistStep({ answers }: { answers: string[] }) {
+  const [name, setName] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [email, setEmail] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [done, setDone] = useState(false);
+
+  const validate = () => {
+    const e: Record<string, string> = {};
+    if (name.trim().length < 2) e.name = "Informe seu nome.";
+    const digits = onlyDigits(whatsapp);
+    if (digits.length < 10 || digits.length > 11)
+      e.whatsapp = "WhatsApp inválido.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))
+      e.email = "Email inválido.";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const handleSubmit = async (ev: React.FormEvent) => {
+    ev.preventDefault();
+    if (!validate() || submitting) return;
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const res = await fetch("/api/diagnostico/lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          whatsapp: onlyDigits(whatsapp),
+          email: email.trim().toLowerCase(),
+          answers,
+          source: "waitlist",
+        }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      setDone(true);
+    } catch {
+      setSubmitError("Não foi possível enviar agora. Tente novamente.");
+      setSubmitting(false);
+    }
+  };
+
+  if (done) {
+    return (
+      <div className="px-6 py-16 max-w-xl mx-auto text-center">
+        <div className="mx-auto w-16 h-16 rounded-full bg-emerald-100 grid place-items-center text-3xl">
+          ✓
+        </div>
+        <h2 className="mt-6 text-2xl md:text-[28px] font-extrabold tracking-tight leading-tight">
+          Pronto, você está na lista.
+        </h2>
+        <p className="mt-4 text-neutral-600">
+          Assim que o <strong className="text-neutral-900">Construindo um Viral</strong>{" "}
+          sair, você vai receber o link antes de todo mundo.
+        </p>
+        <p className="mt-3 text-neutral-600">
+          Quem está na lista paga o preço de lançamento —{" "}
+          <span className="bg-yellow-300 px-1 box-decoration-clone font-semibold">
+            R$ 47
+          </span>{" "}
+          em vez de R$ 197.
+        </p>
+        <p className="mt-6 text-sm text-neutral-500 italic">
+          Fica de olho no email e no WhatsApp. Sem spam, só o aviso de
+          lançamento.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="px-6 py-12 max-w-xl mx-auto">
+      <p className="text-center text-xs uppercase tracking-widest text-neutral-500">
+        Pré-lançamento
+      </p>
+      <h2 className="mt-3 text-2xl md:text-[28px] font-extrabold tracking-tight leading-tight text-center">
+        Entre na lista de espera do{" "}
+        <span className="bg-yellow-300 px-1 box-decoration-clone">
+          Construindo um Viral
+        </span>
+      </h2>
+      <p className="mt-4 text-center text-neutral-600">
+        O workshop ainda não está aberto. Quem entra na lista é avisado{" "}
+        <strong className="text-neutral-900">primeiro</strong> quando o curso
+        sair e paga{" "}
+        <strong className="text-neutral-900">preço de lançamento</strong>.
+      </p>
+
+      <ul className="mt-8 space-y-3 text-neutral-700 text-[15px]">
+        <li className="flex gap-2">
+          <span className="text-emerald-500 font-bold">→</span>
+          <span>Aviso de lançamento por email e WhatsApp, antes de virar público</span>
+        </li>
+        <li className="flex gap-2">
+          <span className="text-emerald-500 font-bold">→</span>
+          <span>
+            Acesso ao preço de lançamento:{" "}
+            <span className="bg-yellow-300 px-1 box-decoration-clone font-semibold">
+              R$ 47
+            </span>{" "}
+            (vai pra R$ 197 depois)
+          </span>
+        </li>
+        <li className="flex gap-2">
+          <span className="text-emerald-500 font-bold">→</span>
+          <span>
+            Bônus exclusivo da lista: diagnóstico completo do seu perfil junto
+            do workshop
+          </span>
+        </li>
+      </ul>
+
+      <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4" noValidate>
+        <div>
+          <label className="block text-sm font-medium text-neutral-700 mb-1.5">
+            Nome
+          </label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            autoComplete="name"
+            className="w-full px-4 py-3 rounded-xl border border-neutral-200 focus:border-neutral-900 focus:outline-none transition"
+            placeholder="Seu nome"
+          />
+          {errors.name && (
+            <p className="mt-1 text-sm text-rose-500">{errors.name}</p>
+          )}
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-neutral-700 mb-1.5">
+            WhatsApp
+          </label>
+          <input
+            type="tel"
+            value={whatsapp}
+            onChange={(e) => setWhatsapp(maskWhatsapp(e.target.value))}
+            autoComplete="tel"
+            inputMode="numeric"
+            className="w-full px-4 py-3 rounded-xl border border-neutral-200 focus:border-neutral-900 focus:outline-none transition"
+            placeholder="(11) 99999-9999"
+          />
+          {errors.whatsapp && (
+            <p className="mt-1 text-sm text-rose-500">{errors.whatsapp}</p>
+          )}
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-neutral-700 mb-1.5">
+            Email
+          </label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
+            className="w-full px-4 py-3 rounded-xl border border-neutral-200 focus:border-neutral-900 focus:outline-none transition"
+            placeholder="voce@email.com"
+          />
+          {errors.email && (
+            <p className="mt-1 text-sm text-rose-500">{errors.email}</p>
+          )}
+        </div>
+        {submitError && (
+          <p className="text-sm text-rose-500 text-center">{submitError}</p>
+        )}
+        <button
+          type="submit"
+          disabled={submitting}
+          className="mt-2 w-full py-4 rounded-2xl bg-emerald-500 text-white font-semibold text-lg hover:bg-emerald-600 transition disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {submitting ? "Enviando..." : "Quero entrar na lista"}
+        </button>
+        <p className="text-xs text-neutral-400 text-center">
+          Sem spam. Só o aviso de lançamento.
+        </p>
+      </form>
+    </div>
+  );
+}
+
+export default function Quiz({ mode = "pitch" }: { mode?: QuizMode } = {}) {
   const [step, setStep] = useState<Step>("intro");
   const [answers, setAnswers] = useState<string[]>([]);
+
+  const finalStep: Step = mode === "waitlist" ? "waitlist" : "pitch";
 
   const stepIndex =
     step === "intro"
@@ -815,7 +1003,7 @@ export default function Quiz() {
         ? 4
         : step === "result"
           ? 5
-          : step === "pitch"
+          : step === "pitch" || step === "waitlist"
             ? 6
             : Number(step);
   const pct = Math.min(100, (stepIndex / 6) * 100);
@@ -840,9 +1028,10 @@ export default function Quiz() {
           <LeadCapture answers={answers} onSubmitted={() => setStep("result")} />
         )}
         {step === "result" && (
-          <ResultStep answers={answers} onContinue={() => setStep("pitch")} />
+          <ResultStep answers={answers} onContinue={() => setStep(finalStep)} />
         )}
         {step === "pitch" && <PitchStep />}
+        {step === "waitlist" && <WaitlistStep answers={answers} />}
       </main>
       <footer className="text-center text-xs text-neutral-400 py-6">
         © 2026 — augustofelipe.com
