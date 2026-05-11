@@ -15,7 +15,7 @@ export function CtaTeaserSection({ agendaUrl }: Props) {
         <span className="text-sm font-medium uppercase tracking-wider text-brand-highlight">
           Próximo passo
         </span>
-        <h2 className="text-3xl md:text-[44px] font-medium leading-[1.1] tracking-tight">
+        <h2 className="text-3xl md:text-[44px] font-medium leading-[1.1] tracking-tight text-white">
           O plano de ação completo está pronto.
         </h2>
         <p className="text-base md:text-lg text-white/70 font-light leading-relaxed max-w-2xl">
