@@ -15,66 +15,30 @@ import { EconomiaSection } from "./sections/EconomiaSection";
 import { EncerramentoSection } from "./sections/EncerramentoSection";
 import { TeamTestimonialSection } from "@/components/sections/TeamTestimonialSection";
 import { MiniFaqSection } from "./sections/MiniFaqSection";
-import { ValorNaMesaSection } from "./sections/ValorNaMesaSection";
-import { MaturidadeSlider } from "./sections/MaturidadeSlider";
-import { RadarPilares } from "./sections/RadarPilares";
-import { PilaresCards } from "./sections/PilaresCards";
-import { CtaTeaserSection } from "./sections/CtaTeaserSection";
 
 interface Props {
   data: AnaliseData;
   /**
-   * Slot opcional renderizado como primeiro filho do `<main>` da análise.
-   * Usado por `/analise/[slug]` pra inserir `<AnaliseTracker>` (sentinelas
-   * de scroll ancoradas só ao conteúdo da análise, sem incluir Header/Footer).
+   * Slot opcional renderizado como primeiro filho do `<main>`.
+   * Hoje sem uso (a página `/analise/[slug]` monta seu próprio layout enxuto
+   * sem usar `PageProposta`). Mantido pra propostas estáticas que queiram
+   * inserir tracking custom.
    */
   tracker?: React.ReactNode;
-  /**
-   * Modo teaser: análise gerada via wizard, gated atrás de Sessão Estratégica.
-   * Mostra diagnóstico + pilares + economia, esconde frentes/banco/fases/escopo/potencial.
-   * Default false — propostas estáticas (Haytarzan etc.) continuam renderizando tudo.
-   */
-  modoTeaser?: boolean;
 }
 
-export function PageProposta({ data, tracker, modoTeaser = false }: Props) {
+/**
+ * Página completa de proposta — usada SÓ por propostas estáticas:
+ * `/proposta-haytarzan`, `/proposta-augusto-felipe`, `/proposta-carlos-damiao`.
+ *
+ * A análise gerada via wizard (`/analise/[slug]`) NÃO usa este componente —
+ * tem layout próprio minimalista em `app/(site)/analise/[slug]/page.tsx`
+ * (sem Header/Footer, sem Hero/Retrato/Diagnóstico/Tese/Economia/Encerramento).
+ */
+export function PageProposta({ data, tracker }: Props) {
   const modelo = resolveModeloProposta(data.modelo);
   const ofertaNoFinal = modelo === "cash_on_delivery";
   const esconderEscopo = modelo === "cash_on_delivery";
-
-  if (modoTeaser) {
-    return (
-      <>
-        <Header />
-        <main
-          className="bg-white relative"
-          data-proposta-modelo={modelo}
-          data-proposta-teaser="true"
-          data-analise-content
-        >
-          {tracker}
-          <HeroSection data={data.hero} />
-          {data.economiaPrevista && (
-            <ValorNaMesaSection totais={data.economiaPrevista.totais} />
-          )}
-          <RetratoSection data={data.retrato} />
-          <DiagnosticoSection data={data.diagnostico} />
-          {data.pilares && <MaturidadeSlider pilares={data.pilares} />}
-          {data.pilares && <RadarPilares pilares={data.pilares} />}
-          {data.pilares && <PilaresCards pilares={data.pilares} />}
-          <TeseSection data={data.tese} />
-          {data.economiaPrevista && (
-            <EconomiaSection data={data.economiaPrevista} agendaUrl={data.agendaUrl} />
-          )}
-          <CtaTeaserSection agendaUrl={data.agendaUrl} />
-          <EncerramentoSection data={data.encerramento} agendaUrl={data.agendaUrl} />
-          <TeamTestimonialSection />
-          {data.miniFaq && <MiniFaqSection data={data.miniFaq} />}
-        </main>
-        <Footer />
-      </>
-    );
-  }
 
   return (
     <>

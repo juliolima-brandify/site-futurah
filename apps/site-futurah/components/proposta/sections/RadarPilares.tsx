@@ -15,9 +15,12 @@ const ORDEM: ChavePilar[] = [
   "velocidade",
 ];
 
-const VIEW = 600;
-const CENTER = VIEW / 2;
+const VIEW_W = 800;
+const VIEW_H = 720;
+const CENTER_X = VIEW_W / 2;
+const CENTER_Y = VIEW_H / 2;
 const RADIUS = 200;
+const LABEL_DIST = RADIUS + 32;
 
 function corPorScore(score: number): { fill: string; stroke: string; text: string } {
   if (score <= 4) return { fill: "#FDECE9", stroke: "#E84F3D", text: "#B23A2E" };
@@ -25,11 +28,15 @@ function corPorScore(score: number): { fill: string; stroke: string; text: strin
   return { fill: "#E8F5EA", stroke: "#5BB967", text: "#2F6B3B" };
 }
 
-function point(angleRad: number, dist: number) {
+function point(angleRad: number, dist: number, cx: number, cy: number) {
   return {
-    x: CENTER + Math.cos(angleRad) * dist,
-    y: CENTER + Math.sin(angleRad) * dist,
+    x: cx + Math.cos(angleRad) * dist,
+    y: cy + Math.sin(angleRad) * dist,
   };
+}
+
+function estimateWidth(text: string): number {
+  return Math.max(72, text.length * 7.3 + 22);
 }
 
 export function RadarPilares({ pilares }: Props) {
@@ -39,25 +46,25 @@ export function RadarPilares({ pilares }: Props) {
 
   if (ordenados.length < 3) return null;
 
-  // Cada pilar tem um ângulo. Começamos no topo (-PI/2) e vamos horário.
   const step = (Math.PI * 2) / ordenados.length;
   const angles = ordenados.map((_, i) => -Math.PI / 2 + step * i);
 
   const pontos = ordenados.map((p, i) => {
     const r = (p.score / 10) * RADIUS;
-    return point(angles[i], r);
+    return point(angles[i], r, CENTER_X, CENTER_Y);
   });
 
   const polygonStr = pontos.map((pt) => `${pt.x.toFixed(1)},${pt.y.toFixed(1)}`).join(" ");
 
-  // Grid: 4 níveis (25/50/75/100% do raio).
-  const niveis = [0.25, 0.5, 0.75, 1].map((frac) => {
-    const pts = angles
-      .map((a) => point(a, RADIUS * frac))
+  const niveis = [0.25, 0.5, 0.75, 1].map((frac) =>
+    angles
+      .map((a) => point(a, RADIUS * frac, CENTER_X, CENTER_Y))
       .map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`)
-      .join(" ");
-    return pts;
-  });
+      .join(" "),
+  );
+
+  const labelHeight = 24;
+  const labelPaddingX = 12;
 
   return (
     <section className="w-full bg-white px-4 md:px-8 lg:px-12 py-16 md:py-20">
@@ -71,14 +78,13 @@ export function RadarPilares({ pilares }: Props) {
           </p>
         </div>
 
-        <div className="w-full max-w-[560px]">
+        <div className="w-full max-w-[680px]">
           <svg
-            viewBox={`0 0 ${VIEW} ${VIEW}`}
+            viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
             className="w-full h-auto"
             role="img"
             aria-label="Radar com nota de cada pilar"
           >
-            {/* Grid concêntrico */}
             {niveis.map((pts, i) => (
               <polygon
                 key={i}
@@ -89,14 +95,13 @@ export function RadarPilares({ pilares }: Props) {
               />
             ))}
 
-            {/* Eixos dashed */}
             {angles.map((a, i) => {
-              const p = point(a, RADIUS);
+              const p = point(a, RADIUS, CENTER_X, CENTER_Y);
               return (
                 <line
                   key={i}
-                  x1={CENTER}
-                  y1={CENTER}
+                  x1={CENTER_X}
+                  y1={CENTER_Y}
                   x2={p.x}
                   y2={p.y}
                   stroke="#E5E5E5"
@@ -106,7 +111,6 @@ export function RadarPilares({ pilares }: Props) {
               );
             })}
 
-            {/* Polígono do score */}
             <polygon
               points={polygonStr}
               fill="#F2C03733"
@@ -115,7 +119,6 @@ export function RadarPilares({ pilares }: Props) {
               strokeLinejoin="round"
             />
 
-            {/* Pontos coloridos nos vértices */}
             {pontos.map((pt, i) => {
               const cor = corPorScore(ordenados[i].score);
               return (
@@ -131,40 +134,53 @@ export function RadarPilares({ pilares }: Props) {
               );
             })}
 
-            {/* Labels nos vértices */}
             {angles.map((a, i) => {
-              const labelDist = RADIUS + 50;
-              const pt = point(a, labelDist);
+              const labelPt = point(a, LABEL_DIST, CENTER_X, CENTER_Y);
               const cor = corPorScore(ordenados[i].score);
               const nome = ordenados[i].nome;
-              const isTop = Math.abs(Math.sin(a) + 1) < 0.05;
-              const isBottom = Math.abs(Math.sin(a) - 1) < 0.05;
-              const anchor = isTop || isBottom
-                ? "middle"
-                : Math.cos(a) > 0
-                  ? "start"
-                  : "end";
+              const width = estimateWidth(nome);
+              const cosA = Math.cos(a);
+
+              let rectX: number;
+              let textX: number;
+              let textAnchor: "start" | "middle" | "end";
+
+              if (cosA > 0.3) {
+                textAnchor = "start";
+                rectX = labelPt.x;
+                textX = labelPt.x + labelPaddingX;
+              } else if (cosA < -0.3) {
+                textAnchor = "end";
+                rectX = labelPt.x - width;
+                textX = labelPt.x - labelPaddingX;
+              } else {
+                textAnchor = "middle";
+                rectX = labelPt.x - width / 2;
+                textX = labelPt.x;
+              }
+
+              const rectY = labelPt.y - labelHeight / 2;
+              const textY = labelPt.y + 4;
+
               return (
                 <g key={i}>
                   <rect
-                    x={pt.x - estimateWidth(nome) / 2}
-                    y={pt.y - 13}
-                    width={estimateWidth(nome)}
-                    height="22"
-                    rx="11"
+                    x={rectX}
+                    y={rectY}
+                    width={width}
+                    height={labelHeight}
+                    rx={labelHeight / 2}
                     fill={cor.fill}
                     stroke={cor.stroke}
                     strokeWidth="1.5"
-                    transform={transformForAnchor(anchor, pt.x, estimateWidth(nome))}
                   />
                   <text
-                    x={pt.x}
-                    y={pt.y + 4}
+                    x={textX}
+                    y={textY}
                     fontSize="13"
                     fontWeight="500"
                     fill={cor.text}
-                    textAnchor="middle"
-                    transform={transformForAnchor(anchor, pt.x, estimateWidth(nome))}
+                    textAnchor={textAnchor}
                   >
                     {nome}
                   </text>
@@ -176,18 +192,4 @@ export function RadarPilares({ pilares }: Props) {
       </div>
     </section>
   );
-}
-
-function estimateWidth(text: string): number {
-  return Math.max(72, text.length * 7.5 + 20);
-}
-
-function transformForAnchor(
-  anchor: "start" | "middle" | "end",
-  px: number,
-  width: number,
-): string {
-  if (anchor === "middle") return "translate(0,0)";
-  if (anchor === "start") return `translate(${width / 2 - 6}, 0)`;
-  return `translate(${-width / 2 + 6}, 0)`;
 }

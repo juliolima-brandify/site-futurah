@@ -6,7 +6,7 @@
 >
 > **Atualização (2026-05-06):** migrado pra **Vercel AI Gateway** (`@ai-sdk/gateway` + `generateObject`). Schema zod (`lib/ai/schema.ts`) virou source-of-truth do output da IA — resolve **B4** (validação runtime). `H8` resolvido com `after()` do `next/server`. Provider/modelo agora trocável via `AI_GATEWAY_MODEL` sem mexer em código. Em prod, OIDC do Vercel autentica o gateway sozinho — `OPENAI_API_KEY` foi descontinuada.
 >
-> **Atualização (2026-05-11):** mudança de produto — **revisão humana desligada do fluxo de lead**. IA gera → publica direto → resultado aparece na própria página de espera (sem email). Análise agora é **teaser**: mostra diagnóstico + radar de 8 pilares + economia, esconde frentes/banco/fases/escopo/potencial (essas viram CTA pra Sessão Estratégica). Schema da IA ganhou seção `pilares` (6 pilares com score 0-10); +2 pilares "comportamentais" (Maturidade, Velocidade) são derivados em código a partir das respostas do wizard, sem alucinação. `/admin/analises` segue existindo como histórico mas não tem mais fila de aprovação. Ver seção **9 — Pós-implementação (2026-05-11)**.
+> **Atualização (2026-05-11):** mudança de produto — **revisão humana desligada do fluxo de lead** + **página da análise simplificada radicalmente**. IA gera → publica direto → resultado aparece na própria página de espera (sem email). A `/analise/[slug]` agora é uma **única tela enxuta** (sem Header, sem Footer, sem Hero/Retrato/Diagnóstico/Tese/Economia/Encerramento/FAQ): só callout de valor na mesa → maturidade → radar de 8 pilares → cards de pilares → CTA pra Sessão Estratégica → fundadores. Schema da IA ganhou seção `pilares` (6 pilares com score 0-10); +2 pilares "comportamentais" (Maturidade, Velocidade) são derivados em código sem alucinação. `/admin/analises` segue existindo como histórico mas não tem mais fila de aprovação. Ver seção **9 — Pós-implementação (2026-05-11)**.
 
 Ver também:
 - [`CLAUDE.md`](./CLAUDE.md) — seção "Fluxo de Análise (pipeline interno)" e "Pipeline de IA (`lib/ai/`)"
@@ -56,13 +56,14 @@ Ver também:
    | Quando 'publicada' → router.replace(/analise/[slug])  (em ~10-30s)
    | Quando 'falhou' → CTA pra contato@futurah.co
    v
-[ /analise/[slug] — modo teaser ]                                               [IMPLEMENTADO]
+[ /analise/[slug] — layout minimalista ]                                        [IMPLEMENTADO]
    | SELECT where slug=$1 AND status='publicada'
-   | <PageProposta data={...} modoTeaser />
-   | Mostra: Hero → ValorNaMesa → Retrato → Diagnostico → MaturidadeSlider →
-   |   RadarPilares → PilaresCards → Tese → Economia → CtaTeaser → Encerramento
-   | Esconde: Frentes, BancoIdeias, Fases, Escopo, Potencial (vira CTA pra
-   |   Sessão Estratégica — cria curiosidade comercial)
+   | <main> próprio, SEM Header, SEM Footer, SEM PageProposta
+   | Ordem: AnaliseTracker → ValorNaMesa → MaturidadeSlider →
+   |   RadarPilares → PilaresCards → CtaTeaser → TeamTestimonial
+   | Não usa: Hero, Retrato, Diagnóstico, Tese, Economia detalhada,
+   |   Encerramento, FAQ, Frentes, Banco, Fases, Escopo, Potencial.
+   |   (Esses só existem em propostas estáticas via PageProposta.)
    | noindex via robots meta
    v
 [ Tracking H4 — via tracker-worker ]                                            [IMPLEMENTADO]
@@ -257,10 +258,11 @@ Decisão: **retirar a revisão humana do caminho crítico** e fazer a análise a
 - `lib/ai/prompt-analise.ts`: bloco `PILARES_BRIEF` no system com critérios de calibração por gargalo/momento/equipe/plataformas. Princípio: ao menos 1 pilar de "dor" tem score ≤ 4 e automação-IA sempre ≤ 5 (cria a abertura comercial).
 - `lib/ai/gerar.ts`: função `derivarPilaresComportamentais(momento, velocidade)` calcula 2 pilares "âncora" sem IA — Maturidade do Negócio (validação=3, tração=6, escala=8) e Velocidade de Execução (pesquisando=2, validar=6, prioridade=9). São mergidos com os 6 da IA → total de 8 pilares no radar.
 
-**Frontend — modo teaser na `PageProposta`**
-- Nova prop `modoTeaser?: boolean` (default `false` — propostas estáticas tipo `/proposta-haytarzan` seguem renderizando tudo).
-- `/analise/[slug]` passa `modoTeaser`. Ordem nova: Hero → **ValorNaMesa** → Retrato → Diagnostico → **MaturidadeSlider** → **RadarPilares** → **PilaresCards** → Tese → Economia → **CtaTeaser** → Encerramento → TeamTestimonial → MiniFaq.
-- Esconde: Frentes, BancoIdeias, Fases, Escopo, Potencial. (Substituídas pelo `CtaTeaserSection`.)
+**Frontend — `/analise/[slug]` enxuto, sem `PageProposta`**
+- A página `/analise/[slug]` foi reescrita pra **NÃO usar `PageProposta`**. Layout próprio, minimalista, sem Header e sem Footer.
+- Ordem final: `AnaliseTracker` → `ValorNaMesaSection` → `MaturidadeSlider` → `RadarPilares` → `PilaresCards` → `CtaTeaserSection` → `TeamTestimonialSection`. Só isso.
+- Removidas da página (mas ainda existem como componentes pra propostas estáticas): Hero, Retrato, Diagnóstico, Tese, Economia detalhada (tabela de cargos/plataformas), Encerramento, FAQ, Frentes, BancoIdeias, Fases, Escopo, Potencial.
+- `PageProposta` voltou ao formato original (sem prop `modoTeaser`) — segue usado SÓ por `/proposta-haytarzan`, `/proposta-augusto-felipe`, `/proposta-carlos-damiao`.
 
 **Componentes visuais novos** (`components/proposta/sections/`)
 - `ValorNaMesaSection.tsx` — callout vermelho ("Sua operação está deixando aproximadamente R$ X,XX na mesa todos os meses"). Lê `economiaPrevista.totais.economiaMensal`.
@@ -272,13 +274,30 @@ Decisão: **retirar a revisão humana do caminho crítico** e fazer a análise a
 **Tracking**
 - `AnaliseCTA` ganhou location `"teaser"` (além de `"economia"` e `"encerramento"`) pra segmentar cliques no dashboard.
 
+### Iteração final do mesmo dia — página enxuta (sem chrome)
+Decisão posterior no mesmo dia: a análise gerada ficou muito longa. Reduzido pra **uma tela só**, sem Header/Footer:
+
+1. `ValorNaMesaSection` — callout vermelho
+2. `MaturidadeSlider`
+3. `RadarPilares` (radar SVG)
+4. `PilaresCards` (8 cards)
+5. `CtaTeaserSection`
+6. `TeamTestimonialSection`
+
+A `/analise/[slug]` **parou de usar `PageProposta`** — passou a montar seu próprio `<main>` direto. A prop `modoTeaser` foi removida do `PageProposta`, que voltou ao formato original (só pra propostas estáticas).
+
+Bug do `RadarPilares` (labels laterais sobrepondo o desenho) corrigido junto: viewBox aumentado pra 800×720, `transformForAnchor` removido, posicionamento de rect+text agora baseado em `Math.cos(angle)` com 3 modos (start/middle/end).
+
 ### Commits
-- (este commit) feat(analise): publicação direta + radar de pilares + modo teaser
+- `33380a39` — feat(analise): publicação direta + radar de pilares + modo teaser
+- (este commit) refactor(analise): /analise/[slug] enxuto + fix radar labels
 
 ### O que ficou órfão (sem remover ainda)
 - `/admin/analises` + endpoints `aprovar`/`rejeitar` — funcionam, mas a fila de `pendente_revisao` não tem mais entradas novas.
 - Email Resend — código intacto, mas não dispara no fluxo normal.
 - Preview por superadmin via `?preview=1` — continua funcionando (gate por `payload.auth`), só não tem mais utilidade no caminho normal.
+- Componentes de proposta tradicionais (`Hero`, `Retrato`, `Diagnostico`, `Tese`, `Frentes`, `BancoIdeias`, `Fases`, `Escopo`, `Potencial`, `Economia` detalhada, `Encerramento`, `MiniFaq`) — não aparecem mais em análises geradas. Continuam usados pelas propostas estáticas.
+- Seções da `analiseGeradaSchema` que a IA gera mas não aparecem na página (`hero`, `retrato`, `diagnostico`, `tese`, `frentes`, `bancoIdeias`, `fases`, `escopo`, `potencial`, `encerramento`, `miniFaq`) — ficam gravadas em `conteudo` mas não renderizadas. Custo de tokens "desperdiçado" — vale enxugar o prompt+schema numa próxima rodada se quiser economizar.
 
 ### Próxima ação crítica
-Decidir se vale remover o código órfão de admin/Resend ou se mantém como infraestrutura "stand-by" pra eventual volta da revisão humana.
+Decidir se vale (a) enxugar `analiseGeradaSchema` + prompt pra IA gerar só o que aparece na página (`pilares`), reduzindo custo de tokens, e (b) remover o código órfão de admin/Resend/seções não-usadas.

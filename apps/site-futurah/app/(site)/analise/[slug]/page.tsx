@@ -5,8 +5,13 @@ import { headers as nextHeaders } from "next/headers";
 import { getPayload } from "payload";
 import config from "@payload-config";
 import { db, analises } from "@/lib/db";
-import { PageProposta } from "@/components/proposta/PageProposta";
 import type { AnaliseData } from "@/components/proposta/types";
+import { ValorNaMesaSection } from "@/components/proposta/sections/ValorNaMesaSection";
+import { MaturidadeSlider } from "@/components/proposta/sections/MaturidadeSlider";
+import { RadarPilares } from "@/components/proposta/sections/RadarPilares";
+import { PilaresCards } from "@/components/proposta/sections/PilaresCards";
+import { CtaTeaserSection } from "@/components/proposta/sections/CtaTeaserSection";
+import { TeamTestimonialSection } from "@/components/sections/TeamTestimonialSection";
 import { AnaliseTracker } from "./AnaliseTracker";
 
 interface PageProps {
@@ -33,8 +38,8 @@ async function loadAnaliseBySlug(slug: string) {
  * mas slug-guessing não vaza análises pendentes/falhas).
  *
  * Quando `?preview=1` E o request vem de um superadmin autenticado, deixa
- * passar status `pendente_revisao` — usado pelo botão "Pré-visualizar"
- * em `/admin/analises`.
+ * passar status `pendente_revisao` — legado, usado pelo botão
+ * "Pré-visualizar" do admin órfão.
  */
 async function isPreviewAllowed(searchParams: { preview?: string }): Promise<boolean> {
   if (searchParams.preview !== "1") return false;
@@ -61,6 +66,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
+/**
+ * Layout minimalista — sem Header, sem Footer. A análise gerada é um
+ * diagnóstico focado: callout de valor na mesa → maturidade → radar →
+ * cards de pilares → CTA pra Sessão Estratégica → fundadores. O plano
+ * de ação completo só é apresentado na sessão (gated atrás do CTA).
+ */
 export default async function AnaliseSlugPage({ params, searchParams }: PageProps) {
   const { slug } = await params;
   const sp = await searchParams;
@@ -70,8 +81,6 @@ export default async function AnaliseSlugPage({ params, searchParams }: PageProp
     notFound();
   }
 
-  // Sem o gate de auth, qualquer slug bruto-forçado vazaria análises
-  // não-publicadas. Por isso o flag isolado de preview.
   if (analise.status !== "publicada") {
     const preview =
       analise.status === "pendente_revisao" && (await isPreviewAllowed(sp));
@@ -80,20 +89,21 @@ export default async function AnaliseSlugPage({ params, searchParams }: PageProp
 
   const data = analise.conteudo as AnaliseData;
 
-  // Tracker renderizado dentro do `<main>` da análise (via prop `tracker`)
-  // pra que as sentinelas absolute (50%/90%) ancorem só no conteúdo da
-  // análise, sem incluir Header/Footer/mini-FAQ.
   return (
-    <PageProposta
-      data={data}
-      modoTeaser
-      tracker={
-        <AnaliseTracker
-          slug={slug}
-          variante={data.variante}
-          modelo={data.modelo ?? "cash_on_delivery"}
-        />
-      }
-    />
+    <main className="bg-white relative" data-analise-content>
+      <AnaliseTracker
+        slug={slug}
+        variante={data.variante}
+        modelo={data.modelo ?? "cash_on_delivery"}
+      />
+      {data.economiaPrevista && (
+        <ValorNaMesaSection totais={data.economiaPrevista.totais} />
+      )}
+      {data.pilares && <MaturidadeSlider pilares={data.pilares} />}
+      {data.pilares && <RadarPilares pilares={data.pilares} />}
+      {data.pilares && <PilaresCards pilares={data.pilares} />}
+      <CtaTeaserSection agendaUrl={data.agendaUrl} />
+      <TeamTestimonialSection />
+    </main>
   );
 }

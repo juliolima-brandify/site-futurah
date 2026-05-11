@@ -148,7 +148,7 @@ Fonte padrão: **Neue Haas Grotesk Display** (carregada localmente via `lib/font
 
 ### Fluxo de Análise (pipeline interno)
 
-**Estado (2026-05-11):** fluxo **end-to-end funcional, publicação direta sem revisão humana** — wizard estilo typeform → API → AI Gateway → `/analise/[slug]` em modo teaser (radar de pilares + economia + CTA pra Sessão Estratégica). Resultado aparece na própria página de espera após ~10-30s, sem email.
+**Estado (2026-05-11):** fluxo **end-to-end funcional, publicação direta sem revisão humana** — wizard estilo typeform → API → AI Gateway → `/analise/[slug]` numa **página única enxuta** (callout de valor na mesa + slider de maturidade + radar de pilares + cards + CTA + fundadores). Sem Header, sem Footer. Resultado aparece na própria página de espera após ~10-30s, sem email.
 
 #### Entradas (dois caminhos)
 1. **Home** → `components/sections/Contact.tsx` coleta `nome + email + site/@` → `POST /api/contact` (grava em `leads` do Payload) → `router.push('/aplicacao?name=&email=&social=')`.
@@ -189,21 +189,21 @@ Se falhar em qualquer etapa, grava `status='falhou'` + `revisorNotas` com a mens
 
 #### Espera + entrega
 - `/aplicacao/recebido/[slug]` — client component com polling a cada 3s em `/api/aplicacao/[slug]/status`. Copy adaptativa por status (`pendente_dados`/`scraping`/`gerando`/`publicada`/`falhou`). Quando `publicada`, redireciona pra `/analise/[slug]`. Polling segue até `publicada` ou `falhou` — desde 2026-05-11, `pendente_revisao` não acontece mais no caminho normal.
-- `/analise/[slug]` — server component que `SELECT WHERE slug=$1 AND status='publicada'`, renderiza `<PageProposta data={conteudo} modoTeaser />`. `noindex` via robots meta (slug é o token).
+- `/analise/[slug]` — server component que `SELECT WHERE slug=$1 AND status='publicada'`. **Não usa `PageProposta`** — monta seu próprio `<main>` enxuto, sem Header e sem Footer. `noindex` via robots meta (slug é o token).
 
-#### Modo teaser (`PageProposta modoTeaser`)
-Quando renderizada por `/analise/[slug]`, a `PageProposta` recebe `modoTeaser`. Isso muda a ordem das seções e esconde as partes "como resolver" pra criar abertura comercial:
+#### Layout da `/analise/[slug]`
+Página única, focada em diagnóstico + abertura comercial. Não importa Header nem Footer (o `(site)/layout.tsx` também não monta esses chrome — eles só vêm via `PageProposta` em propostas estáticas).
 
-**Mostra**: Hero → `ValorNaMesaSection` (callout "R$ X na mesa") → Retrato → Diagnostico → `MaturidadeSlider` → `RadarPilares` → `PilaresCards` → Tese → Economia → `CtaTeaserSection` → Encerramento → TeamTestimonial → MiniFaq.
+Ordem fixa:
+1. `AnaliseTracker` — client component invisível (`siteId='futurah'`, dispara `analise_view` + `analise_scroll_50/90` via IntersectionObserver e seta `window.__FUTURAH_ANALISE_SLUG__` pra os CTAs).
+2. `ValorNaMesaSection` — callout vermelho "Sua operação está deixando R$ X,XX na mesa todos os meses" (lê `economiaPrevista.totais.economiaMensal`).
+3. `MaturidadeSlider` — slider gradiente vermelho→amarelo→verde, posição = score do pilar `maturidade`.
+4. `RadarPilares` — radar SVG octogonal de 8 vértices. viewBox 800x720, raio 200, labels com pílula colorida por faixa de score (≤4 vermelho, 5-7 amarelo, ≥8 verde). Sem libs externas — SVG inline server-rendered.
+5. `PilaresCards` — lista de 8 cards (bolinha + nome + descrição curta + pill `N/10`).
+6. `CtaTeaserSection` — bloco escuro "O plano de ação completo está pronto" com CTA pra `agendaUrl`. Instrumentado via `AnaliseCTA location="teaser"`.
+7. `TeamTestimonialSection` — fundadores (Julio + Vinicius).
 
-**Esconde**: Frentes, BancoIdeias, Fases, Escopo, Potencial. Essas só aparecem em propostas estáticas (`/proposta-haytarzan`, `/proposta-augusto-felipe`, `/proposta-carlos-damiao`), que não usam `modoTeaser`.
-
-Componentes novos (todos em `components/proposta/sections/`):
-- `ValorNaMesaSection` — callout vermelho com `economiaPrevista.totais.economiaMensal`.
-- `MaturidadeSlider` — slider gradiente vermelho→amarelo→verde com posição derivada do score do pilar `maturidade`.
-- `RadarPilares` — radar SVG octogonal (8 pilares), grid concêntrico, polígono de score colorido por faixa (≤4 vermelho, 5-7 amarelo, ≥8 verde). Sem libs externas — SVG inline server-rendered.
-- `PilaresCards` — lista de 8 cards (bolinha + nome + descrição + pill `N/10`).
-- `CtaTeaserSection` — bloco escuro "Plano de ação completo na Sessão Estratégica" com CTA pra `agendaUrl`. Instrumentado via `AnaliseCTA location="teaser"`.
+Todos os componentes de proposta tradicionais (`Hero`, `Retrato`, `Diagnostico`, `Tese`, `Frentes`, `BancoIdeias`, `Fases`, `Escopo`, `Potencial`, `Economia` detalhada, `Encerramento`, `MiniFaq`) **continuam existindo** mas só são usados pelas propostas estáticas via `PageProposta`. Análise gerada não toca neles.
 
 #### O que ainda falta
 - **Scraping real do Instagram**: IA hoje só tem os dados do wizard; `dados_scraped` fica `null`. Pipeline externo (n8n/worker Python) ainda não existe — B3 do gap plan.
