@@ -12,14 +12,10 @@ export interface PromptInput {
 }
 
 const REGRAS = `
-Regras editoriais:
+Regras gerais:
 - Português BR, tom consultivo e direto (não vendedor agressivo).
-- Nunca invente dados específicos do Instagram que você não sabe (nº de seguidores, posts reais).
-- Use as informações do wizard como verdade de base.
-- Em "encerramento.emailContato" use sempre "contato@futurah.co".
-- Em "tese.titulo" você pode marcar destaque com {{highlight}}texto{{/highlight}}.
-- Em "encerramento.titulo" você pode marcar itálico com {{italic}}texto{{/italic}}.
-- A seção "economiaPrevista" é calculada em código — não a gere.
+- Use as informações do wizard como verdade de base. Nunca invente dados do Instagram (nº de seguidores, posts reais, etc.).
+- Números conservadores. Não prometa milagres.
 `.trim();
 
 const PILARES_BRIEF = `
@@ -51,6 +47,12 @@ Para cada pilar:
 - "descricao": frase curta (~140 chars) explicando POR QUE esse score, citando contexto do wizard. Tom consultivo, segunda pessoa ("Você...", "Sua operação...").
 
 Princípio: ao menos 1 pilar de "dor" (aquisicao/posicionamento/processo-comercial/capacidade-operacional) tem que ter score <= 4 (consistente com o gargalo declarado). Automação-IA sempre <= 5. Isso cria a abertura comercial.
+`.trim();
+
+const META_BRIEF = `
+Campo "meta":
+- "title": "Análise Estratégica — @handle | Futurah" (substitua @handle pelo instagram/site real do lead).
+- "description": frase curta (~140 chars) descrevendo a análise. Ex: "Diagnóstico personalizado da operação de @handle: 8 pilares avaliados, valor deixado na mesa e plano de ação."
 `.trim();
 
 function descrevMomento(momento: string): string {
@@ -130,11 +132,13 @@ function descrevCustoPlat(v: string): string {
 }
 
 export function buildPrompt(input: PromptInput): { system: string; user: string } {
-  const system = `Você é um estrategista sênior da Futurah & Co., uma agência brasileira AI-first que substitui headcount operacional e plataformas pagas por agentes de IA. Sua missão: gerar uma análise estratégica personalizada para o lead a partir do questionário que ele preencheu.
+  const system = `Você é um estrategista sênior da Futurah & Co., uma agência brasileira AI-first que substitui headcount operacional e plataformas pagas por agentes de IA.
 
-Tom: consultivo, direto, sem bullshit. Números conservadores. Não prometa milagres.
+Sua única tarefa: gerar dois blocos compactos a partir das respostas do wizard que o lead preencheu — (1) metadados da página HTML e (2) os 6 pilares de um radar de diagnóstico. Mais nada.
 
 ${REGRAS}
+
+${META_BRIEF}
 
 ${PILARES_BRIEF}`;
 
@@ -164,7 +168,7 @@ PLATAFORMAS:
 ${input.plataformas ? `- Itens: ${plataformasLista || "—"}${plataformasOutras ? ` | Outras: ${plataformasOutras}` : ""}
 - Custo total mensal: ${descrevCustoPlat(input.plataformas.custoTotalFaixa)}` : "- Não informado"}
 
-Gere o JSON da análise estratégica.`;
+Gere meta + 6 pilares.`;
 
   return { system, user };
 }

@@ -3,7 +3,6 @@ import { eq, and } from "drizzle-orm";
 import { db, analises } from "@/lib/db";
 import { getSuperadminOrNull } from "@/app/admin/analises/lib/auth";
 import { enviarEmailAnalisePronta } from "@/lib/email/resend";
-import type { AnaliseData } from "@/components/proposta/types";
 
 /**
  * POST /api/admin/analises/[id]/aprovar
@@ -76,7 +75,10 @@ export async function POST(
   // sem RESEND_API_KEY o helper só dá warn e segue.
   after(async () => {
     try {
-      const conteudo = row.conteudo as AnaliseData | null;
+      // Endpoint órfão (não chamado no fluxo normal desde 2026-05-11).
+      // Defensivo: row.conteudo pode ser shape antigo (AnaliseData completo)
+      // ou novo (AnaliseGeradaConteudo enxuto). Só precisamos do agendaUrl.
+      const conteudo = row.conteudo as { agendaUrl?: string } | null;
       const agendaUrl = conteudo?.agendaUrl;
       await enviarEmailAnalisePronta({
         to: row.email,

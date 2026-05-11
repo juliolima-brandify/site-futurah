@@ -299,5 +299,25 @@ Bug do `RadarPilares` (labels laterais sobrepondo o desenho) corrigido junto: vi
 - Componentes de proposta tradicionais (`Hero`, `Retrato`, `Diagnostico`, `Tese`, `Frentes`, `BancoIdeias`, `Fases`, `Escopo`, `Potencial`, `Economia` detalhada, `Encerramento`, `MiniFaq`) — não aparecem mais em análises geradas. Continuam usados pelas propostas estáticas.
 - Seções da `analiseGeradaSchema` que a IA gera mas não aparecem na página (`hero`, `retrato`, `diagnostico`, `tese`, `frentes`, `bancoIdeias`, `fases`, `escopo`, `potencial`, `encerramento`, `miniFaq`) — ficam gravadas em `conteudo` mas não renderizadas. Custo de tokens "desperdiçado" — vale enxugar o prompt+schema numa próxima rodada se quiser economizar.
 
+### Iteração 3 do mesmo dia — schema/prompt enxutos
+Tokens da IA estavam sendo gastos em seções que não aparecem mais (hero, retrato, diagnostico, tese, frentes, banco, fases, escopo, potencial, encerramento, faq). Removidos do schema e do prompt.
+
+**Schema** (`lib/ai/schema.ts`): `analiseGeradaSchema` agora é só `{ meta: { title, description }, pilares: { pilares[6] } }`. Sem `variante`, `modelo`, nem qualquer das seções tradicionais.
+
+**Prompt** (`lib/ai/prompt-analise.ts`): removidas instruções pra `{{highlight}}`/`{{italic}}` (que eram só pra tese/encerramento), persona enxuta. Adicionado `META_BRIEF` curto. `PILARES_BRIEF` mantido inalterado.
+
+**Tipo** (`components/proposta/types.ts`): novo tipo `AnaliseGeradaConteudo` minimal — `{ meta, pilares?, economiaPrevista?, agendaUrl?, variante?, modelo? }`. `AnaliseData` continua existindo intacto pra propostas estáticas.
+
+**Gerar** (`lib/ai/gerar.ts`): salva `conteudo` como `AnaliseGeradaConteudo`. Removido `stripNulls` (sem mais `.nullable()` no schema).
+
+**Render** (`app/(site)/analise/[slug]/page.tsx`): lê `conteudo as AnaliseGeradaConteudo`. `AnaliseTracker` recebe defaults pra `variante` e `modelo` (já não vêm da IA).
+
+**Admin órfão** (`/api/admin/analises/[id]/aprovar`): cast de `conteudo` virou `{ agendaUrl?: string }` defensivo — funciona pra ambos os shapes (legado e novo).
+
+### Commits
+- `33380a39` — feat(analise): publicação direta + radar de pilares + modo teaser
+- `85a8d6e7` — refactor(analise): /analise/[slug] enxuto + fix radar labels
+- (este commit) refactor(ai): enxuga schema e prompt da análise pra só meta + pilares
+
 ### Próxima ação crítica
-Decidir se vale (a) enxugar `analiseGeradaSchema` + prompt pra IA gerar só o que aparece na página (`pilares`), reduzindo custo de tokens, e (b) remover o código órfão de admin/Resend/seções não-usadas.
+Remover o código órfão de admin/Resend e os componentes de proposta que ficaram exclusivos das estáticas (se valer a manutenção de duplicação). Por ora todos estão estáveis em stand-by.

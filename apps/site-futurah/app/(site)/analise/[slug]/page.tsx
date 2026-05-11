@@ -5,7 +5,7 @@ import { headers as nextHeaders } from "next/headers";
 import { getPayload } from "payload";
 import config from "@payload-config";
 import { db, analises } from "@/lib/db";
-import type { AnaliseData } from "@/components/proposta/types";
+import type { AnaliseGeradaConteudo } from "@/components/proposta/types";
 import { ValorNaMesaSection } from "@/components/proposta/sections/ValorNaMesaSection";
 import { MaturidadeSlider } from "@/components/proposta/sections/MaturidadeSlider";
 import { RadarPilares } from "@/components/proposta/sections/RadarPilares";
@@ -57,7 +57,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const analise = await loadAnaliseBySlug(slug);
   const conteudo =
-    analise?.status === "publicada" ? (analise.conteudo as AnaliseData | null) : null;
+    analise?.status === "publicada"
+      ? (analise.conteudo as AnaliseGeradaConteudo | null)
+      : null;
 
   return {
     title: conteudo?.meta.title ?? "Análise | Futurah and Co.",
@@ -87,13 +89,13 @@ export default async function AnaliseSlugPage({ params, searchParams }: PageProp
     if (!preview) notFound();
   }
 
-  const data = analise.conteudo as AnaliseData;
+  const data = analise.conteudo as AnaliseGeradaConteudo;
 
   return (
     <main className="bg-white relative" data-analise-content>
       <AnaliseTracker
         slug={slug}
-        variante={data.variante}
+        variante={data.variante ?? "empresa"}
         modelo={data.modelo ?? "cash_on_delivery"}
       />
       {data.economiaPrevista && (

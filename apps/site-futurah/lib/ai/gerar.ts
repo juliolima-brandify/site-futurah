@@ -10,7 +10,7 @@ import { analiseModel } from "./gateway";
 import { analiseGeradaSchema } from "./schema";
 import { buildPrompt } from "./prompt-analise";
 import { calcularEconomia } from "./economia";
-import type { AnaliseData, PilarData } from "@/components/proposta/types";
+import type { AnaliseGeradaConteudo, PilarData } from "@/components/proposta/types";
 
 /**
  * Pilares "comportamentais" derivados das respostas do wizard. Não dependem
@@ -87,27 +87,16 @@ const GRUPO_POR_CHAVE: Record<string, "dor" | "stack"> = {
   "automacao-ia": "stack",
 };
 
-// OpenAI strict mode exige todo campo no `required`, então o schema usa
-// `.nullable()` em vez de `.optional()`. Normalizamos `null` -> ausência
-// antes de salvar pra `AnaliseData` (que tem `?: T`, não `T | null`).
-function stripNulls<T>(obj: T): T {
-  if (Array.isArray(obj)) return obj.map(stripNulls) as T;
-  if (obj && typeof obj === "object") {
-    const out: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(obj)) {
-      if (v !== null) out[k] = stripNulls(v);
-    }
-    return out as T;
-  }
-  return obj;
-}
-
 /**
  * Gera o conteúdo da análise via Vercel AI Gateway e grava no banco.
  * Idempotente: se já existe `conteudo`, não faz nada.
  *
  * Disparada via `after()` em /api/aplicacao — roda fora do response cycle
  * mas dentro do budget da função serverless.
+ *
+ * Conteúdo salvo é `AnaliseGeradaConteudo` (subset enxuto de `AnaliseData`):
+ * só `meta`, `pilares` (6 da IA + 2 derivados), `economiaPrevista`
+ * (calculada em código) e `agendaUrl` (snapshot da env).
  */
 export async function gerarAnaliseEmBackground(analiseId: string): Promise<void> {
   const [row] = await db
@@ -153,24 +142,18 @@ export async function gerarAnaliseEmBackground(analiseId: string): Promise<void>
     // for trocada depois. Sem env -> CTA cai em fallback no client.
     const agendaUrl = process.env.NEXT_PUBLIC_AGENDA_URL?.trim() || undefined;
 
-    const cleaned = stripNulls(parsed) as Omit<
-      AnaliseData,
-      "agendaUrl" | "economiaPrevista" | "pilares"
-    > & { pilares?: { pilares: Array<Omit<PilarData, "grupo">> } };
-
     // Merge: 2 comportamentais (derivados em código) + 6 da IA (anotados com grupo).
     const pilaresComportamentais = derivarPilaresComportamentais(
       row.momento ?? "",
       row.velocidade ?? "",
     );
-    const pilaresIA: PilarData[] = (cleaned.pilares?.pilares ?? []).map((p) => ({
+    const pilaresIA: PilarData[] = parsed.pilares.pilares.map((p) => ({
       ...p,
       grupo: GRUPO_POR_CHAVE[p.chave] ?? "dor",
     }));
 
-    const conteudo: AnaliseData = {
-      ...cleaned,
-      agendaUrl,
+    const conteudo: AnaliseGeradaConteudo = {
+      meta: parsed.meta,
       pilares: { pilares: [...pilaresComportamentais, ...pilaresIA] },
       economiaPrevista: economia
         ? {
@@ -178,10 +161,11 @@ export async function gerarAnaliseEmBackground(analiseId: string): Promise<void>
             cta: { ...economia.cta, href: agendaUrl ?? economia.cta.href },
           }
         : undefined,
+      agendaUrl,
     };
 
-    // Publica direto (sem revisão humana). Análise é mais geral/teaser
-    // — o plano de ação completo fica gated atrás da Sessão Estratégica.
+    // Publica direto (sem revisão humana). Análise é teaser — o plano de
+    // ação completo fica gated atrás da Sessão Estratégica.
     await db
       .update(analises)
       .set({

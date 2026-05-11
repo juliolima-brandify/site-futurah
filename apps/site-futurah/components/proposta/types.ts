@@ -250,8 +250,38 @@ export interface AnaliseData {
   escopo: EscopoData;
   potencial: PotencialData;
   economiaPrevista?: EconomiaPrevistaData;
-  /** Pilares pro radar de diagnóstico visual (só usado em modoTeaser). */
+  /** Pilares pro radar de diagnóstico visual. Hoje só populado em propostas estáticas que opcionalmente queiram exibir. */
   pilares?: PilaresData;
   encerramento: EncerramentoData;
   miniFaq?: MiniFaqData;
+}
+
+/**
+ * Subset MUITO menor de `AnaliseData`, salvo no JSONB `analises.conteudo` para
+ * análises GERADAS PELA IA via `/aplicacao` → `lib/ai/gerar.ts`.
+ *
+ * A página `/analise/[slug]` só renderiza: callout de valor na mesa, slider
+ * de maturidade, radar de pilares, cards de pilares, CTA pra Sessão e
+ * fundadores. Esse subset reflete só o que essas seções precisam, evitando
+ * que a IA gaste tokens em hero/retrato/diagnostico/tese/frentes/banco/fases/
+ * escopo/potencial/encerramento/faq — seções que existem em `AnaliseData`
+ * mas SÓ aparecem em propostas estáticas (`/proposta-haytarzan` etc.).
+ *
+ * - `meta`: gerada pela IA, usada em `generateMetadata` da página.
+ * - `pilares`: 6 da IA + 2 derivados em código (Maturidade, Velocidade).
+ * - `economiaPrevista`: calculada em código (`lib/ai/economia.ts`), não IA.
+ * - `agendaUrl`: snapshot da env `NEXT_PUBLIC_AGENDA_URL`.
+ * - `variante`/`modelo`: opcionais, usados só pra propagar contexto pro
+ *   tracking (`AnaliseTracker`). Defaults aplicados na hora de renderizar.
+ */
+export interface AnaliseGeradaConteudo {
+  meta: {
+    title: string;
+    description: string;
+  };
+  variante?: VarianteAnalise;
+  modelo?: ModeloProposta;
+  pilares?: PilaresData;
+  economiaPrevista?: EconomiaPrevistaData;
+  agendaUrl?: string;
 }
