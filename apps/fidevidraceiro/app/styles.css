@@ -121,9 +121,6 @@
 }
 .fdv-root strong {
   font-weight: 700;
-  background: var(--fdv-acid-500);
-  color: var(--fdv-primary-900);
-  padding: 0 4px;
 }
 
 /* =========================================================

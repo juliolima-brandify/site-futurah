@@ -118,7 +118,7 @@ export default function FiDeVidraceiroDesignSystem() {
             <span className="fdv-badge fdv-badge-acid">v0.2 — REWORK</span>
           </div>
           <h1 style={{ fontSize: "clamp(3rem, 9vw, 7.5rem)", maxWidth: "14ch", marginBottom: "var(--fdv-space-6)" }}>
-            FILHO DE VIDRACEIRO. <span style={{ background: "var(--fdv-orange-500)", padding: "0 0.1em" }}>ARTISTA</span> NA INTERNET.
+            FILHO DE VIDRACEIRO. ARTISTA NA INTERNET.
           </h1>
           <p style={{ fontSize: "var(--fdv-text-lg)", maxWidth: "60ch", color: "var(--fdv-text-muted)" }}>
             Sistema visual de um <strong>creator</strong> que vive na linha entre arte e produção de conteúdo. Grotesco, direto, anti-corporativo. Pra quem fala como gente, não como marca.
