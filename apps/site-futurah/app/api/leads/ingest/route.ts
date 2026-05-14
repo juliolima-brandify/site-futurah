@@ -22,6 +22,7 @@ type IngestPayload = {
   name?: string
   email?: string
   whatsapp?: string
+  social?: string
   source?: string
   answers?: unknown
 }
@@ -73,6 +74,8 @@ export async function POST(request: Request) {
   if (whatsappRaw && (whatsappRaw.length < 10 || whatsappRaw.length > 11)) {
     return bad("whatsapp_invalid")
   }
+
+  const social = (body.social ?? "").toString().trim().slice(0, 64)
 
   const source =
     (body.source ?? "").toString().trim().slice(0, 64) || "ingest"
@@ -133,6 +136,7 @@ export async function POST(request: Request) {
         nome: name,
         email,
         whatsapp: whatsappRaw || undefined,
+        social: social || undefined,
         source,
         // `origem` campo legado: refletir source pra manter o admin coerente.
         origem: source,

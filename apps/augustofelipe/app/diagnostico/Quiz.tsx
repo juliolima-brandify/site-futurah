@@ -141,6 +141,23 @@ function maskWhatsapp(v: string) {
   return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
 }
 
+// Aceita "@usuario", "usuario", "instagram.com/usuario",
+// "https://www.instagram.com/usuario/" e devolve só o handle.
+function normalizeInstagram(v: string) {
+  return v
+    .trim()
+    .replace(/^https?:\/\//i, "")
+    .replace(/^(www\.)?instagram\.com\//i, "")
+    .replace(/^@/, "")
+    .replace(/\/+$/, "")
+    .split(/[/?#]/)[0];
+}
+
+// Handles do Instagram: letras, números, ponto e underline; 1–30 chars.
+function isValidInstagram(handle: string) {
+  return /^[A-Za-z0-9._]{1,30}$/.test(handle);
+}
+
 function LeadCapture({
   answers,
   onSubmitted,
@@ -149,6 +166,7 @@ function LeadCapture({
   onSubmitted: () => void;
 }) {
   const [name, setName] = useState("");
+  const [instagram, setInstagram] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -158,6 +176,8 @@ function LeadCapture({
   const validate = () => {
     const e: Record<string, string> = {};
     if (name.trim().length < 2) e.name = "Informe seu nome.";
+    const ig = normalizeInstagram(instagram);
+    if (!isValidInstagram(ig)) e.instagram = "Informe seu @ do Instagram.";
     const digits = onlyDigits(whatsapp);
     if (digits.length < 10 || digits.length > 11)
       e.whatsapp = "WhatsApp inválido.";
@@ -178,6 +198,7 @@ function LeadCapture({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim(),
+          instagram: normalizeInstagram(instagram),
           whatsapp: onlyDigits(whatsapp),
           email: email.trim().toLowerCase(),
           answers,
@@ -218,6 +239,24 @@ function LeadCapture({
           />
           {errors.name && (
             <p className="mt-1 text-sm text-rose-500">{errors.name}</p>
+          )}
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-neutral-700 mb-1.5">
+            Instagram
+          </label>
+          <input
+            type="text"
+            value={instagram}
+            onChange={(e) => setInstagram(e.target.value)}
+            autoComplete="off"
+            autoCapitalize="none"
+            spellCheck={false}
+            className="w-full px-4 py-3 rounded-xl border border-neutral-200 focus:border-neutral-900 focus:outline-none transition"
+            placeholder="@seu.usuario"
+          />
+          {errors.instagram && (
+            <p className="mt-1 text-sm text-rose-500">{errors.instagram}</p>
           )}
         </div>
         <div>
@@ -808,6 +847,7 @@ function PitchStep() {
 
 function WaitlistStep({ answers }: { answers: string[] }) {
   const [name, setName] = useState("");
+  const [instagram, setInstagram] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -818,6 +858,8 @@ function WaitlistStep({ answers }: { answers: string[] }) {
   const validate = () => {
     const e: Record<string, string> = {};
     if (name.trim().length < 2) e.name = "Informe seu nome.";
+    const ig = normalizeInstagram(instagram);
+    if (!isValidInstagram(ig)) e.instagram = "Informe seu @ do Instagram.";
     const digits = onlyDigits(whatsapp);
     if (digits.length < 10 || digits.length > 11)
       e.whatsapp = "WhatsApp inválido.";
@@ -838,6 +880,7 @@ function WaitlistStep({ answers }: { answers: string[] }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim(),
+          instagram: normalizeInstagram(instagram),
           whatsapp: onlyDigits(whatsapp),
           email: email.trim().toLowerCase(),
           answers,
@@ -937,6 +980,24 @@ function WaitlistStep({ answers }: { answers: string[] }) {
           />
           {errors.name && (
             <p className="mt-1 text-sm text-rose-500">{errors.name}</p>
+          )}
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-neutral-700 mb-1.5">
+            Instagram
+          </label>
+          <input
+            type="text"
+            value={instagram}
+            onChange={(e) => setInstagram(e.target.value)}
+            autoComplete="off"
+            autoCapitalize="none"
+            spellCheck={false}
+            className="w-full px-4 py-3 rounded-xl border border-neutral-200 focus:border-neutral-900 focus:outline-none transition"
+            placeholder="@seu.usuario"
+          />
+          {errors.instagram && (
+            <p className="mt-1 text-sm text-rose-500">{errors.instagram}</p>
           )}
         </div>
         <div>

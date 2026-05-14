@@ -13,11 +13,25 @@ function ingestEndpoint(): string {
 
 type LeadPayload = {
   name?: string;
+  instagram?: string;
   whatsapp?: string;
   email?: string;
   answers?: unknown;
   source?: string;
 };
+
+// Normaliza @, URL, trailing slash → só o handle puro.
+function normalizeInstagram(v: string) {
+  return v
+    .trim()
+    .replace(/^https?:\/\//i, "")
+    .replace(/^(www\.)?instagram\.com\//i, "")
+    .replace(/^@/, "")
+    .replace(/\/+$/, "")
+    .split(/[/?#]/)[0];
+}
+
+const INSTAGRAM_RE = /^[A-Za-z0-9._]{1,30}$/;
 
 export async function POST(req: Request) {
   let body: LeadPayload;
@@ -30,11 +44,14 @@ export async function POST(req: Request) {
   // Defesa em profundidade: validamos aqui antes de chamar o site-futurah,
   // pra cortar payloads obviamente ruins sem round-trip.
   const name = (body.name ?? "").trim();
+  const instagram = normalizeInstagram(body.instagram ?? "");
   const whatsappDigits = (body.whatsapp ?? "").replace(/\D+/g, "");
   const email = (body.email ?? "").trim().toLowerCase();
 
   if (name.length < 2)
     return NextResponse.json({ error: "name_invalid" }, { status: 400 });
+  if (!INSTAGRAM_RE.test(instagram))
+    return NextResponse.json({ error: "instagram_invalid" }, { status: 400 });
   if (whatsappDigits.length < 10 || whatsappDigits.length > 11)
     return NextResponse.json({ error: "whatsapp_invalid" }, { status: 400 });
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
@@ -51,6 +68,7 @@ export async function POST(req: Request) {
     name,
     email,
     whatsapp: whatsappDigits,
+    social: instagram,
     source: body.source || "diagnostico",
     answers: Array.isArray(body.answers) ? body.answers : null,
   };
