@@ -30,7 +30,7 @@ node --import tsx/esm ./node_modules/payload/dist/bin/index.js generate:importma
 - `AI_GATEWAY_API_KEY` — chave do **Vercel AI Gateway** usada pelo pipeline de geração (`lib/ai/`). Em deploy Vercel, o gateway autentica via OIDC token automaticamente — esta var só é obrigatória em **dev local**. Sem ela em dev, `POST /api/aplicacao` aceita a submissão mas a geração falha e a análise termina em `status='falhou'`. Pegar a chave em Vercel Dashboard → AI Gateway.
 - `AI_GATEWAY_MODEL` — opcional. Default `openai/gpt-4.1-mini`. Precisa do prefixo do provider (ex: `anthropic/claude-sonnet-4-6`, `openai/gpt-4o`). Trocar provider/modelo é só editar esta var.
 - `NEXT_PUBLIC_AGENDA_URL` — **opcional**. URL da agenda comercial (Calendly, Cal.com etc.) usada nos CTAs da página `/analise/[slug]`. **Afeta APENAS análises geradas em runtime** (lida em `lib/ai/gerar.ts` e gravada como snapshot imutável em `conteudo.agendaUrl` — trocar a var depois NÃO altera análises antigas). **Não afeta propostas estáticas** (`/proposta-haytarzan`, `/proposta-augusto-felipe`, `/proposta-carlos-damiao`): elas precisam setar `cta.href` no data file (`lib/proposta/[cliente]-data.ts`) — sem isso, o CTA cai em `mailto:contato@futurah.co`. Sem ela em análises geradas: CTA de Encerramento cai em `mailto:contato@futurah.co` e CTA de Economia usa o `cta.href` do schema.
-- `RESEND_API_KEY` — **opcional**. API key do Resend pra disparo de email quando análise é aprovada no admin. Sem ela, aprovação segue funcionando mas o lead só recebe a análise se acessar o link direto. Pegar em https://resend.com/api-keys.
+- `RESEND_API_KEY` — **opcional**. API key do Resend pra disparo de email transacional automático sempre que uma análise é publicada (no fluxo direto via `gerar.ts`) ou aprovada manualmente em `/admin/analises` (legado). Sem ela, a publicação segue funcionando e o lead vê o resultado pela própria página de espera — só não recebe email. Pegar em https://resend.com/api-keys.
 - `RESEND_FROM_EMAIL` — **opcional**. Endereço/nome do remetente (ex: `Futurah <analise@futurah.co>`). Default: `Futurah <analise@futurah.co>`. Domínio precisa estar verificado no Resend.
 - `CALENDLY_PERSONAL_ACCESS_TOKEN` — **opcional** (não consumido por código ainda — reservado para webhook de "agendamento criado", scheduling links únicos com prefill, e listagem de eventos no admin). Token tem escopo `webhooks:write`, `scheduled_events:read/write`, `scheduling_links:write`, etc. Rotacionar em https://calendly.com/integrations/api_webhooks. Setado em todos os 3 envs do Vercel.
 
@@ -50,7 +50,7 @@ O projeto é deployado na **Vercel**, team `admbrandify-gmailcoms-projects` (`te
 - `TRACKER_API_TOKEN` — bearer pra ler `/api/utm-summary` no Worker (sincronizado com o secret `API_READ_TOKEN` no Worker via `wrangler secret put`).
 - `LEADS_INGEST_TOKEN` — bearer fixo aceito por `/api/leads/ingest`. **Mesmo valor** está setado no projeto `augustofelipe` (que escreve). Rotacionar = atualizar nos dois projetos em sincronia. Listar/checar com `npx vercel env ls --scope=admbrandify-gmailcoms-projects`.
 - `NEXT_PUBLIC_AGENDA_URL` — opcional. URL da agenda do CTA da análise. Coberto pelo wildcard `NEXT_PUBLIC_*` no `turbo.json` (não precisa listar individualmente).
-- `RESEND_API_KEY` + `RESEND_FROM_EMAIL` — opcionais. Email transacional pra notificar lead quando análise é aprovada no admin (`/admin/analises`).
+- `RESEND_API_KEY` + `RESEND_FROM_EMAIL` — opcionais. Email transacional disparado automaticamente em todo fluxo direto (`gerar.ts`, após publicar) e também via aprovação manual em `/admin/analises` (legado).
 - `CALENDLY_PERSONAL_ACCESS_TOKEN` — opcional. PAT pra futuro webhook de "agendamento criado" + scheduling links únicos com prefill. Já provisionado nos 3 envs (2026-05-08); ainda sem código consumindo.
 
 **Gotchas do build em monorepo Turbo 2 strict** (já consertados no repo, ler antes de mexer):
@@ -148,7 +148,7 @@ Fonte padrão: **Neue Haas Grotesk Display** (carregada localmente via `lib/font
 
 ### Fluxo de Análise (pipeline interno)
 
-**Estado (2026-05-11):** fluxo **end-to-end funcional, publicação direta sem revisão humana** — wizard estilo typeform → API → AI Gateway → `/analise/[slug]` numa **página única enxuta** (callout de valor na mesa + slider de maturidade + radar de pilares + cards + CTA + fundadores). Sem Header, sem Footer. Resultado aparece na própria página de espera após ~10-30s, sem email.
+**Estado (2026-05-15):** fluxo **end-to-end funcional, publicação direta sem revisão humana** — wizard estilo typeform → API → AI Gateway → `/analise/[slug]` numa **página única enxuta** (callout de valor na mesa + slider de maturidade + radar de pilares + cards + CTA + fundadores). Sem Header, sem Footer. Resultado aparece na própria página de espera após ~10-30s. Email transacional via Resend dispara em paralelo (best-effort, não bloqueia publicação) com link pra análise + CTA pra Sessão Estratégica.
 
 #### Entradas (dois caminhos)
 1. **Home** → `components/sections/Contact.tsx` coleta `nome + email + site/@` → `POST /api/contact` (grava em `leads` do Payload) → `router.push('/aplicacao?name=&email=&social=')`.
@@ -184,8 +184,9 @@ Orquestrador assíncrono. Fluxo:
 5. **Calcula `economiaPrevista` programaticamente** em `lib/ai/economia.ts` — cruza `equipe.cargos` e `plataformas.items` com o catálogo (`lib/ai/catalogo.ts`) para produzir a tabela "custo atual vs projetado + total de economia". Não delega números à IA (evita alucinação).
 6. **Deriva 2 pilares comportamentais** (Maturidade, Velocidade) programaticamente a partir de `momento` / `velocidade` do wizard — sem IA, sem alucinação. Merge com os 6 pilares gerados pela IA → total de 8 pilares em `conteudo.pilares.pilares`.
 7. Salva `conteudo` + status → `publicada` direto (`publishedAt = now()`). **Sem revisão humana no caminho.**
+8. Dispara `enviarEmailAnalisePronta` (Resend) com link da análise + CTA pra `agendaUrl`. **Isolado em try/catch interno** — falha de email só loga `[ai/gerar] resend falhou`, NÃO marca a análise como `falhou` (ela já publicou). Sem `RESEND_API_KEY`: helper retorna `{ skipped: true }` silenciosamente.
 
-Se falhar em qualquer etapa, grava `status='falhou'` + `revisorNotas` com a mensagem.
+Se falhar em qualquer etapa (exceto Resend), grava `status='falhou'` + `revisorNotas` com a mensagem.
 
 #### Espera + entrega
 - `/aplicacao/recebido/[slug]` — client component com polling a cada 3s em `/api/aplicacao/[slug]/status`. Copy adaptativa por status (`pendente_dados`/`scraping`/`gerando`/`publicada`/`falhou`). Quando `publicada`, redireciona pra `/analise/[slug]`. Polling segue até `publicada` ou `falhou` — desde 2026-05-11, `pendente_revisao` não acontece mais no caminho normal.
@@ -242,7 +243,7 @@ Server-rendered (RSC), gated por `requireSuperadmin()` (Payload). Lista análise
 
 **Fluxo antigo (até 2026-05-10):** wizard → `POST /api/aplicacao` → `gerarAnaliseEmBackground` salva como `pendente_revisao` → admin entra em `/admin/analises`, revisa e aprova/rejeita → `POST /api/admin/analises/[id]/aprovar` muda status pra `publicada` + dispara email Resend pro lead; rejeitar grava `revisor_notas` e marca `falhou`.
 
-**Fluxo atual (desde 2026-05-11):** wizard → `POST /api/aplicacao` → `gerarAnaliseEmBackground` salva direto como `publicada` (sem passar por revisão). Resultado aparece na própria `/aplicacao/recebido/[slug]` após polling detectar `publicada` (~10-30s). Email Resend não dispara mais no fluxo normal.
+**Fluxo atual (desde 2026-05-11, com email reativado em 2026-05-15):** wizard → `POST /api/aplicacao` → `gerarAnaliseEmBackground` salva direto como `publicada` (sem passar por revisão) e dispara email Resend best-effort logo após o `UPDATE` de publicação. Resultado aparece na própria `/aplicacao/recebido/[slug]` após polling detectar `publicada` (~10-30s) **e** chega no inbox do lead em paralelo.
 
 **Estrutura** (`app/admin/analises/`):
 - `page.tsx` — lista server-rendered.

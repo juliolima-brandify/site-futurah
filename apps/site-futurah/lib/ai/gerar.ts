@@ -10,6 +10,7 @@ import { analiseModel } from "./gateway";
 import { analiseGeradaSchema } from "./schema";
 import { buildPrompt } from "./prompt-analise";
 import { calcularEconomia } from "./economia";
+import { enviarEmailAnalisePronta } from "@/lib/email/resend";
 import type { AnaliseGeradaConteudo, PilarData } from "@/components/proposta/types";
 
 /**
@@ -175,6 +176,20 @@ export async function gerarAnaliseEmBackground(analiseId: string): Promise<void>
         updatedAt: new Date(),
       })
       .where(eq(analises.id, analiseId));
+
+    // Email transacional via Resend. Isolado em try/catch — falha de email
+    // NÃO marca a análise como 'falhou' (ela já publicou com sucesso).
+    // Sem RESEND_API_KEY: helper retorna { skipped: true } silenciosamente.
+    try {
+      await enviarEmailAnalisePronta({
+        to: row.email,
+        nome: row.nome ?? null,
+        slug: row.slug,
+        agendaUrl,
+      });
+    } catch (emailErr) {
+      console.error("[ai/gerar] resend falhou para", analiseId, emailErr);
+    }
   } catch (err) {
     console.error("[ai/gerar]", analiseId, err);
     try {

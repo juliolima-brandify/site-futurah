@@ -387,3 +387,27 @@ Nenhuma. `conteudo` é jsonb; novos campos coexistem com shape antigo sem altera
 
 ### Status
 🔴 Planejado, não implementado. Doc deste plano commitado em 2026-05-15. Ordem de execução prevista: catálogo → schema → prompt → tipo → componente → render → doc final.
+
+## 11. Pós-implementação (2026-05-15) — Resend reativado no fluxo direto
+
+### Contexto
+Desde a mudança pra publicação direta (2026-05-11), o Resend ficou órfão — código intacto e env vars (`RESEND_API_KEY`, `RESEND_FROM_EMAIL`) configuradas na Vercel, mas o helper `enviarEmailAnalisePronta` só era chamado em `POST /api/admin/analises/[id]/aprovar`, que deixou de ser acionado no caminho normal. Resultado: leads recebiam a análise apenas via polling em `/aplicacao/recebido/[slug]`, sem cópia por email pra resgatar depois.
+
+### O que foi entregue
+- **`lib/ai/gerar.ts`**: importa `enviarEmailAnalisePronta` e chama logo após o `UPDATE` que seta `status='publicada'`. Chamada isolada em `try/catch` interno — falha de email loga `[ai/gerar] resend falhou` mas **não** marca a análise como `falhou` (ela já publicou com sucesso).
+- **Comportamento**: best-effort. Sem `RESEND_API_KEY` (dev local sem chave): helper retorna `{ skipped: true }` silenciosamente, sem warning chato. Em prod: dispara automaticamente em **toda análise gerada**.
+- **Payload do email**: `to = row.email`, `nome = row.nome`, `slug = row.slug`, `agendaUrl` (snapshot da env capturado mais cedo no mesmo fluxo). Mantém consistência com o `agendaUrl` gravado em `conteudo` — não há divergência entre o que aparece no CTA da página e o do email.
+
+### Decisão de design: best-effort, não retry
+Email NÃO entra no caminho crítico. Se Resend cair ou rate-limit estourar:
+- Análise segue publicada e acessível via link direto.
+- Lead vê o resultado pela página de espera (polling).
+- Log fica no Vercel pra investigação manual se quisermos reenviar.
+
+Não há retry automático nem fila persistente. Volume baixo (~10-30 análises/dia) não justifica. Se virar problema, próxima iteração seria mover o disparo pra worker dedicado com retry exponencial.
+
+### Commits
+- (este commit) feat(analise): dispara email Resend automaticamente ao publicar análise
+
+### Doc atualizada
+- `CLAUDE.md`: env vars (`RESEND_API_KEY`/`RESEND_FROM_EMAIL`), estado do fluxo (linha "Estado (2026-05-15)"), passo 8 do gerador, seção do painel admin (fluxo atual reativado).
