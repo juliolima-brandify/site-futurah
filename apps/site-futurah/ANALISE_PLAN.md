@@ -321,3 +321,69 @@ Tokens da IA estavam sendo gastos em seções que não aparecem mais (hero, retr
 
 ### Próxima ação crítica
 Remover o código órfão de admin/Resend e os componentes de proposta que ficaram exclusivos das estáticas (se valer a manutenção de duplicação). Por ora todos estão estáveis em stand-by.
+
+## 10. Iteração planejada (2026-05-15) — prévia de soluções da Futurah
+
+### Decisão de produto
+A análise gerada hoje é puramente diagnóstica (radar + pilares + valor na mesa). Vamos adicionar uma **prévia de soluções da Futurah** entre `PilaresCards` e `CtaTeaserSection` — vitrine curta do que a Futurah faz, **personalizada pelo gargalo do lead**, mas sem entregar o plano de ação completo (esse continua gated atrás da Sessão Estratégica).
+
+**Decisões travadas:**
+- **Personalização**: IA escolhe 3-5 soluções de um catálogo fixo, com 1 linha contextualizada pro gargalo/cargos/plataformas do lead.
+- **Profundidade**: nome + 1 linha (~80 chars) — sem descrição longa, sem benefício elaborado. Mantém o gate da Sessão.
+- **Posição**: entre `PilaresCards` e `CtaTeaserSection`. Lê como progressão: problema → diagnóstico → o que dá pra fazer → vamos conversar.
+
+### Catálogo fixo (`lib/ai/catalogo-solucoes.ts` — novo)
+Source-of-truth com **10 soluções** (enum estrito pra schema). Cada entry tem `{ chave, nome, descricaoBase, relevantePara }`:
+
+- `agente-atendimento` — Agente de Atendimento 24h (DM + WhatsApp)
+- `agente-sdr` — Agente SDR / Pré-qualificação
+- `agente-agendamento` — Agente de Agendamento
+- `agente-followup` — Agente de Follow-up
+- `landing-conversao` — Landing Page de Conversão
+- `identidade-visual` — Identidade Visual
+- `trafego-pago` — Tráfego Pago Gerenciado (Meta + Google)
+- `conteudo` — Conteúdo Recorrente
+- `dashboard` — Dashboard Operacional
+- `crm-integracoes` — CRM + Integrações
+
+### Schema da IA (`lib/ai/schema.ts`)
+Adiciona campo `solucoes` ao `analiseGeradaSchema`:
+
+```ts
+solucoes: z.object({
+  solucoes: z.array(z.object({
+    chave: solucaoChaveSchema,       // enum estrito do catálogo
+    linha: z.string()                  // ~80 chars contextualizada
+  })).min(3).max(5)
+})
+```
+
+### Prompt (`lib/ai/prompt-analise.ts`)
+Novo bloco `SOLUCOES_BRIEF`:
+- Lista do catálogo com `chave + nome` (IA escolhe por chave, sem inventar).
+- Regras de calibração por gargalo:
+  - `trafego` → obrigatórios: `trafego-pago` + `landing-conversao`
+  - `processo` → obrigatórios: `agente-atendimento` + `agente-sdr`
+  - `gestao` → obrigatórios: agentes diversos + `dashboard`
+  - `posicionamento` → obrigatórios: `identidade-visual` + `landing-conversao` + `conteudo`
+- Linha tem que citar contexto do lead (cargos/plataformas) — proibido genérico.
+
+### Tipo (`components/proposta/types.ts`)
+Adiciona `solucoes?: SolucoesData` em `AnaliseGeradaConteudo` (opcional pra não quebrar análises antigas).
+
+### Componente (`components/proposta/sections/PreviaSolucoesSection.tsx` — novo)
+Lista vertical de cards minimalistas. Cada card: bolinha colorida + `nome` (negrito) + `linha` (cinza). Tom alinhado ao resto da página enxuta — sem CTAs internos, sem ícones decorativos pesados.
+
+### Render (`app/(site)/analise/[slug]/page.tsx`)
+Inserir `<PreviaSolucoesSection solucoes={conteudo.solucoes} />` entre `<PilaresCards />` e `<CtaTeaserSection />`. Fallback silencioso se `solucoes` ausente (análises pré-mudança não renderizam a seção).
+
+### Custo
+- Input: ~200 tokens (`SOLUCOES_BRIEF` + catálogo).
+- Output: ~150 tokens (3-5 itens × ~80 chars + chaves).
+- Marginal — mesma ordem do `PILARES_BRIEF` atual.
+
+### Migration
+Nenhuma. `conteudo` é jsonb; novos campos coexistem com shape antigo sem alterar schema do Postgres. Análises antigas (sem `solucoes`) seguem renderizando — só não mostram a nova seção.
+
+### Status
+🔴 Planejado, não implementado. Doc deste plano commitado em 2026-05-15. Ordem de execução prevista: catálogo → schema → prompt → tipo → componente → render → doc final.
