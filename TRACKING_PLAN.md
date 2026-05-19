@@ -186,7 +186,8 @@ Premissa: dev fluente em TS/Next, **iniciante em Workers**. Estimativas em dias 
 - [x] Fase 1.6 — Eventos custom _(props sanitizados em ingest com promoted keys: `blob13`=url, `blob14`=label, `blob15`=target, `blob16`=rest_json até 1.5KB, `double3`=position, `double4`=value; novos endpoints `/api/events`, `/api/event-names`; SDK `trackClick({url,label,position})`; bio do fidevidraceiro instrumentada via `<LinkButton>` em `pointerdown`+`auxclick`; seção "Eventos custom" no dashboard — 2026-05-04, PR #3)_
 - [ ] Fase 2 — Sessões + conversões
 - [ ] Fase 3 — Atribuição + dashboard
-- [ ] Fase 4 — Server-side tagging
+- [x] Fase 4.0 — Meta CAPI V1 enxuto (sem Queues, Workers Free) _(SDK `trackConversion()` gera `event_id` único, dispara pixel client com `eventID` e manda beacon com `identity` {email,phone,fbp,fbc}; `loadMetaPixel()` + prop `metaPixelId` no `<Tracker>`; cookie `_fbc` construído do `fbclid` no init; Worker `capi.ts` reenvia eventos da allowlist pro Graph API em `ctx.waitUntil` com PII hasheada SHA-256 + IP/UA server-side, config de pixel em KV `config:meta`, token em secret `META_CAPI_TOKENS`; PII nunca escrita no AE. Instrumentado: `Lead` no LeadCapture/WaitlistStep do augustofelipe. Pendente: setar KV+secret+env e validar EMQ no Events Manager — 2026-05-19)_
+- [ ] Fase 4 — Server-side tagging completo (Queue events-fanout + retry/batch, Google Ads Enhanced, proxy 1st-party do fbevents.js)
 - [ ] Fase 5 — Polimento
 
 ## Schema atual do AE `tracker_events` (post-Fase 1.6)

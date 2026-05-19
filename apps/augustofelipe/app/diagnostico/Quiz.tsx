@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { trackConversion } from "@futurah/tracker-sdk";
 
 type Step = "intro" | 1 | 2 | 3 | "lead" | "result" | "pitch" | "waitlist";
 
@@ -206,6 +207,13 @@ function LeadCapture({
         }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      // Conversão deduplicada pixel×CAPI (Worker reenvia server-side).
+      trackConversion("Lead", {
+        value: 47,
+        currency: "BRL",
+        email: email.trim().toLowerCase(),
+        phone: onlyDigits(whatsapp),
+      });
       onSubmitted();
     } catch {
       setSubmitError("Não foi possível enviar agora. Tente novamente.");
@@ -888,6 +896,13 @@ function WaitlistStep({ answers }: { answers: string[] }) {
         }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      // Lead da lista de espera — mesma dedup pixel×CAPI.
+      trackConversion("Lead", {
+        value: 47,
+        currency: "BRL",
+        email: email.trim().toLowerCase(),
+        phone: onlyDigits(whatsapp),
+      });
       setDone(true);
     } catch {
       setSubmitError("Não foi possível enviar agora. Tente novamente.");

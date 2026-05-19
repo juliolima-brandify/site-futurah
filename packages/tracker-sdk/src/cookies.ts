@@ -14,6 +14,16 @@ const TWO_YEARS = 730 * DAYS;
 const NINETY_DAYS = 90 * DAYS;
 const THIRTY_DAYS = 30 * DAYS;
 
+// Reexpostos para o módulo fb.ts (cookies _fbp/_fbc) sem duplicar a lógica
+// de parsing/escrita já validada aqui.
+export function readRawCookie(name: string): string | null {
+  return readCookie(name);
+}
+
+export function writeRawCookie(name: string, value: string, maxAgeMs: number): void {
+  writeCookie(name, value, maxAgeMs);
+}
+
 function readCookie(name: string): string | null {
   if (typeof document === "undefined") return null;
   const match = document.cookie

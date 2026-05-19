@@ -4,6 +4,7 @@
 // a CF pode cortar a escrita após a response (mesma classe de bug do
 // gerarAnaliseEmBackground na Vercel).
 
+import { maybeForwardToMeta } from "./capi";
 import { getCfMeta, getClientIp, parseUserAgent } from "./enrichment";
 import { hashIp } from "./salt";
 import type { Env, TrackEvent, EnrichedEvent, PromotedProps } from "./types";
@@ -220,6 +221,10 @@ export async function handleIngest(
   // mesmo após a Response 204 já ter saído. Sem isso, em alta latência
   // a runtime pode cancelar o write.
   ctx.waitUntil(persistEvent(event, request, env));
+  // Forward server-side pro Meta CAPI (no-op se não for conversão ou se o
+  // site não tiver pixel/token configurado). Independente do persistEvent —
+  // uma falha no CAPI não pode derrubar a escrita no AE e vice-versa.
+  ctx.waitUntil(maybeForwardToMeta(event, request, env));
 
   return new Response(null, {
     status: 204,

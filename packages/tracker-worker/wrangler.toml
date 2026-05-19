@@ -39,6 +39,10 @@ AE_DATASET = "tracker_events"
 # Secrets gerenciados via `wrangler secret put`:
 #   API_READ_TOKEN     — bearer token consumido por GET /api/*
 #   CF_API_TOKEN_AE    — token CF com permissão "Account Analytics: Read" para SQL API
+#   META_CAPI_TOKENS   — JSON {"<site_id>":"<token>"} (system-user, sem expiração)
+#                        usado pelo forward Meta CAPI. Pixel id (não-secreto)
+#                        fica no KV em config:meta. Sem este secret o forward
+#                        vira no-op e o tracking normal segue funcionando.
 #
 # Cron de rotação de salt do hash de IP (Workers Paid).
 # TODO(cron): habilitar após upgrade pra plano paid.

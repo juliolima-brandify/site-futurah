@@ -8,6 +8,9 @@ export interface Env {
   // Secrets:
   API_READ_TOKEN: string;
   CF_API_TOKEN_AE: string;
+  // JSON `{ "<site_id>": "<meta_capi_access_token>" }`. Opcional — sem ele
+  // o forward pro CAPI vira no-op (tracking normal segue funcionando).
+  META_CAPI_TOKENS?: string;
 }
 
 export type Attribution = {
@@ -44,6 +47,16 @@ export type TrackEvent = {
     last: Attribution | null;
   };
   props?: Record<string, unknown>;
+  // Conversões (ver tracker-sdk trackConversion). event_id deduplica
+  // pixel×CAPI. identity carrega PII CRUA usada SÓ pra montar o payload
+  // hasheado do CAPI — NUNCA escrita no Analytics Engine.
+  event_id?: string;
+  identity?: {
+    email?: string;
+    phone?: string;
+    fbp?: string;
+    fbc?: string;
+  };
 };
 
 export type EnrichedEvent = TrackEvent & {

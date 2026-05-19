@@ -8,7 +8,15 @@ import {
   readLastTouch,
 } from "./cookies";
 import { captureContext } from "./context";
+import { ensureFbc, fbqTrack, readFbCookies } from "./fb";
 import { parseAttribution, hasAnyAttribution, type AttributionPayload } from "./utm";
+
+function uuid(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return `evt-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
 
 export type TrackerConfig = {
   siteId: string;
@@ -38,6 +46,31 @@ export type TrackEventPayload = {
     last: AttributionPayload | null;
   };
   props?: Record<string, unknown>;
+  // Conversões: id único compartilhado com o pixel client (dedup pixel×CAPI
+  // na janela de 48h da Meta). Ausente em pageview/eventos normais.
+  event_id?: string;
+  // Dados de match do CAPI. Email/telefone vão CRUS por HTTPS — o Worker
+  // hasheia (SHA-256) e NÃO persiste no Analytics Engine. fbp/fbc são
+  // preenchidos automaticamente a partir dos cookies.
+  identity?: {
+    email?: string;
+    phone?: string;
+    fbp?: string;
+    fbc?: string;
+  };
+};
+
+export type ConversionOpts = {
+  /** Valor monetário da conversão (ex: 47). */
+  value?: number;
+  /** Moeda ISO-4217. Default "BRL". */
+  currency?: string;
+  /** Email do lead (cru — hasheado server-side). */
+  email?: string;
+  /** Telefone do lead, só dígitos (cru — hasheado server-side). */
+  phone?: string;
+  /** Props extras para o Analytics Engine (não vão pro CAPI). */
+  props?: Record<string, unknown>;
 };
 
 let config: TrackerConfig | null = null;
@@ -58,6 +91,9 @@ export function init(opts: TrackerConfig): void {
   bootstrapped = true;
   // Garante que o anon id existe.
   getOrCreateAnonId();
+  // Constrói/persiste o cookie _fbc a partir do fbclid da URL (antes de
+  // qualquer track, pra primeira conversão já sair com fbc).
+  ensureFbc();
   // Captura UTMs da URL atual e persiste em cookies (first/last).
   const current = parseAttribution(window.location.search);
   if (hasAnyAttribution(current)) {
@@ -119,6 +155,69 @@ export function pageview(extraProps?: Record<string, unknown>): void {
 }
 
 /**
+ * Conversão deduplicada pixel×CAPI. Gera UM `event_id`, dispara o pixel
+ * client com esse `eventID` E manda o beacon pro Worker com o mesmo
+ * `event_id` + identity. O Worker reenvia via CAPI server-side; a Meta
+ * deduplica os dois pelo par (event_name, event_id) na janela de 48h.
+ *
+ * `eventName` deve ser um evento PADRÃO da Meta ("Lead", "Purchase",
+ * "InitiateCheckout", "CompleteRegistration", "ViewContent"...). Retorna o
+ * `event_id` gerado (útil pra logs/teste).
+ */
+export function trackConversion(eventName: string, opts: ConversionOpts = {}): string {
+  const eventId = uuid();
+  if (typeof window === "undefined" || !config) return eventId;
+
+  const { value, currency = "BRL", email, phone, props } = opts;
+
+  // Pixel client (no-op se bloqueado — o CAPI cobre).
+  const pixelParams: Record<string, unknown> = {};
+  if (typeof value === "number") {
+    pixelParams.value = value;
+    pixelParams.currency = currency;
+  }
+  fbqTrack(eventName, pixelParams, eventId);
+
+  const ctx = captureContext();
+  const current = parseAttribution(window.location.search);
+  const { fbp, fbc } = readFbCookies();
+  const payload: TrackEventPayload = {
+    v: 1,
+    site_id: config.siteId,
+    event: eventName,
+    ts: Date.now(),
+    anon_id: getOrCreateAnonId(),
+    url: ctx.url,
+    path: ctx.path,
+    title: ctx.title,
+    referrer: ctx.referrer,
+    language: ctx.language,
+    timezone: ctx.timezone,
+    screen_w: ctx.screen_w,
+    screen_h: ctx.screen_h,
+    viewport_w: ctx.viewport_w,
+    viewport_h: ctx.viewport_h,
+    attribution: {
+      current: hasAnyAttribution(current) ? current : {},
+      first: readFirstTouch(),
+      last: readLastTouch(),
+    },
+    props:
+      typeof value === "number" ? { value, currency, ...(props ?? {}) } : props,
+    event_id: eventId,
+    identity: {
+      email: email || undefined,
+      phone: phone || undefined,
+      fbp: fbp || undefined,
+      fbc: fbc || undefined,
+    },
+  };
+  log("conversion", eventName, eventId, payload);
+  sendBeacon(config.endpoint, payload);
+  return eventId;
+}
+
+/**
  * Opções de `trackClick`. Os campos `url`, `label`, `target`, `position` e
  * `value` são **promoted keys** no Worker — viram colunas dedicadas no
  * Analytics Engine (blob13/blob14/blob15 e double3/double4) e ficam
@@ -170,4 +269,5 @@ export function trackClick(opts: TrackClickOpts): void {
   track(event, props);
 }
 
+export { loadMetaPixel } from "./fb";
 export type { AttributionPayload } from "./utm";

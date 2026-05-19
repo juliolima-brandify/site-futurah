@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { init, isInitialized, pageview } from "./index";
+import { init, isInitialized, loadMetaPixel, pageview } from "./index";
 
 export type TrackerProps = {
   siteId: string;
@@ -12,6 +12,11 @@ export type TrackerProps = {
    * Se não passar, o componente só dispara pageview no mount.
    */
   pathname?: string | null;
+  /**
+   * ID do Meta Pixel. Se passado, carrega o fbevents.js (PageView automático)
+   * após o init. Conversões deduplicadas usam `trackConversion()`.
+   */
+  metaPixelId?: string;
 };
 
 /**
@@ -19,12 +24,19 @@ export type TrackerProps = {
  * do app — o useSearchParams interno do Next.js (caso o caller queira UTMs
  * em SPA navigations) exige Suspense boundary.
  */
-export function Tracker({ siteId, endpoint, debug, pathname }: TrackerProps): null {
+export function Tracker({
+  siteId,
+  endpoint,
+  debug,
+  pathname,
+  metaPixelId,
+}: TrackerProps): null {
   const lastPath = useRef<string | null>(null);
 
   useEffect(() => {
     if (!isInitialized()) {
       init({ siteId, endpoint, debug });
+      if (metaPixelId) loadMetaPixel(metaPixelId);
     }
     // pageview inicial
     if (lastPath.current === null) {
@@ -38,7 +50,7 @@ export function Tracker({ siteId, endpoint, debug, pathname }: TrackerProps): nu
       lastPath.current = next;
       pageview();
     }
-  }, [siteId, endpoint, debug, pathname]);
+  }, [siteId, endpoint, debug, pathname, metaPixelId]);
 
   return null;
 }
