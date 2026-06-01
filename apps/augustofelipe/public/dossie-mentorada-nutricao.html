@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Dossiê Estratégico — Mentorada Nutrição | Creator Elite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16140F;
+    --ink-2:#3A362E;
+    --muted:#6E6857;
+    --line:#E0DBCF;
+    --paper:#F6F3EC;
+    --card:#FFFFFF;
+    --lima:#DCFF69;
+    --blue:#0B2FFF;
+    --red:#E5484D;
+    --amber:#F0A52B;
+    --green:#3F9E54;
+    --red-soft:#FBE9E9;
+    --amber-soft:#FBF1DF;
+    --green-soft:#E7F3E9;
+    --shadow:0 1px 2px rgba(20,18,12,.04),0 8px 24px rgba(20,18,12,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Manrope',system-ui,sans-serif;
+    color:var(--ink-2);
+    background:var(--paper);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:0 24px}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:var(--ink);
+    color:#F6F3EC;
+    padding:72px 0 64px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"";position:absolute;inset:0;
+    background:radial-gradient(900px 400px at 85% -10%, rgba(220,255,105,.14), transparent 60%);
+    pointer-events:none;
+  }
+  .eyebrow{
+    font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+    font-weight:700;color:var(--lima);margin-bottom:20px;
+  }
+  .hero h1{
+    font-family:'Fraunces',serif;font-weight:600;
+    font-size:clamp(34px,5.4vw,56px);line-height:1.04;
+    letter-spacing:-.02em;color:#FFF;margin-bottom:18px;
+  }
+  .hero h1 em{font-style:italic;color:var(--lima)}
+  .hero .sub{font-size:18px;color:#CFC9BB;max-width:680px}
+  .meta-row{
+    display:flex;flex-wrap:wrap;gap:10px;margin-top:30px;
+  }
+  .chip{
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);
+    color:#E8E3D6;border-radius:100px;padding:7px 15px;font-size:13px;font-weight:600;
+  }
+  .chip b{color:#FFF}
+
+  /* ---------- SECTION ---------- */
+  section{padding:56px 0}
+  .kicker{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+    font-weight:700;color:var(--muted);margin-bottom:14px;
+  }
+  .kicker .dot{width:7px;height:7px;border-radius:50%;background:var(--lima);box-shadow:0 0 0 4px rgba(220,255,105,.3)}
+  h2{
+    font-family:'Fraunces',serif;font-weight:600;
+    font-size:clamp(26px,3.6vw,38px);line-height:1.12;
+    letter-spacing:-.015em;color:var(--ink);margin-bottom:14px;
+  }
+  h3{
+    font-family:'Manrope';font-weight:800;font-size:19px;
+    color:var(--ink);margin:28px 0 12px;letter-spacing:-.01em;
+  }
+  p.lead{font-size:17px;color:var(--ink-2);max-width:760px;margin-bottom:8px}
+  p{margin-bottom:12px}
+
+  /* ---------- CARDS ---------- */
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:22px;box-shadow:var(--shadow);
+  }
+  .card h4{font-size:15px;font-weight:800;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;gap:9px}
+  .card ul{list-style:none;margin-top:8px}
+  .card li{position:relative;padding-left:20px;margin-bottom:7px;font-size:14.5px}
+  .card li::before{content:"";position:absolute;left:2px;top:9px;width:6px;height:6px;border-radius:50%;background:var(--blue)}
+  .ico{width:30px;height:30px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex:0 0 auto}
+
+  /* ---------- KPI STRIP ---------- */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:8px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;text-align:center}
+  .kpi .n{font-family:'Fraunces',serif;font-size:30px;font-weight:700;color:var(--ink);line-height:1}
+  .kpi .l{font-size:12px;color:var(--muted);margin-top:7px;font-weight:600;letter-spacing:.02em}
+
+  /* ---------- RADAR / PILLARS ---------- */
+  .radar-block{display:grid;grid-template-columns:380px 1fr;gap:30px;align-items:center}
+  .radar-wrap{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow)}
+  .pillar-list{display:flex;flex-direction:column;gap:12px}
+  .pillar{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:14px 16px}
+  .pillar .top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+  .pillar .name{font-weight:800;font-size:14.5px;color:var(--ink)}
+  .pillar .score{font-family:'Fraunces',serif;font-weight:700;font-size:16px;padding:1px 10px;border-radius:8px}
+  .bar{height:8px;border-radius:99px;background:#ECE8DD;overflow:hidden}
+  .bar > i{display:block;height:100%;border-radius:99px}
+  .pillar .desc{font-size:13px;color:var(--muted);margin-top:8px}
+  .sc-low{color:var(--red);background:var(--red-soft)}
+  .sc-mid{color:#B9791A;background:var(--amber-soft)}
+  .sc-high{color:var(--green);background:var(--green-soft)}
+  .fill-low{background:var(--red)} .fill-mid{background:var(--amber)} .fill-high{background:var(--green)}
+
+  /* ---------- TABLE ---------- */
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+  table{width:100%;border-collapse:collapse;background:var(--card);font-size:14px;min-width:560px}
+  thead th{
+    background:var(--ink);color:#F2EEE4;text-align:left;padding:13px 16px;
+    font-size:12px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;
+  }
+  tbody td{padding:13px 16px;border-top:1px solid var(--line);vertical-align:top}
+  tbody tr:nth-child(even){background:#FAF8F2}
+  td b{color:var(--ink)}
+  .tag{display:inline-block;font-size:11px;font-weight:800;padding:3px 9px;border-radius:7px;letter-spacing:.02em}
+  .tag.crit{background:var(--red-soft);color:var(--red)}
+  .tag.warn{background:var(--amber-soft);color:#B9791A}
+  .tag.ok{background:var(--green-soft);color:var(--green)}
+
+  /* ---------- COMPLIANCE ---------- */
+  .alert{
+    border-left:4px solid var(--red);background:var(--red-soft);
+    border-radius:0 14px 14px 0;padding:20px 22px;margin:8px 0 22px;
+  }
+  .alert h3{margin:0 0 6px;color:#B0282C;display:flex;align-items:center;gap:9px}
+  .alert p{margin:0;font-size:14.5px;color:#7C2A2C}
+
+  /* ---------- BIO COMPARE ---------- */
+  .bio-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .bio{border-radius:14px;padding:20px;font-family:'Manrope';font-size:14.5px;white-space:pre-line}
+  .bio.old{background:#F2EFE7;border:1px dashed #C9C3B4;color:var(--muted)}
+  .bio.new{background:var(--ink);color:#F4F1E8;border:1px solid var(--ink)}
+  .bio .lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;margin-bottom:12px;display:block}
+  .bio.old .lbl{color:#A39B88}
+  .bio.new .lbl{color:var(--lima)}
+
+  /* ---------- TIMELINE ---------- */
+  .phase{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .phase + .phase{margin-top:16px}
+  .phase .ph-h{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+  .ph-num{font-family:'Fraunces',serif;font-weight:700;font-size:20px;width:46px;height:46px;border-radius:12px;background:var(--lima);color:var(--ink);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .ph-h .ph-t{font-weight:800;font-size:17px;color:var(--ink)}
+  .ph-h .ph-d{font-size:13px;color:var(--muted);font-weight:600}
+  .checks{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px 22px}
+  .checks li{position:relative;padding-left:26px;font-size:14px;margin-bottom:2px}
+  .checks li::before{content:"";position:absolute;left:0;top:3px;width:16px;height:16px;border-radius:5px;border:2px solid var(--blue);background:#fff}
+
+  /* ---------- GANCHOS ---------- */
+  .hooks{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .hook{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--blue);border-radius:0 12px 12px 0;padding:14px 16px;font-size:14px}
+  .hook span{display:block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin-bottom:6px}
+
+  /* ---------- SCRIPT ---------- */
+  .script{background:var(--ink);border-radius:16px;padding:8px;overflow:hidden}
+  .blk{padding:18px 22px;border-bottom:1px solid rgba(255,255,255,.08)}
+  .blk:last-child{border-bottom:0}
+  .blk .bt{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--lima);margin-bottom:7px}
+  .blk .bx{color:#E7E3D8;font-size:14.5px}
+  .blk .ex{color:#A8A293;font-size:13.5px;font-style:italic;margin-top:6px}
+
+  /* ---------- CALLOUT ---------- */
+  .callout{background:var(--ink);color:#F4F1E8;border-radius:20px;padding:34px 32px;text-align:center;position:relative;overflow:hidden}
+  .callout::after{content:"";position:absolute;inset:0;background:radial-gradient(600px 240px at 50% -20%,rgba(220,255,105,.16),transparent 60%)}
+  .callout .q{font-family:'Fraunces',serif;font-style:italic;font-weight:500;font-size:clamp(20px,2.8vw,27px);line-height:1.4;position:relative;max-width:760px;margin:0 auto}
+
+  footer{padding:40px 0 60px;text-align:center;color:var(--muted);font-size:13px}
+  .div{height:1px;background:var(--line);margin:0}
+
+  @media (max-width:760px){
+    .grid-2,.grid-3,.bio-grid,.hooks,.kpis,.radar-block,.checks{grid-template-columns:1fr}
+    .kpis{grid-template-columns:1fr 1fr}
+    .radar-block{gap:20px}
+  }
+  @media print{
+    body{background:#fff}
+    .hero,.callout,.bio.new,.script{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    section{padding:30px 0;break-inside:avoid}
+    .phase,.card,.tbl-wrap{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Creator Elite · Dossiê Estratégico</div>
+    <h1>Autoridade real,<br><em>travada por processo.</em></h1>
+    <p class="sub">Diagnóstico completo da nova mentorada — nicho de emagrecimento para pessoas com compulsão alimentar. O desbloqueio vem de sistema e consistência, não de esforço bruto.</p>
+    <div class="meta-row">
+      <span class="chip"><b>Nicho:</b>&nbsp;Nutrição / Comportamento alimentar</span>
+      <span class="chip"><b>Seguidores:</b>&nbsp;~10k (estagnada 3 meses)</span>
+      <span class="chip"><b>Faturamento:</b>&nbsp;R$ 5k–20k/mês</span>
+      <span class="chip"><b>Horizonte:</b>&nbsp;90 dias</span>
+    </div>
+  </div>
+</header>
+
+<!-- 1. RESUMO / KPIs -->
+<section>
+  <div class="wrap">
+    <div class="kicker"><span class="dot"></span> Panorama</div>
+    <h2>Onde ela está hoje</h2>
+    <p class="lead">Profissional com diferencial difícil de copiar — venceu obesidade (-40kg) e transtorno alimentar, e fala com expertise vivida. O problema não é competência: é distribuição, formato e regularidade.</p>
+    <div class="kpis">
+      <div class="kpi"><div class="n">9/10</div><div class="l">Autoridade &amp; Conexão</div></div>
+      <div class="kpi"><div class="n">3/10</div><div class="l">Consistência</div></div>
+      <div class="kpi"><div class="n">5/10</div><div class="l">Conversão</div></div>
+      <div class="kpi"><div class="n">4/10</div><div class="l">Conteúdo &amp; Formato</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- 2. RADAR DE PILARES -->
+<section>
+  <div class="wrap">
+    <div class="kicker"><span class="dot"></span> Diagnóstico por pilares</div>
+    <h2>Radar de maturidade do perfil</h2>
+    <p class="lead">Seis eixos pontuados de 0 a 10. O contraste é nítido: a base humana é excepcional, mas a máquina de produção e distribuição está parada.</p>
+    <div class="radar-block" style="margin-top:24px">
+      <div class="radar-wrap">
+        <svg id="radar" viewBox="0 0 360 360" width="100%" role="img" aria-label="Radar de pilares"></svg>
+      </div>
+      <div class="pillar-list" id="pillars"></div>
+    </div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- 3. COMPLIANCE CFN -->
+<section>
+  <div class="wrap">
+    <div class="kicker"><span class="dot"></span> Risco regulatório · prioridade máxima</div>
+    <h2>Compliance CFN antes de qualquer estratégia</h2>
+    <div class="alert">
+      <h3>⚠️ Isto vem antes do conteúdo</h3>
+      <p>Nutricionista é profissão regulamentada. O Código de Ética e a Res. CFN 304/2024 restringem antes/depois, promessa de resultado e o uso do termo "especialista". Errar aqui queima credibilidade e expõe a processo ético — corrigir é inegociável.</p>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:30%">Prática</th><th style="width:12%">Status</th><th>Por quê / Como corrigir</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>Antes/depois de paciente</b><br>destaque "Resultados"</td>
+            <td><span class="tag crit">Proibido</span></td>
+            <td>CFN veda fotos de antes/depois e divulgação de resultados de pacientes. <b>Trocar por depoimento em texto/áudio sobre o processo e o comportamento</b> — nunca balança, medidas ou kg.</td>
+          </tr>
+          <tr>
+            <td><b>"Especialista em..."</b> na bio</td>
+            <td><span class="tag crit">Restrito</span></td>
+            <td>Só permitido com título de especialista/pós reconhecida. Sem isso, usar <b>"Nutricionista · foco em..."</b> ou <b>"atuação em..."</b>.</td>
+          </tr>
+          <tr>
+            <td><b>Promessa de emagrecer</b><br>("vou te provar", "vai emagrecer")</td>
+            <td><span class="tag warn">Cuidado</span></td>
+            <td>Promessa de resultado é vedada. Reformular ganchos para <b>educação e comportamento</b>, não promessa.</td>
+          </tr>
+          <tr>
+            <td><b>Própria transformação (-40kg)</b></td>
+            <td><span class="tag ok">Permitido</span></td>
+            <td>É dado dela como pessoa, não de paciente. <b>Mantém</b> — é o maior diferencial. Só não vincular a promessa para o seguidor.</td>
+          </tr>
+          <tr>
+            <td><b>Conteúdo baseado em evidência</b></td>
+            <td><span class="tag ok">Permitido</span></td>
+            <td>Desmistificar mitos com ciência é exatamente o terreno seguro e diferenciado. <b>Dobrar a aposta aqui.</b></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- 4. FORÇAS x GAPS -->
+<section>
+  <div class="wrap">
+    <div class="kicker"><span class="dot"></span> Diagnóstico competitivo</div>
+    <h2>Forças únicas &amp; o que destravar</h2>
+    <div class="grid-2" style="margin-top:22px">
+      <div class="card">
+        <h4><span class="ico" style="background:var(--green-soft)">✦</span> Forças difíceis de copiar</h4>
+        <ul>
+          <li><b>Experiência vivida</b> com obesidade e transtorno alimentar — prova viva, não teoria.</li>
+          <li><b>Vocabulário proprietário</b> ("cabeça de dieta", "8/80", "tudo perfeito") que gera pertencimento imediato.</li>
+          <li><b>Sem demonizar alimento e sem toxic positivity</b> — zona rara no nicho.</li>
+          <li><b>Retenção de pacientes alta</b> + DMs respondidas = confiança e algoritmo de Stories aquecido.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4><span class="ico" style="background:var(--red-soft)">!</span> O que está travando</h4>
+        <ul>
+          <li><b>Audiência contaminada</b> por virais fora do nicho — algoritmo recalibrando (3–5 semanas).</li>
+          <li><b>Formato único e estático</b> — corte rápido, mas sem dinamismo visual; retenção cai nos 3s.</li>
+          <li><b>Bloqueio criativo + ansiedade ao postar</b> → frequência irregular (o maior risco do plano).</li>
+          <li><b>Não lê os próprios dados</b> — decide sem saber taxa de conclusão e saves/views.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- 5. BIO -->
+<section>
+  <div class="wrap">
+    <div class="kicker"><span class="dot"></span> Ativo de conversão</div>
+    <h2>Reescrita da bio</h2>
+    <p class="lead">A bio atual é genérica para o ICP e usa CTA fraco ("Agendamento"). A nova fala direto com quem tem compulsão, sinaliza ticket e respeita o CFN.</p>
+    <div class="bio-grid" style="margin-top:20px">
+      <div class="bio old">
+        <span class="lbl">Bio atual</span>Venci a obesidade (-40kg) e vou te guiar nesse caminho também!
+Atendimento on-line para todo o mundo 🌎
+Agendamento 👇</div>
+      <div class="bio new">
+        <span class="lbl">Bio proposta (CFN-safe)</span>Nutricionista · venci obesidade e transtorno alimentar
+Emagrecimento sem dieta restritiva, com base em ciência 🧠
+Para quem já tentou de tudo e vive no efeito sanfona
+👇 Acompanhamento de 3 meses</div>
+    </div>
+    <p style="font-size:13.5px;color:var(--muted);margin-top:14px">Trocou "especialista" por "Nutricionista ·", tirou a promessa direta de resultado, e mira a dor real do ICP. Testar A/B por 15 dias medindo cliques no link.</p>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- 6. ESTRATÉGIA DE CONTEÚDO -->
+<section>
+  <div class="wrap">
+    <div class="kicker"><span class="dot"></span> Plano de conteúdo</div>
+    <h2>Pilares de conteúdo &amp; mix semanal</h2>
+    <div class="tbl-wrap" style="margin:20px 0 28px">
+      <table>
+        <thead><tr><th>Pilar</th><th style="width:12%">Peso</th><th>Formato</th><th>Objetivo</th></tr></thead>
+        <tbody>
+          <tr><td><b>Comportamento alimentar</b></td><td>40%</td><td>Reel direto ao ponto</td><td>Viralização + identificação do ICP</td></tr>
+          <tr><td><b>React / desconstrução de mito</b></td><td>25%</td><td>Reel tela dividida</td><td>Alcance + autoridade (baixo custo)</td></tr>
+          <tr><td><b>Processo de paciente</b></td><td>20%</td><td>Reel narrativo / carrossel</td><td>Prova social <i>sem antes/depois</i></td></tr>
+          <tr><td><b>Bastidores / humanização</b></td><td>15%</td><td>Stories + Reel curto</td><td>Conexão + DMs</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Banco de ganchos (CFN-safe)</h3>
+    <div class="hooks">
+      <div class="hook"><span>Identificação</span>"Se você já fez 10 dietas e voltou a tudo, não é falta de força de vontade."</div>
+      <div class="hook"><span>Lista</span>"5 coisas que sabotam o emagrecimento de quem tem compulsão — sem perceber."</div>
+      <div class="hook"><span>Desmistificação</span>"Não, [alimento] não 'engorda' — e a ciência explica por quê."</div>
+      <div class="hook"><span>React</span>"Reagindo a esse conselho de dieta que viralizou — e por que ele é perigoso."</div>
+      <div class="hook"><span>Contraste</span>"A diferença entre quem mantém o resultado e quem fica no efeito sanfona."</div>
+      <div class="hook"><span>Vivência</span>"O que eu sentia quando pesava 40kg a mais — e ninguém fala sobre isso."</div>
+    </div>
+
+    <h3>Estrutura de script — anti-bloqueio (3 blocos)</h3>
+    <div class="script">
+      <div class="blk"><div class="bt">Bloco 1 · Gancho (0–3s)</div><div class="bx">Frase de impacto que nomeia a dor do ICP.</div><div class="ex">"Se você emagrece e engorda tudo de novo, o problema não é o seu corpo."</div></div>
+      <div class="blk"><div class="bt">Bloco 2 · Desenvolvimento (3–50s)</div><div class="bx">2 a 3 pontos diretos, com evidência e a linguagem dela. Listas verbais ("primeiro… segundo…").</div></div>
+      <div class="blk"><div class="bt">Bloco 3 · CTA conversacional (5s finais)</div><div class="bx">Nunca "me chama no direct". Gera comentário/salvamento.</div><div class="ex">"Qual dessas você se identificou? Comenta aqui." · "Salva pra lembrar." · "Manda pra quem precisa ver."</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- 7. TÉCNICA -->
+<section>
+  <div class="wrap">
+    <div class="kicker"><span class="dot"></span> Produção</div>
+    <h2>Dinamismo &amp; estética sem sofrer</h2>
+    <p class="lead">Ela não quer fazer capa elaborada. A solução é reduzir decisão: técnicas de baixo esforço e alto impacto.</p>
+    <div class="grid-3" style="margin-top:22px">
+      <div class="card"><h4><span class="ico" style="background:var(--amber-soft)">⚡</span> CapCut — 3 truques</h4><ul><li>Zoom leve (2–3%) a cada corte de fala.</li><li>1–2 B-rolls de 1s (comida, texto, print de DM autorizada).</li><li>Texto na tela nos pontos-chave (60% assiste sem som).</li></ul></div>
+      <div class="card"><h4><span class="ico" style="background:var(--green-soft)">◇</span> Feed ticket-alto</h4><ul><li>1 template de capa no Canva — criar 1x, duplicar sempre.</li><li>Paleta fixa de 3 cores em Stories e capas.</li><li>Foto de perfil com luz natural + enquadramento no rosto.</li></ul></div>
+      <div class="card"><h4><span class="ico" style="background:var(--red-soft)">◷</span> Rotina anti-ansiedade</h4><ul><li>Dia fixo de gravação (lote de 3–4 reels).</li><li>Script pronto antes de gravar.</li><li>Frequência &gt; perfeição: postar imperfeito é melhor que travar.</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- 8. CONCORRENTES -->
+<section>
+  <div class="wrap">
+    <div class="kicker"><span class="dot"></span> Benchmark</div>
+    <h2>Concorrentes — o que extrair de cada um</h2>
+    <div class="tbl-wrap" style="margin-top:20px">
+      <table>
+        <thead><tr><th>Perfil</th><th>O que observar</th></tr></thead>
+        <tbody>
+          <tr><td><b>@nutriniquee</b></td><td>Humor e linguagem popular sem perder autoridade.</td></tr>
+          <tr><td><b>@isabellalacerda_nutri</b></td><td>Posicionamento de ticket alto — estética, bio e CTA.</td></tr>
+          <tr><td><b>@nutri.dennisfugiwara</b></td><td>Estrutura de Reacts e formatos de lista.</td></tr>
+          <tr><td><b>@lucaseducampos</b></td><td>Volume e consistência de temas.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:13.5px;color:var(--muted);margin-top:14px">Tarefa: mapear os 10 reels de melhor performance de cada e identificar padrões de gancho, duração e estrutura.</p>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- 9. PLANO 90 DIAS -->
+<section>
+  <div class="wrap">
+    <div class="kicker"><span class="dot"></span> Execução</div>
+    <h2>Plano de 90 dias em 3 fases</h2>
+    <div style="margin-top:22px">
+      <div class="phase">
+        <div class="ph-h"><div class="ph-num">1</div><div><div class="ph-t">Reset &amp; base</div><div class="ph-d">Semanas 1–2</div></div></div>
+        <ul class="checks">
+          <li>Auditar Insights dos últimos 30 reels (conclusão + saves/views)</li>
+          <li>Aplicar nova bio (teste A/B)</li>
+          <li>Corrigir compliance CFN no perfil e destaques</li>
+          <li>Criar 1 template de capa + paleta de 3 cores</li>
+          <li>Mapear 10 reels de cada concorrente</li>
+          <li>Definir dia fixo de gravação</li>
+        </ul>
+      </div>
+      <div class="phase">
+        <div class="ph-h"><div class="ph-num">2</div><div><div class="ph-t">Retomada de tração</div><div class="ph-d">Semanas 3–8</div></div></div>
+        <ul class="checks">
+          <li>3 reels/semana pelos pilares definidos</li>
+          <li>1 React por semana (alto alcance, baixo custo)</li>
+          <li>Scripts no template de 3 blocos</li>
+          <li>Stories com enquete/pergunta 3x/semana</li>
+          <li>1 carrossel de processo de paciente a cada 2 semanas</li>
+          <li>Medir baseline de retenção e ajustar</li>
+        </ul>
+      </div>
+      <div class="phase">
+        <div class="ph-h"><div class="ph-num">3</div><div><div class="ph-t">Conversão &amp; escala</div><div class="ph-d">Semanas 9–12</div></div></div>
+        <ul class="checks">
+          <li>CTA de acompanhamento em 1 reel/semana</li>
+          <li>Impulsionar conversão de perfil (não alcance bruto)</li>
+          <li>Atualizar destaque de depoimentos (CFN-safe)</li>
+          <li>Avaliar conta paralela — decisão conjunta, não antes</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- 10. METAS -->
+<section>
+  <div class="wrap">
+    <div class="kicker"><span class="dot"></span> Indicadores</div>
+    <h2>Metas — realistas e priorizadas</h2>
+    <p class="lead">A meta de 30k em 90 dias (3x) é agressiva para conta estagnada. O ganho de <b>seguidor qualificado</b> e o <b>dobro do faturamento</b> importam mais que o número bruto.</p>
+    <div class="tbl-wrap" style="margin-top:20px">
+      <table>
+        <thead><tr><th>Indicador</th><th>Hoje</th><th>Meta 30 dias</th><th>Meta 90 dias</th></tr></thead>
+        <tbody>
+          <tr><td><b>Faturamento mensal</b> <span class="tag ok">prioridade</span></td><td>R$ 5k–20k</td><td>R$ 10k mín.</td><td><b>2× do atual</b></td></tr>
+          <tr><td><b>Seguidores qualificados</b></td><td>~10k</td><td>12–13k</td><td>15–18k <span class="tag warn">realista</span></td></tr>
+          <tr><td>Meta original do perfil</td><td>~10k</td><td>—</td><td>30k <span class="tag warn">esticada</span></td></tr>
+          <tr><td><b>Frequência de reels</b></td><td>Irregular</td><td>3/semana</td><td>3–4/semana</td></tr>
+          <tr><td><b>Taxa de conclusão</b></td><td>Desconhecida</td><td>Medir baseline</td><td>&gt; 45%</td></tr>
+          <tr><td><b>Saves / views</b></td><td>Alto (não medido)</td><td>Medir baseline</td><td>Manter + crescer</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- 11. ATENÇÃO -->
+<section>
+  <div class="wrap">
+    <div class="kicker"><span class="dot"></span> Pontos críticos</div>
+    <h2>Riscos a monitorar</h2>
+    <div class="grid-2" style="margin-top:22px">
+      <div class="card"><h4><span class="ico" style="background:var(--red-soft)">1</span> Audiência contaminada</h4><p style="font-size:14px;margin:0">Seguidores dos virais off-topic ainda estão lá. Os próximos reels de nutrição terão alcance relativo baixo por 3–5 semanas. <b>É normal e temporário — não interpretar como fracasso.</b></p></div>
+      <div class="card"><h4><span class="ico" style="background:var(--amber-soft)">2</span> Ansiedade ao postar</h4><p style="font-size:14px;margin:0">Maior risco do plano. A solução não é motivação — é <b>processo</b>: script e template prontos, dia fixo. Reduzir decisões = reduzir ansiedade.</p></div>
+      <div class="card"><h4><span class="ico" style="background:var(--amber-soft)">3</span> Conta paralela — não agora</h4><p style="font-size:14px;margin:0">Ideia válida, mas dividir atenção nos primeiros 90 dias seria fatal. <b>Registrar, não agir ainda.</b></p></div>
+      <div class="card"><h4><span class="ico" style="background:var(--green-soft)">4</span> ICP tem poder aquisitivo</h4><p style="font-size:14px;margin:0">Paciente traumatizado por dietas costuma ter renda para investir em saúde — mas o perfil precisa <b>sinalizar valor</b> (bio, estética, como fala do serviço nos Stories).</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CALLOUT FINAL -->
+<section style="padding-top:20px">
+  <div class="wrap">
+    <div class="callout">
+      <p class="q">"Profissional com autoridade real e diferencial único, travada por contaminação de audiência, bloqueio criativo e ausência de processo. O desbloqueio vem de consistência com sistema — não de esforço bruto. E tudo dentro do que o CFN permite."</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Dossiê Estratégico · Creator Elite · gerado em 01/06/2026 · documento interno (noindex)
+</footer>
+
+<script>
+  const pillars = [
+    {name:'Autoridade & Conexão', score:9, desc:'Experiência vivida, expertise e confiança. Pacientes ficam. Maior ativo do perfil.'},
+    {name:'Posicionamento & Nicho', score:5, desc:'Consolidado mas não converte; audiência diluída por virais fora do nicho.'},
+    {name:'Conversão', score:5, desc:'Quem entra fica, mas o perfil não converte novos seguidores em pacientes.'},
+    {name:'Estética & Percepção de valor', score:4, desc:'Feed sem cara de ticket alto; sem padrão visual de capa/paleta.'},
+    {name:'Conteúdo & Formato', score:4, desc:'Formato único e estático; bloqueio criativo; sem dinamismo de edição.'},
+    {name:'Consistência & Operação', score:3, desc:'Frequência irregular, ansiedade ao postar, scripts travados.'}
+  ];
+
+  function cls(s){return s<=4?'low':s<=7?'mid':'high'}
+  function color(s){return s<=4?'#E5484D':s<=7?'#F0A52B':'#3F9E54'}
+
+  // ---- Pillar cards ----
+  document.getElementById('pillars').innerHTML = pillars.map(p=>{
+    const c=cls(p.score);
+    return `<div class="pillar">
+      <div class="top"><span class="name">${p.name}</span><span class="score sc-${c}">${p.score}/10</span></div>
+      <div class="bar"><i class="fill-${c}" style="width:${p.score*10}%"></i></div>
+      <div class="desc">${p.desc}</div>
+    </div>`;
+  }).join('');
+
+  // ---- Radar SVG ----
+  (function(){
+    const svg=document.getElementById('radar');
+    const cx=180,cy=180,R=120,n=pillars.length;
+    const ns='http://www.w3.org/2000/svg';
+    const ang=i=>(-90 + i*360/n)*Math.PI/180;
+    const pt=(i,r)=>[cx+Math.cos(ang(i))*r, cy+Math.sin(ang(i))*r];
+
+    // grid rings
+    [0.25,0.5,0.75,1].forEach(f=>{
+      const pts=pillars.map((_,i)=>pt(i,R*f).join(',')).join(' ');
+      const poly=document.createElementNS(ns,'polygon');
+      poly.setAttribute('points',pts);
+      poly.setAttribute('fill','none');
+      poly.setAttribute('stroke','#E4DFD2');
+      poly.setAttribute('stroke-width','1');
+      svg.appendChild(poly);
+    });
+    // spokes
+    pillars.forEach((_,i)=>{
+      const [x,y]=pt(i,R);
+      const l=document.createElementNS(ns,'line');
+      l.setAttribute('x1',cx);l.setAttribute('y1',cy);l.setAttribute('x2',x);l.setAttribute('y2',y);
+      l.setAttribute('stroke','#E4DFD2');l.setAttribute('stroke-width','1');
+      svg.appendChild(l);
+    });
+    // data polygon
+    const dpts=pillars.map((p,i)=>pt(i,R*p.score/10).join(',')).join(' ');
+    const dp=document.createElementNS(ns,'polygon');
+    dp.setAttribute('points',dpts);
+    dp.setAttribute('fill','rgba(11,47,255,.10)');
+    dp.setAttribute('stroke','#0B2FFF');
+    dp.setAttribute('stroke-width','2');
+    dp.setAttribute('stroke-linejoin','round');
+    svg.appendChild(dp);
+    // vertices
+    pillars.forEach((p,i)=>{
+      const [x,y]=pt(i,R*p.score/10);
+      const c=document.createElementNS(ns,'circle');
+      c.setAttribute('cx',x);c.setAttribute('cy',y);c.setAttribute('r','4.5');
+      c.setAttribute('fill',color(p.score));
+      c.setAttribute('stroke','#fff');c.setAttribute('stroke-width','1.5');
+      svg.appendChild(c);
+    });
+    // labels (score badges)
+    pillars.forEach((p,i)=>{
+      const [x,y]=pt(i,R+18);
+      const t=document.createElementNS(ns,'text');
+      t.setAttribute('x',x);t.setAttribute('y',y+4);
+      t.setAttribute('text-anchor', Math.abs(Math.cos(ang(i)))<0.3?'middle':(Math.cos(ang(i))>0?'start':'end'));
+      t.setAttribute('font-family','Manrope,sans-serif');
+      t.setAttribute('font-size','11');t.setAttribute('font-weight','800');
+      t.setAttribute('fill',color(p.score));
+      t.textContent=p.score;
+      svg.appendChild(t);
+    });
+  })();
+</script>
+
+</body>
+</html>
