@@ -189,6 +189,31 @@
   footer{padding:40px 0 60px;text-align:center;color:var(--muted);font-size:13px}
   .div{height:1px;background:var(--line);margin:0}
 
+  /* ---------- TABS ---------- */
+  .tabbar{position:sticky;top:0;z-index:20;background:rgba(246,243,236,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .tabbar .wrap{display:flex;gap:8px;padding-top:12px;padding-bottom:12px}
+  .tab{
+    appearance:none;border:1px solid transparent;background:transparent;cursor:pointer;
+    font-family:'Manrope';font-weight:700;font-size:14px;color:var(--muted);
+    padding:9px 18px;border-radius:100px;transition:.18s;letter-spacing:.01em;
+  }
+  .tab:hover{color:var(--ink);background:rgba(20,18,12,.04)}
+  .tab[aria-selected="true"]{background:var(--ink);color:#F4F1E8;border-color:var(--ink)}
+  .tabpanel[hidden]{display:none}
+  .tabpanel:focus{outline:none}
+
+  /* ---------- RESPOSTAS ORIGINAIS ---------- */
+  .qgroup{margin-top:34px}
+  .qgroup:first-of-type{margin-top:8px}
+  .qgroup-h{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+  .qgroup-h .ix{font-family:'Fraunces',serif;font-weight:700;font-size:15px;width:30px;height:30px;border-radius:8px;background:var(--lima);color:var(--ink);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .qgroup-h .gt{font-weight:800;font-size:16px;color:var(--ink);letter-spacing:.01em}
+  .qa{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:16px 18px;box-shadow:var(--shadow)}
+  .qa + .qa{margin-top:12px}
+  .qa .q{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--blue);margin-bottom:8px}
+  .qa .a{font-size:14.5px;color:var(--ink-2);white-space:pre-line}
+  .qa .a.short{font-family:'Fraunces',serif;font-size:18px;color:var(--ink);font-weight:600}
+
   @media (max-width:760px){
     .grid-2,.grid-3,.bio-grid,.hooks,.kpis,.radar-block,.checks{grid-template-columns:1fr}
     .kpis{grid-template-columns:1fr 1fr}
@@ -218,6 +243,17 @@
     </div>
   </div>
 </header>
+
+<!-- TABS -->
+<nav class="tabbar" role="tablist" aria-label="Seções">
+  <div class="wrap">
+    <button class="tab" id="t-dossie" role="tab" aria-selected="true" aria-controls="tab-dossie">Dossiê estratégico</button>
+    <button class="tab" id="t-respostas" role="tab" aria-selected="false" aria-controls="tab-respostas">Respostas originais</button>
+  </div>
+</nav>
+
+<!-- ============ PAINEL 1: DOSSIÊ ============ -->
+<div class="tabpanel" id="tab-dossie" role="tabpanel" aria-labelledby="t-dossie" tabindex="-1">
 
 <!-- 1. RESUMO / KPIs -->
 <section>
@@ -518,6 +554,20 @@ Para quem já tentou de tudo e vive no efeito sanfona
   </div>
 </section>
 
+</div><!-- /tab-dossie -->
+
+<!-- ============ PAINEL 2: RESPOSTAS ORIGINAIS ============ -->
+<div class="tabpanel" id="tab-respostas" role="tabpanel" aria-labelledby="t-respostas" tabindex="-1" hidden>
+  <section>
+    <div class="wrap">
+      <div class="kicker"><span class="dot"></span> Onboarding Creator Elite</div>
+      <h2>Respostas originais do questionário</h2>
+      <p class="lead">Transcrição literal do que a mentorada preencheu — base de todo o diagnóstico desta página.</p>
+      <div id="answers" style="margin-top:8px"></div>
+    </div>
+  </section>
+</div><!-- /tab-respostas -->
+
 <footer>
   Dossiê Estratégico · Creator Elite · gerado em 01/06/2026 · documento interno (noindex)
 </footer>
@@ -601,6 +651,73 @@ Para quem já tentou de tudo e vive no efeito sanfona
       t.textContent=p.score;
       svg.appendChild(t);
     });
+  })();
+
+  // ---- Respostas originais ----
+  const answers = [
+    {step:'Nicho', items:[
+      {q:'Nicho / temática', a:'Fitness / Saúde', short:true},
+      {q:'Ângulo específico do perfil', a:'Acompanhamento nutricional de emagrecimento de 3 meses para pessoas com compulsão alimentar/descontrole alimentar que estão com sobrepeso/obesidade'}
+    ]},
+    {step:'Posicionamento', items:[
+      {q:'Como descreveria seu posicionamento hoje?', a:'Está consolidado mas não está convertendo', short:true}
+    ]},
+    {step:'Diagnóstico Estratégico Profundo', items:[
+      {q:'Como o perfil está hoje (primeira impressão, foto, destaques)', a:'Foto boa, nome diz o que faço, eu mesma sou case de sucesso, tenho destaques com prova social e vídeos de conteúdo de nutrição. Acredito que o feed possa ser mais arrumadinho e bonitinho, e também com a aparência de ticket mais alto eu só não consigo fazer isso, não sei muito bem como e honestamente não tenho saco para ficar fazendo capa para reels toda elaborada. Mas se for necessário vocês me passam a orientação e eu faço.\nNos ultimos 6 meses postei muitos vídeos que não eram de nutrição e que viralizaram e acabou puxando muitas pessoas que procuram outra coisa e isso fez o meu engajamento, credibilidade e conversão diminuirem. Antes era MUITO boa. Recentemente arquivei esses vídeos e tambem alterei um pouco a minha bio. Porém também acho que tenho muito potencial com esses tipos de vídeo se criar outra conta e focar em outro público, mas aí já são outros 500'},
+      {q:'Bio atual (texto exato)', a:'Venci a obesidade (-40kg) e vou te guiar nesse caminho também!\nAtendimento on-line para todo o mundo 🌎\nAgendamento 👇'},
+      {q:'Instagram dos concorrentes (@)', a:'@nutriniquee\n@isabellalacerda_nutri\n@nutri.dennisfugiwara\n@lucaseducampos'},
+      {q:'O que funciona no nicho', a:'React, videos sucintos listando coisas ou vídeos muito elaborados mais longos mostrando as nuances de um caso específicos'},
+      {q:'Padrões virais percebidos', a:'5 coisa que...  Vou te falar uma coisa pra quem quer emagrecer... Eu estou cansada de ouvir... Vocês viram a blogueira que.... Nao, tal coisa não engorda.... React de vídeos absurdos de nutrição... Desmistificando mitos'},
+      {q:'Oportunidades / brechas no nicho', a:'O comportamento e a maneira que a pessoa entra no processo de emagrecimento dita se ela terá resultado ou não. Cabeça de dieta, 8/80 péssimas, cabeça de pode ou não pode, de no pain no gain, de querer fazer tudo perfeito'},
+      {q:'Formatos em alta no nicho', a:'Reacts, vídeos acolhedores detalhando um certo caso de emagrecimento, abordar assuntos em alta de nutrição, analisando a dieta de tal pessoa...'},
+      {q:'Retenção (as pessoas assistem até o fim? salvam?)', a:'Honestamente eu não sei pois não sei o que seria um número legal de salvamentos, compartilhamentos etc para a minha quantidade de views.'},
+      {q:'Linguagem / tom de voz', a:'Sem rodeios mas acolhedor e ditático. Não sou hostil e também não promovo estilos de vida tóxicos que não são realistas mas também cobro um certo tipo de dedicação e honestidade do meu publico. Basicamente falo na lata mas sem xingar ninguem. Sempre me baseio em evidência cientifica'},
+      {q:'Formatos que mais usa', a:'90% reel, 10% carrossel e post. Stories diários sempre'},
+      {q:'Diferenciação (o que te separa dos outros perfis)', a:'Tenho carisma e sou muito realista com o que é possivel e o que não é possivel de ser feito. Edição de cortes rapidos, falo rápido e consigo colocar muitas informações em um vídeo mas meu video não é dinamico. Como tenho experiência pessoal com transtornos alimentares consigo falar com muita expertise, sinceridade e confiança sobre comportamento alimentar e quem tem sabe pois eu falo coisas bem especificas que quem nunca passou por isso não saberia. Isso faz com que as pessoas que tem transtorno alimentar e obesidade se sintam muito confortáveis comigo e não sintam tanto receio de iniciar um acompanhamento nutricional. Sou muito aberta sobre a minha vida isso também ajuda. Não tenho vergonha de falar nada, tem hora que sou engracadinha e também sempre respondo as minhas dms. Promovo um estilo de vida equilibrado e não demonizo nenhum tipo de alimento o que as pessoas gostam. Geralmente o meu paciente é um paciente traumatizado que passou por dietas restritivas e nao querem isso de novo'}
+    ]},
+    {step:'Monetização', items:[
+      {q:'Como monetiza seu Instagram hoje?', a:'Produto / serviço próprio', short:true},
+      {q:'Faturamento mensal médio (últimos 3 meses)', a:'R$ 5.000 a R$ 20.000', short:true}
+    ]},
+    {step:'Percepção atual', items:[
+      {q:'O que está funcionando e o que está travado?', a:'Pessoas curtem, salvam e enviam muito. Comentários mais ou menos, poderia ter mais. Estou nos 10k à 3 meses e faz muito tempo que um video meu de nutrição não tem uma quantidade alta de reels. Não sei fazer video dinamico de nutrição'}
+    ]},
+    {step:'Dores', items:[
+      {q:'Maior dor / frustração que te trouxe pra mentoria', a:'Tenho potencial mas estou muito travada. Ócio cirativo, nao sei muito sobre edição no capcut e sobre como filmar videos diferentes, fico smepre no mesmo formato. Muita ansiedade ao postar. Não consigo fazer scripts tao bem quanto fazia antes. Meu conhecimento e abordagem são muito boas, quem começa a tratar comigo continua por muito tempo, meus pacientes gostam muito de mim e tem resultados fantásticos e eu quero ter o retorno de todo o esforco que coloco no insta.'}
+    ]},
+    {step:'Bloqueios', items:[
+      {q:'O que já tentou e não funcionou? Por quê?', a:'Já fiz metoria por 1 ano e foi o que me fez chegar aos 5k, mas aí estagnei. Funcionou mas agora acho que preciso de outras coisas, estratégias, conhecimento a respeito de como fazer videos e editar mesmo para continuar a crescer.'}
+    ]},
+    {step:'Objetivos', items:[
+      {q:'Objetivo concreto nos próximos 90 dias', a:'Sair de 10k para 30k e aumentar 100% o meu faturamento em relação à o que ganho agora. Chamar seguidores que estão interessados em nutrição e também que nao ganhem um salário minimo, então seguidores que compram e que tenham mais dinheiro. Já estou fazendo a minha parte em mudar a minha aparência também e tomo muito cuidado com o que mostro'},
+      {q:'Prazo desejado pra atingir o objetivo', a:'Em 90 dias', short:true}
+    ]}
+  ];
+
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  document.getElementById('answers').innerHTML = answers.map((g,i)=>`
+    <div class="qgroup">
+      <div class="qgroup-h"><span class="ix">${i+1}</span><span class="gt">${esc(g.step)}</span></div>
+      ${g.items.map(it=>`
+        <div class="qa">
+          <div class="q">${esc(it.q)}</div>
+          <div class="a${it.short?' short':''}">${esc(it.a)}</div>
+        </div>`).join('')}
+    </div>`).join('');
+
+  // ---- Tabs ----
+  (function(){
+    const tabs=[...document.querySelectorAll('.tab')];
+    function select(id){
+      tabs.forEach(t=>{
+        const on=t.id==='t-'+id;
+        t.setAttribute('aria-selected',on);
+      });
+      document.getElementById('tab-dossie').hidden = id!=='dossie';
+      document.getElementById('tab-respostas').hidden = id!=='respostas';
+      window.scrollTo({top:0,behavior:'instant'in window?'instant':'auto'});
+    }
+    tabs.forEach(t=>t.addEventListener('click',()=>select(t.id.replace('t-',''))));
   })();
 </script>
 
