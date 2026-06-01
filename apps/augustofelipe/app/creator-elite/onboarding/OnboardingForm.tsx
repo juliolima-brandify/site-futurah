@@ -14,6 +14,19 @@ type FormData = {
 
   posicionamento: string;
 
+  // Etapa 2 — Diagnóstico Estratégico Profundo
+  diagPerfil: string;
+  diagBio: string;
+  diagConcorrentes: string;
+  diagNichoFunciona: string;
+  diagPadroesVirais: string;
+  diagOportunidades: string;
+  diagFormatosAlta: string;
+  diagRetencao: string;
+  diagLinguagem: string;
+  diagFormatos: string;
+  diagDiferenciacao: string;
+
   monetizacaoTipo: string;
   monetizacaoTipoOutro: string;
   faturamento: string;
@@ -35,6 +48,17 @@ const EMPTY: FormData = {
   nichoCategoriaOutro: "",
   nichoDescricao: "",
   posicionamento: "",
+  diagPerfil: "",
+  diagBio: "",
+  diagConcorrentes: "",
+  diagNichoFunciona: "",
+  diagPadroesVirais: "",
+  diagOportunidades: "",
+  diagFormatosAlta: "",
+  diagRetencao: "",
+  diagLinguagem: "",
+  diagFormatos: "",
+  diagDiferenciacao: "",
   monetizacaoTipo: "",
   monetizacaoTipoOutro: "",
   faturamento: "",
@@ -168,6 +192,52 @@ const STEPS: Step[] = [
     },
   },
   {
+    key: "diag-perfil",
+    label: "Perfil & bio",
+    validate: (d) => {
+      const e: Errors = {};
+      if (d.diagPerfil.trim().length < 30)
+        e.diagPerfil = "Descreva com mais detalhe (mínimo 30 caracteres).";
+      if (d.diagBio.trim().length < 5)
+        e.diagBio = "Cole sua bio atual.";
+      return e;
+    },
+  },
+  {
+    key: "diag-concorrentes",
+    label: "Concorrentes",
+    validate: (d) => {
+      const e: Errors = {};
+      if (d.diagConcorrentes.trim().length < 6)
+        e.diagConcorrentes = "Liste pelo menos um perfil de referência.";
+      if (d.diagNichoFunciona.trim().length < 10)
+        e.diagNichoFunciona = "Conte o que funciona no nicho (mínimo 10 caracteres).";
+      if (d.diagPadroesVirais.trim().length < 10)
+        e.diagPadroesVirais = "Descreva os padrões virais (mínimo 10 caracteres).";
+      if (d.diagOportunidades.trim().length < 10)
+        e.diagOportunidades = "Aponte ao menos uma oportunidade (mínimo 10 caracteres).";
+      if (d.diagFormatosAlta.trim().length < 10)
+        e.diagFormatosAlta = "Liste os formatos em alta (mínimo 10 caracteres).";
+      return e;
+    },
+  },
+  {
+    key: "diag-conteudo",
+    label: "Conteúdo & diferenciação",
+    validate: (d) => {
+      const e: Errors = {};
+      if (d.diagRetencao.trim().length < 10)
+        e.diagRetencao = "Conte como está sua retenção (mínimo 10 caracteres).";
+      if (d.diagLinguagem.trim().length < 10)
+        e.diagLinguagem = "Descreva sua linguagem / tom (mínimo 10 caracteres).";
+      if (d.diagFormatos.trim().length < 10)
+        e.diagFormatos = "Liste os formatos que mais usa (mínimo 10 caracteres).";
+      if (d.diagDiferenciacao.trim().length < 20)
+        e.diagDiferenciacao = "Conte o que te diferencia (mínimo 20 caracteres).";
+      return e;
+    },
+  },
+  {
     key: "monetizacao",
     label: "Monetização",
     validate: (d) => {
@@ -259,6 +329,61 @@ function buildAnswers(data: FormData) {
       step: "Posicionamento",
       question: "Como descreveria seu posicionamento hoje?",
       value: data.posicionamento,
+    },
+    {
+      step: "Diagnóstico Estratégico Profundo",
+      question: "Como o perfil está hoje (primeira impressão, foto, destaques)",
+      value: data.diagPerfil.trim(),
+    },
+    {
+      step: "Diagnóstico Estratégico Profundo",
+      question: "Bio atual (texto exato)",
+      value: data.diagBio.trim(),
+    },
+    {
+      step: "Diagnóstico Estratégico Profundo",
+      question: "Instagram dos concorrentes (@)",
+      value: data.diagConcorrentes.trim(),
+    },
+    {
+      step: "Diagnóstico Estratégico Profundo",
+      question: "O que funciona no nicho",
+      value: data.diagNichoFunciona.trim(),
+    },
+    {
+      step: "Diagnóstico Estratégico Profundo",
+      question: "Padrões virais percebidos",
+      value: data.diagPadroesVirais.trim(),
+    },
+    {
+      step: "Diagnóstico Estratégico Profundo",
+      question: "Oportunidades / brechas no nicho",
+      value: data.diagOportunidades.trim(),
+    },
+    {
+      step: "Diagnóstico Estratégico Profundo",
+      question: "Formatos em alta no nicho",
+      value: data.diagFormatosAlta.trim(),
+    },
+    {
+      step: "Diagnóstico Estratégico Profundo",
+      question: "Retenção (as pessoas assistem até o fim? salvam?)",
+      value: data.diagRetencao.trim(),
+    },
+    {
+      step: "Diagnóstico Estratégico Profundo",
+      question: "Linguagem / tom de voz",
+      value: data.diagLinguagem.trim(),
+    },
+    {
+      step: "Diagnóstico Estratégico Profundo",
+      question: "Formatos que mais usa",
+      value: data.diagFormatos.trim(),
+    },
+    {
+      step: "Diagnóstico Estratégico Profundo",
+      question: "Diferenciação (o que te separa dos outros perfis)",
+      value: data.diagDiferenciacao.trim(),
     },
     {
       step: "Monetização",
@@ -489,12 +614,13 @@ function IntroScreen({
           Antes da sua call, preciso te conhecer.
         </h1>
         <p className="mt-6 text-neutral-600 text-[17px] leading-relaxed">
-          Esse questionário é a <strong className="text-neutral-900">Etapa 1</strong>{" "}
-          da mentoria. As suas respostas vão direto pro Augusto e são a base da
-          sua sessão estratégica.
+          Esse questionário cobre a <strong className="text-neutral-900">Etapa 1</strong>{" "}
+          (seu contexto) e o <strong className="text-neutral-900">Diagnóstico
+          Estratégico Profundo (Etapa 2)</strong>. As suas respostas vão direto
+          pro Augusto e são a base da sua sessão estratégica.
         </p>
         <p className="mt-3 text-neutral-600 text-[17px] leading-relaxed">
-          Reserve uns <strong className="text-neutral-900">8 a 12 minutos</strong>{" "}
+          Reserve uns <strong className="text-neutral-900">15 a 20 minutos</strong>{" "}
           e responda com sinceridade — quanto mais específico, mais útil.
         </p>
 
@@ -702,6 +828,33 @@ function StepBody({
           data={data}
           errors={errors}
           setField={setField}
+        />
+      );
+    case "diag-perfil":
+      return (
+        <DiagPerfilStep
+          data={data}
+          errors={errors}
+          setField={setField}
+          onSubmit={onSubmit}
+        />
+      );
+    case "diag-concorrentes":
+      return (
+        <DiagConcorrentesStep
+          data={data}
+          errors={errors}
+          setField={setField}
+          onSubmit={onSubmit}
+        />
+      );
+    case "diag-conteudo":
+      return (
+        <DiagConteudoStep
+          data={data}
+          errors={errors}
+          setField={setField}
+          onSubmit={onSubmit}
         />
       );
     case "monetizacao":
@@ -946,6 +1099,232 @@ function PosicionamentoStep({
           value={data.posicionamento}
           onChange={(v) => setField("posicionamento", v)}
           error={errors.posicionamento}
+        />
+      </div>
+    </div>
+  );
+}
+
+// -- Etapa 2 · Diagnóstico Estratégico Profundo --
+
+function DiagKicker() {
+  return (
+    <p className="text-xs uppercase tracking-[0.18em] text-fuchsia-600 font-semibold mb-3">
+      Etapa 2 · Diagnóstico Estratégico Profundo
+    </p>
+  );
+}
+
+function DiagPerfilStep({
+  data,
+  errors,
+  setField,
+  onSubmit,
+}: {
+  data: FormData;
+  errors: Errors;
+  setField: <K extends keyof FormData>(key: K, value: FormData[K]) => void;
+  onSubmit: () => void;
+}) {
+  return (
+    <div>
+      <DiagKicker />
+      <StepTitle>Vamos olhar pro seu perfil de perto.</StepTitle>
+      <StepHelper>
+        Esse é o ponto de partida do diagnóstico. Descreva como seu perfil está
+        hoje e cole sua bio do jeitinho que ela aparece.
+      </StepHelper>
+
+      <div className="mt-8">
+        <TextareaField
+          label="Como seu perfil está hoje?"
+          helper="Primeira impressão de quem chega: foto, nome, destaques, feed. Seja crítico."
+          value={data.diagPerfil}
+          onChange={(v) => setField("diagPerfil", v)}
+          error={errors.diagPerfil}
+          onSubmit={onSubmit}
+          minLen={30}
+          maxLen={1000}
+          rows={5}
+          placeholder="Ex: Foto boa, mas o nome não diz o que eu faço. Destaques desorganizados. Feed sem identidade visual clara..."
+          autoFocus
+        />
+      </div>
+
+      <div className="mt-10">
+        <TextareaField
+          label="Cole sua bio atual"
+          helper="O texto exato que está na sua bio do Instagram hoje."
+          value={data.diagBio}
+          onChange={(v) => setField("diagBio", v)}
+          error={errors.diagBio}
+          onSubmit={onSubmit}
+          minLen={5}
+          maxLen={400}
+          rows={3}
+          placeholder="Ex: 🏋️‍♀️ Treino em casa pra mães | Sem equipamento | Link do app ↓"
+        />
+      </div>
+    </div>
+  );
+}
+
+function DiagConcorrentesStep({
+  data,
+  errors,
+  setField,
+  onSubmit,
+}: {
+  data: FormData;
+  errors: Errors;
+  setField: <K extends keyof FormData>(key: K, value: FormData[K]) => void;
+  onSubmit: () => void;
+}) {
+  return (
+    <div>
+      <DiagKicker />
+      <StepTitle>Quem é referência no seu nicho?</StepTitle>
+      <StepHelper>
+        Liste os perfis e anote o que você observa neles. Quanto mais afiada a
+        sua leitura do nicho, mais preciso o diagnóstico.
+      </StepHelper>
+
+      <div className="mt-8">
+        <TextareaField
+          label="Instagram dos concorrentes (@)"
+          helper="Cole o @ (ou o link) de 2 a 4 perfis do seu nicho que você admira ou compete diretamente."
+          value={data.diagConcorrentes}
+          onChange={(v) => setField("diagConcorrentes", v)}
+          error={errors.diagConcorrentes}
+          onSubmit={onSubmit}
+          minLen={6}
+          maxLen={600}
+          rows={3}
+          placeholder="Ex: @perfil1, @perfil2, @perfil3"
+          autoFocus
+        />
+      </div>
+
+      <div className="mt-10 grid gap-6">
+        <TextareaField
+          label="O que funciona no nicho?"
+          value={data.diagNichoFunciona}
+          onChange={(v) => setField("diagNichoFunciona", v)}
+          error={errors.diagNichoFunciona}
+          onSubmit={onSubmit}
+          minLen={10}
+          maxLen={600}
+          rows={2}
+          placeholder="O tipo de conteúdo que sempre engaja nesse nicho."
+        />
+        <TextareaField
+          label="Padrões virais que você percebe"
+          value={data.diagPadroesVirais}
+          onChange={(v) => setField("diagPadroesVirais", v)}
+          error={errors.diagPadroesVirais}
+          onSubmit={onSubmit}
+          minLen={10}
+          maxLen={600}
+          rows={2}
+          placeholder="Ganchos, temas ou formatos que se repetem nos vídeos que estouram."
+        />
+        <TextareaField
+          label="Oportunidades / brechas"
+          value={data.diagOportunidades}
+          onChange={(v) => setField("diagOportunidades", v)}
+          error={errors.diagOportunidades}
+          onSubmit={onSubmit}
+          minLen={10}
+          maxLen={600}
+          rows={2}
+          placeholder="O que ninguém está fazendo direito e você poderia ocupar."
+        />
+        <TextareaField
+          label="Formatos em alta no nicho"
+          value={data.diagFormatosAlta}
+          onChange={(v) => setField("diagFormatosAlta", v)}
+          error={errors.diagFormatosAlta}
+          onSubmit={onSubmit}
+          minLen={10}
+          maxLen={600}
+          rows={2}
+          placeholder="Ex: Reels de bastidores, carrossel de listas, lives semanais..."
+        />
+      </div>
+    </div>
+  );
+}
+
+function DiagConteudoStep({
+  data,
+  errors,
+  setField,
+  onSubmit,
+}: {
+  data: FormData;
+  errors: Errors;
+  setField: <K extends keyof FormData>(key: K, value: FormData[K]) => void;
+  onSubmit: () => void;
+}) {
+  return (
+    <div>
+      <DiagKicker />
+      <StepTitle>Seu conteúdo e o que te torna único.</StepTitle>
+      <StepHelper>
+        Responda cada campo com sinceridade. A diferenciação é a peça-chave do
+        diagnóstico — capricha nela.
+      </StepHelper>
+
+      <div className="mt-8 grid gap-6">
+        <TextareaField
+          label="Retenção"
+          helper="As pessoas assistem até o fim? Salvam? Compartilham? O que você percebe."
+          value={data.diagRetencao}
+          onChange={(v) => setField("diagRetencao", v)}
+          error={errors.diagRetencao}
+          onSubmit={onSubmit}
+          minLen={10}
+          maxLen={800}
+          rows={2}
+          placeholder="Ex: Boa retenção nos primeiros 3s, mas cai forte no meio do vídeo."
+          autoFocus
+        />
+        <TextareaField
+          label="Linguagem / tom de voz"
+          value={data.diagLinguagem}
+          onChange={(v) => setField("diagLinguagem", v)}
+          error={errors.diagLinguagem}
+          onSubmit={onSubmit}
+          minLen={10}
+          maxLen={800}
+          rows={2}
+          placeholder="Ex: Direto e provocador / acolhedor e didático / bem-humorado..."
+        />
+        <TextareaField
+          label="Formatos que mais usa"
+          value={data.diagFormatos}
+          onChange={(v) => setField("diagFormatos", v)}
+          error={errors.diagFormatos}
+          onSubmit={onSubmit}
+          minLen={10}
+          maxLen={800}
+          rows={2}
+          placeholder="Ex: 70% Reels, 20% carrossel, stories diários."
+        />
+      </div>
+
+      <div className="mt-10">
+        <TextareaField
+          label="O que te diferencia dos outros perfis do nicho?"
+          why="Sem diferenciação clara você vira mais um. É daqui que sai o seu posicionamento."
+          value={data.diagDiferenciacao}
+          onChange={(v) => setField("diagDiferenciacao", v)}
+          error={errors.diagDiferenciacao}
+          onSubmit={onSubmit}
+          minLen={20}
+          maxLen={1000}
+          rows={4}
+          placeholder="Ex: Sou a única que mostra o treino com o bebê no colo, em tempo real, sem edição perfeitinha."
         />
       </div>
     </div>
