@@ -6,11 +6,10 @@ import { getPayload } from "payload";
 import config from "@payload-config";
 import { db, analises } from "@/lib/db";
 import type { AnaliseGeradaConteudo } from "@/components/proposta/types";
-import { ValorNaMesaSection } from "@/components/proposta/sections/ValorNaMesaSection";
 import { MaturidadeSlider } from "@/components/proposta/sections/MaturidadeSlider";
 import { RadarPilares } from "@/components/proposta/sections/RadarPilares";
 import { PilaresCards } from "@/components/proposta/sections/PilaresCards";
-import { CtaTeaserSection } from "@/components/proposta/sections/CtaTeaserSection";
+import { CtaCallSection } from "@/components/proposta/sections/CtaCallSection";
 import { TeamTestimonialSection } from "@/components/sections/TeamTestimonialSection";
 import { AnaliseTracker } from "./AnaliseTracker";
 
@@ -98,13 +97,10 @@ export default async function AnaliseSlugPage({ params, searchParams }: PageProp
         variante={data.variante ?? "empresa"}
         modelo={data.modelo ?? "cash_on_delivery"}
       />
-      {data.economiaPrevista && (
-        <ValorNaMesaSection totais={data.economiaPrevista.totais} />
-      )}
       {data.pilares && <MaturidadeSlider pilares={data.pilares} />}
       {data.pilares && <RadarPilares pilares={data.pilares} />}
       {data.pilares && <PilaresCards pilares={data.pilares} />}
-      <CtaTeaserSection agendaUrl={data.agendaUrl} />
+      <CtaCallSection />
       <TeamTestimonialSection />
     </main>
   );

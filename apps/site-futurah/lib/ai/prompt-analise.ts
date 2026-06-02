@@ -26,8 +26,8 @@ O eixo do diagnóstico é MARKETING IA-FIRST (crescimento): aquisição, convers
 1. "aquisicao" — Aquisição. Geração de leads, canais, tráfego, previsibilidade de demanda.
    - Score baixo (0-3) se gargalo="trafego", canais="nao-sei", ou volume="nao-medido". Médio (4-6) se canais depende só de "indicacao" (frágil) ou volume baixo ("ate-10"). Alto (7-8) se já tem tráfego pago rodando ("pago") + volume robusto ("50-200"/"200+"). Calibrar pra baixo quando momento="validacao".
 
-2. "posicionamento" — Posicionamento e Marca. Clareza de oferta, percepção de valor, produção de conteúdo.
-   - Score baixo (0-3) se gargalo="posicionamento" ou conteudo="quase-nao". Médio (4-6) se conteudo="eu" (depende do dono) ou "agencia". Alto (6-8) se conteudo="equipe" e momento="escala". Validacao tende a baixo (3-5).
+2. "posicionamento" — Posicionamento e Marca. Clareza de oferta, percepção de valor.
+   - Score baixo (0-3) se gargalo="posicionamento". Médio (4-6) na maioria dos casos. Validacao tende a baixo (3-5), escala tende a alto (6-8).
 
 3. "processo-comercial" — Processo Comercial. Velocidade de resposta ao lead, follow-up, conversão.
    - ESTE pilar é dominado pelo tempo de resposta. resposta="sem-processo" → 0-2. "dia-seguinte" → 2-4. "horas" → 5-6. "minutos" → 7-9. Ajustar pra baixo se gargalo="processo".
@@ -118,16 +118,6 @@ function descrevVolume(v: string): string {
   return map[v] ?? v;
 }
 
-function descrevConteudo(v: string): string {
-  const map: Record<string, string> = {
-    eu: "produz o próprio conteúdo quando dá tempo",
-    equipe: "tem equipe/social media produzindo",
-    agencia: "terceiriza numa agência",
-    "quase-nao": "quase não produz conteúdo",
-  };
-  return map[v] ?? v;
-}
-
 function descrevResposta(v: string): string {
   const map: Record<string, string> = {
     minutos: "responde leads em minutos",
@@ -194,7 +184,6 @@ ${
   m
     ? `- Canais de aquisição: ${descrevCanais(m.canais)}
 - Volume de leads: ${descrevVolume(m.volume)}
-- Produção de conteúdo: ${descrevConteudo(m.conteudo)}
 - Tempo de resposta ao lead: ${descrevResposta(m.resposta)}
 - Maturidade em IA: ${descrevIaHoje(m.iaHoje)}
 - Investimento mensal em operação: ${descrevInvestimento(m.investimentoFaixa)}${

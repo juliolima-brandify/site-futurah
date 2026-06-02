@@ -2,27 +2,28 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import {
+  WHATSAPP_FUNDADOR_DISPLAY,
+  whatsappFundadorLink,
+  WHATSAPP_MSG_CALL,
+} from '@/lib/contato';
 
+// Ordem do funil (validada por pesquisa de quiz funnels): abre com perguntas
+// fáceis pra criar momentum, deixa os deal-breakers (investimento, prontidão)
+// pro fim, e captura o contato logo antes de liberar o diagnóstico.
 type StepKey =
   | 'analise'
   | 'momento'
   | 'canais'
-  | 'volume'
-  | 'conteudo'
-  | 'resposta'
   | 'gargalo'
+  | 'volume'
+  | 'resposta'
   | 'ia-hoje'
   | 'investimento'
   | 'velocidade'
-  | 'nome'
-  | 'email'
-  | 'whatsapp';
+  | 'contato';
 
-// WhatsApp de um dos fundadores — CTA de contato direto no fim do wizard.
-const WHATSAPP_FUNDADOR_DISPLAY = '+55 34 99254-8114';
-const WHATSAPP_FUNDADOR_LINK =
-  'https://wa.me/5534992548114?text=' +
-  encodeURIComponent('Oi! Acabei de fazer o diagnóstico no site e queria falar com um fundador.');
+const WHATSAPP_LINK = whatsappFundadorLink(WHATSAPP_MSG_CALL);
 
 const optionsMomento = [
   {
@@ -53,28 +54,6 @@ const optionsCanais = [
   { value: 'nao-sei', label: 'Não sei dizer — é inconstante' },
 ];
 
-const optionsVolume = [
-  { value: 'ate-10', label: 'Até 10 por mês' },
-  { value: '10-50', label: '10 a 50 por mês' },
-  { value: '50-200', label: '50 a 200 por mês' },
-  { value: '200+', label: 'Mais de 200 por mês' },
-  { value: 'nao-medido', label: 'Não meço isso' },
-];
-
-const optionsConteudo = [
-  { value: 'eu', label: 'Eu mesmo, quando dá tempo' },
-  { value: 'equipe', label: 'Tenho equipe / social media' },
-  { value: 'agencia', label: 'Agência terceirizada' },
-  { value: 'quase-nao', label: 'Quase não produzo' },
-];
-
-const optionsResposta = [
-  { value: 'minutos', label: 'Em minutos' },
-  { value: 'horas', label: 'Em algumas horas' },
-  { value: 'dia-seguinte', label: 'No dia seguinte ou mais' },
-  { value: 'sem-processo', label: 'Não tenho processo definido' },
-];
-
 const optionsGargalo = [
   {
     value: 'trafego',
@@ -98,6 +77,21 @@ const optionsGargalo = [
   },
 ];
 
+const optionsVolume = [
+  { value: 'ate-10', label: 'Até 10 por mês' },
+  { value: '10-50', label: '10 a 50 por mês' },
+  { value: '50-200', label: '50 a 200 por mês' },
+  { value: '200+', label: 'Mais de 200 por mês' },
+  { value: 'nao-medido', label: 'Não meço isso' },
+];
+
+const optionsResposta = [
+  { value: 'minutos', label: 'Em minutos' },
+  { value: 'horas', label: 'Em algumas horas' },
+  { value: 'dia-seguinte', label: 'No dia seguinte ou mais' },
+  { value: 'sem-processo', label: 'Não tenho processo definido' },
+];
+
 const optionsIaHoje = [
   { value: 'nunca', label: 'Nunca usei' },
   { value: 'frustrou', label: 'Já tentei e me frustrei' },
@@ -113,12 +107,10 @@ const optionsInvestimento = [
   { value: '50k+', label: 'Acima de R$ 50 mil' },
 ];
 
-const areasInvestimento = [
-  { value: 'comercial', label: 'Time comercial / vendas' },
-  { value: 'atendimento', label: 'Atendimento / suporte' },
-  { value: 'trafego', label: 'Gestão de tráfego' },
-  { value: 'conteudo', label: 'Produção de conteúdo' },
-  { value: 'ferramentas', label: 'Ferramentas / SaaS' },
+const optionsVelocidade = [
+  { value: 'prioridade', label: 'Sim, é prioridade total.' },
+  { value: 'validar', label: 'Sim, mas preciso validar o investimento.' },
+  { value: 'pesquisando', label: 'Não, estou apenas pesquisando mercado.' },
 ];
 
 const OptionCard: React.FC<{
@@ -145,24 +137,6 @@ const OptionCard: React.FC<{
   </button>
 );
 
-const ChipOption: React.FC<{
-  label: string;
-  selected?: boolean;
-  onClick?: () => void;
-}> = ({ label, selected, onClick }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className={`px-4 py-2 rounded-full text-[13px] font-medium border transition-all ${
-      selected
-        ? 'border-[#0B2FFF] bg-[#0B2FFF] text-white'
-        : 'border-black/15 bg-white text-black/70 hover:border-black/30'
-    }`}
-  >
-    {label}
-  </button>
-);
-
 const QuestionTitle: React.FC<{ children: React.ReactNode; eyebrow?: string }> = ({
   children,
   eyebrow,
@@ -179,6 +153,9 @@ const QuestionTitle: React.FC<{ children: React.ReactNode; eyebrow?: string }> =
   </div>
 );
 
+const inputClass =
+  'w-full px-4 py-4 rounded-xl border border-black/10 focus:outline-none focus:ring-2 focus:ring-[#0B2FFF]/30 text-[16px]';
+
 export default function ApplicationWizard() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -186,13 +163,11 @@ export default function ApplicationWizard() {
   const [siteName, setSiteName] = useState('');
   const [momento, setMomento] = useState('');
   const [canais, setCanais] = useState('');
-  const [volume, setVolume] = useState('');
-  const [conteudo, setConteudo] = useState('');
-  const [resposta, setResposta] = useState('');
   const [gargalo, setGargalo] = useState('');
+  const [volume, setVolume] = useState('');
+  const [resposta, setResposta] = useState('');
   const [iaHoje, setIaHoje] = useState('');
   const [investimentoFaixa, setInvestimentoFaixa] = useState('');
-  const [investimentoAreas, setInvestimentoAreas] = useState<string[]>([]);
   const [velocidade, setVelocidade] = useState('');
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
@@ -213,25 +188,21 @@ export default function ApplicationWizard() {
     if (emailQ) setEmail(emailQ);
   }, [searchParams]);
 
-  const stepKeys: StepKey[] = useMemo(() => {
-    const base: StepKey[] = [
+  const stepKeys: StepKey[] = useMemo(
+    () => [
       'analise',
       'momento',
       'canais',
-      'volume',
-      'conteudo',
-      'resposta',
       'gargalo',
+      'volume',
+      'resposta',
       'ia-hoje',
       'investimento',
       'velocidade',
-    ];
-    const contato: StepKey[] = [];
-    if (!nameFromUrl) contato.push('nome');
-    if (!emailFromUrl) contato.push('email');
-    contato.push('whatsapp');
-    return [...base, ...contato];
-  }, [nameFromUrl, emailFromUrl]);
+      'contato',
+    ],
+    [],
+  );
 
   const [stepIndex, setStepIndex] = useState(0);
   const currentStep = stepKeys[stepIndex];
@@ -241,6 +212,16 @@ export default function ApplicationWizard() {
     [stepIndex, stepKeys.length],
   );
 
+  // Campos de contato que ainda faltam (nome/email podem vir da URL via home).
+  const precisaNome = !nameFromUrl;
+  const precisaEmail = !emailFromUrl;
+
+  const contatoOk = useMemo(() => {
+    if (precisaNome && nome.trim().length === 0) return false;
+    if (precisaEmail && !/\S+@\S+\.\S+/.test(email.trim())) return false;
+    return whatsapp.trim().length >= 8;
+  }, [precisaNome, precisaEmail, nome, email, whatsapp]);
+
   const canAdvance = useMemo(() => {
     switch (currentStep) {
       case 'analise':
@@ -249,26 +230,20 @@ export default function ApplicationWizard() {
         return momento !== '';
       case 'canais':
         return canais !== '';
-      case 'volume':
-        return volume !== '';
-      case 'conteudo':
-        return conteudo !== '';
-      case 'resposta':
-        return resposta !== '';
       case 'gargalo':
         return gargalo !== '';
+      case 'volume':
+        return volume !== '';
+      case 'resposta':
+        return resposta !== '';
       case 'ia-hoje':
         return iaHoje !== '';
       case 'investimento':
         return investimentoFaixa !== '';
       case 'velocidade':
         return velocidade !== '';
-      case 'nome':
-        return nome.trim().length > 0;
-      case 'email':
-        return /\S+@\S+\.\S+/.test(email.trim());
-      case 'whatsapp':
-        return whatsapp.trim().length >= 8;
+      case 'contato':
+        return contatoOk;
       default:
         return false;
     }
@@ -277,16 +252,13 @@ export default function ApplicationWizard() {
     siteName,
     momento,
     canais,
-    volume,
-    conteudo,
-    resposta,
     gargalo,
+    volume,
+    resposta,
     iaHoje,
     investimentoFaixa,
     velocidade,
-    nome,
-    email,
-    whatsapp,
+    contatoOk,
   ]);
 
   useEffect(() => {
@@ -311,18 +283,12 @@ export default function ApplicationWizard() {
 
   const goBack = () => setStepIndex((idx) => Math.max(idx - 1, 0));
 
-  const toggleArea = (value: string) => {
-    setInvestimentoAreas((prev) =>
-      prev.includes(value) ? prev.filter((a) => a !== value) : [...prev, value],
-    );
-  };
-
   const submitAplicacao = async () => {
     if (submitting) return;
     setSubmitError(null);
 
     if (!canAdvance) {
-      setSubmitError('Preencha o campo antes de enviar.');
+      setSubmitError('Preencha os campos antes de continuar.');
       return;
     }
 
@@ -337,11 +303,11 @@ export default function ApplicationWizard() {
       marketing: {
         canais,
         volume,
-        conteudo,
+        conteudo: '',
         resposta,
         iaHoje,
         investimentoFaixa,
-        investimentoAreas,
+        investimentoAreas: [],
       },
     };
 
@@ -367,7 +333,6 @@ export default function ApplicationWizard() {
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key !== 'Enter') return;
-    // não avança quando estiver num textarea ou em step com input livre múltiplo
     if (event.target instanceof HTMLTextAreaElement) return;
     if (currentStep === 'analise') {
       event.preventDefault();
@@ -415,8 +380,8 @@ export default function ApplicationWizard() {
               </QuestionTitle>
               <p className="text-black/60 text-[15px] text-center max-w-[520px] mx-auto">
                 Comece pelo site ou @instagram do seu negócio. São poucas
-                perguntas — no fim você recebe um diagnóstico do seu funil e de
-                onde a IA pode destravar crescimento.
+                perguntas — no fim você vê uma prévia do seu diagnóstico e fala
+                com a gente pra destravar o crescimento.
               </p>
 
               <div className="flex flex-col gap-3 max-w-[480px] mx-auto">
@@ -426,7 +391,7 @@ export default function ApplicationWizard() {
                   onChange={(event) => setSiteName(event.target.value)}
                   placeholder="Cole o site ou @instagram"
                   autoFocus
-                  className="w-full px-4 py-4 rounded-xl border border-black/10 focus:outline-none focus:ring-2 focus:ring-[#0B2FFF]/30 text-[16px]"
+                  className={inputClass}
                 />
                 <button
                   type="button"
@@ -468,7 +433,7 @@ export default function ApplicationWizard() {
 
           {currentStep === 'canais' && (
             <div className="space-y-6">
-              <QuestionTitle eyebrow="Aquisição · 1/3">
+              <QuestionTitle eyebrow="Aquisição">
                 De onde vêm seus clientes hoje?
               </QuestionTitle>
               <div className="grid gap-3 max-w-[560px] mx-auto w-full">
@@ -484,9 +449,28 @@ export default function ApplicationWizard() {
             </div>
           )}
 
+          {currentStep === 'gargalo' && (
+            <div className="space-y-6">
+              <QuestionTitle eyebrow="Seu maior gargalo">
+                O que mais trava o crescimento da sua empresa hoje?
+              </QuestionTitle>
+              <div className="grid gap-3 max-w-[560px] mx-auto w-full">
+                {optionsGargalo.map((option) => (
+                  <OptionCard
+                    key={option.value}
+                    title={option.label}
+                    description={option.note}
+                    selected={gargalo === option.value}
+                    onClick={() => setGargalo(option.value)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
           {currentStep === 'volume' && (
             <div className="space-y-6">
-              <QuestionTitle eyebrow="Aquisição · 2/3">
+              <QuestionTitle eyebrow="Aquisição">
                 Quantos leads novos você recebe por mês?
               </QuestionTitle>
               <div className="grid gap-3 grid-cols-1 md:grid-cols-2 max-w-[560px] mx-auto w-full">
@@ -502,27 +486,9 @@ export default function ApplicationWizard() {
             </div>
           )}
 
-          {currentStep === 'conteudo' && (
-            <div className="space-y-6">
-              <QuestionTitle eyebrow="Aquisição · 3/3">
-                Quem produz seu conteúdo e com que frequência?
-              </QuestionTitle>
-              <div className="grid gap-3 max-w-[560px] mx-auto w-full">
-                {optionsConteudo.map((option) => (
-                  <OptionCard
-                    key={option.value}
-                    title={option.label}
-                    selected={conteudo === option.value}
-                    onClick={() => setConteudo(option.value)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
           {currentStep === 'resposta' && (
             <div className="space-y-6">
-              <QuestionTitle eyebrow="Conversão · 1/2">
+              <QuestionTitle eyebrow="Conversão">
                 Quando um lead chega, em quanto tempo ele é respondido?
               </QuestionTitle>
               <div className="grid gap-3 grid-cols-1 md:grid-cols-2 max-w-[560px] mx-auto w-full">
@@ -532,25 +498,6 @@ export default function ApplicationWizard() {
                     title={option.label}
                     selected={resposta === option.value}
                     onClick={() => setResposta(option.value)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {currentStep === 'gargalo' && (
-            <div className="space-y-6">
-              <QuestionTitle eyebrow="Conversão · 2/2">
-                O que mais trava o crescimento da sua empresa hoje?
-              </QuestionTitle>
-              <div className="grid gap-3 max-w-[560px] mx-auto w-full">
-                {optionsGargalo.map((option) => (
-                  <OptionCard
-                    key={option.value}
-                    title={option.label}
-                    description={option.note}
-                    selected={gargalo === option.value}
-                    onClick={() => setGargalo(option.value)}
                   />
                 ))}
               </div>
@@ -594,21 +541,6 @@ export default function ApplicationWizard() {
                   />
                 ))}
               </div>
-              <div className="max-w-[620px] mx-auto space-y-2">
-                <p className="text-[13px] text-black/50 text-center">
-                  Onde esse valor é mais concentrado? (opcional)
-                </p>
-                <div className="flex flex-wrap gap-2 justify-center">
-                  {areasInvestimento.map((area) => (
-                    <ChipOption
-                      key={area.value}
-                      label={area.label}
-                      selected={investimentoAreas.includes(area.value)}
-                      onClick={() => toggleArea(area.value)}
-                    />
-                  ))}
-                </div>
-              </div>
             </div>
           )}
 
@@ -619,17 +551,7 @@ export default function ApplicationWizard() {
                 você estaria pronto para começar?
               </QuestionTitle>
               <div className="grid gap-3 max-w-[560px] mx-auto w-full">
-                {[
-                  { value: 'prioridade', label: 'Sim, é prioridade total.' },
-                  {
-                    value: 'validar',
-                    label: 'Sim, mas preciso validar o investimento.',
-                  },
-                  {
-                    value: 'pesquisando',
-                    label: 'Não, estou apenas pesquisando mercado.',
-                  },
-                ].map((option) => (
+                {optionsVelocidade.map((option) => (
                   <OptionCard
                     key={option.value}
                     title={option.label}
@@ -641,59 +563,51 @@ export default function ApplicationWizard() {
             </div>
           )}
 
-          {currentStep === 'nome' && (
+          {currentStep === 'contato' && (
             <div className="space-y-6">
-              <QuestionTitle eyebrow="Contato">
-                Como prefere ser chamado?
+              <QuestionTitle eyebrow="Falta pouco">
+                Pra onde liberamos seu diagnóstico?
               </QuestionTitle>
-              <div className="max-w-[420px] mx-auto">
-                <input
-                  type="text"
-                  value={nome}
-                  onChange={(e) => setNome(e.target.value)}
-                  placeholder="Seu nome"
-                  autoFocus
-                  className="w-full px-4 py-4 rounded-xl border border-black/10 focus:outline-none focus:ring-2 focus:ring-[#0B2FFF]/30 text-[16px] text-center"
-                />
-              </div>
-            </div>
-          )}
-
-          {currentStep === 'email' && (
-            <div className="space-y-6">
-              <QuestionTitle eyebrow="Contato">
-                Qual o melhor e-mail pra te enviar o diagnóstico?
-              </QuestionTitle>
-              <div className="max-w-[420px] mx-auto">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="nome@empresa.com"
-                  autoFocus
-                  className="w-full px-4 py-4 rounded-xl border border-black/10 focus:outline-none focus:ring-2 focus:ring-[#0B2FFF]/30 text-[16px] text-center"
-                />
-              </div>
-            </div>
-          )}
-
-          {currentStep === 'whatsapp' && (
-            <div className="space-y-6">
-              <QuestionTitle eyebrow="Última etapa">
-                Pra qual WhatsApp enviamos seu diagnóstico?
-              </QuestionTitle>
-              <div className="max-w-[420px] mx-auto space-y-3">
+              <p className="text-[14px] text-black/55 text-center max-w-[460px] mx-auto">
+                Vamos enviar sua prévia e o convite pra call onde fazemos o
+                diagnóstico completo.
+              </p>
+              <div className="max-w-[440px] mx-auto space-y-3">
+                {precisaNome && (
+                  <input
+                    type="text"
+                    value={nome}
+                    onChange={(e) => setNome(e.target.value)}
+                    placeholder="Seu nome"
+                    autoFocus
+                    autoComplete="name"
+                    className={inputClass}
+                  />
+                )}
+                {precisaEmail && (
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="nome@empresa.com"
+                    autoFocus={!precisaNome}
+                    autoComplete="email"
+                    className={inputClass}
+                  />
+                )}
                 <input
                   type="tel"
                   value={whatsapp}
                   onChange={(e) => setWhatsapp(e.target.value)}
-                  placeholder="(11) 99999-9999"
-                  autoFocus
-                  className="w-full px-4 py-4 rounded-xl border border-black/10 focus:outline-none focus:ring-2 focus:ring-[#0B2FFF]/30 text-[16px] text-center"
+                  placeholder="WhatsApp — (11) 99999-9999"
+                  autoFocus={!precisaNome && !precisaEmail}
+                  autoComplete="tel"
+                  inputMode="numeric"
+                  className={inputClass}
                 />
-                <p className="text-[13px] text-black/50 text-center">
-                  Usado apenas para entregar seu diagnóstico e agendar a Sessão
-                  Estratégica.
+                <p className="text-[13px] text-black/45 text-center">
+                  Usamos só pra entregar seu diagnóstico e agendar a call. Sem
+                  spam.
                 </p>
               </div>
 
@@ -703,7 +617,7 @@ export default function ApplicationWizard() {
                   Futurah.
                 </p>
                 <a
-                  href={WHATSAPP_FUNDADOR_LINK}
+                  href={WHATSAPP_LINK}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 mt-3 px-5 py-2.5 rounded-xl border border-[#0B2FFF]/30 text-[#0B2FFF] font-medium text-[14px] hover:bg-[#F4F6FF] transition-colors"
@@ -748,7 +662,7 @@ export default function ApplicationWizard() {
                 disabled={!canAdvance || submitting}
                 className="px-6 py-3 rounded-xl bg-[#111] text-white font-medium hover:bg-[#0B2FFF] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {submitting ? 'Enviando...' : 'Ver meu diagnóstico ➔'}
+                {submitting ? 'Gerando...' : 'Ver minha prévia ➔'}
               </button>
             )}
           </div>
