@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Inteligência Competitiva — Nicho Nutrição | Creator Elite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16140F; --ink-2:#3A362E; --muted:#6E6857; --line:#E0DBCF;
+    --paper:#F6F3EC; --card:#FFFFFF; --lima:#DCFF69; --blue:#0B2FFF;
+    --red:#E5484D; --amber:#F0A52B; --green:#3F9E54;
+    --red-soft:#FBE9E9; --amber-soft:#FBF1DF; --green-soft:#E7F3E9;
+    --shadow:0 1px 2px rgba(20,18,12,.04),0 8px 24px rgba(20,18,12,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Manrope',system-ui,sans-serif;color:var(--ink-2);background:var(--paper);line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:980px;margin:0 auto;padding:0 24px}
+
+  .hero{background:var(--ink);color:#F6F3EC;padding:72px 0 64px;position:relative;overflow:hidden}
+  .hero::after{content:"";position:absolute;inset:0;background:radial-gradient(900px 400px at 85% -10%, rgba(220,255,105,.14), transparent 60%);pointer-events:none}
+  .eyebrow{font-size:12px;letter-spacing:.22em;text-transform:uppercase;font-weight:700;color:var(--lima);margin-bottom:20px}
+  .hero h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(34px,5.4vw,56px);line-height:1.04;letter-spacing:-.02em;color:#FFF;margin-bottom:18px}
+  .hero h1 em{font-style:italic;color:var(--lima)}
+  .hero .sub{font-size:18px;color:#CFC9BB;max-width:700px}
+  .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+  .chip{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:#E8E3D6;border-radius:100px;padding:7px 15px;font-size:13px;font-weight:600}
+  .chip b{color:#FFF}
+
+  section{padding:56px 0}
+  .div{height:1px;background:var(--line);max-width:980px;margin:0 auto}
+  .kicker{display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--muted);margin-bottom:14px}
+  .kicker .dot{width:7px;height:7px;border-radius:50%;background:var(--lima);box-shadow:0 0 0 4px rgba(220,255,105,.3)}
+  h2{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(26px,3.6vw,38px);line-height:1.12;letter-spacing:-.015em;color:var(--ink);margin-bottom:14px}
+  h3{font-family:'Manrope';font-weight:800;font-size:19px;color:var(--ink);margin:28px 0 12px;letter-spacing:-.01em}
+  p.lead{font-size:17px;color:var(--ink-2);max-width:780px;margin-bottom:8px}
+  p{margin-bottom:12px}
+
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:var(--shadow)}
+  .card h4{font-size:15px;font-weight:800;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;gap:9px}
+  .card ul{list-style:none;margin-top:8px}
+  .card li{position:relative;padding-left:20px;margin-bottom:7px;font-size:14.5px}
+  .card li::before{content:"";position:absolute;left:2px;top:9px;width:6px;height:6px;border-radius:50%;background:var(--blue)}
+  .ico{width:30px;height:30px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-size:15px;flex:0 0 auto}
+
+  /* KPIs / cards concorrente */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:8px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;text-align:center}
+  .kpi .h{font-weight:800;font-size:13px;color:var(--ink);margin-bottom:10px}
+  .kpi .n{font-family:'Fraunces',serif;font-size:26px;font-weight:700;color:var(--ink);line-height:1}
+  .kpi .l{font-size:11.5px;color:var(--muted);margin-top:6px;font-weight:600}
+  .kpi .n2{font-size:14px;color:var(--blue);font-weight:800;margin-top:8px}
+
+  .comp-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:8px}
+  .comp{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:var(--shadow);position:relative}
+  .comp .rank{position:absolute;top:18px;right:20px;font-family:'Fraunces',serif;font-weight:700;font-size:13px;color:#fff;background:var(--ink);width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center}
+  .comp .at{font-weight:800;color:var(--ink);font-size:17px}
+  .comp .nm{font-size:13px;color:var(--muted);margin-bottom:4px}
+  .comp .stats{display:flex;gap:14px;margin:12px 0 14px;flex-wrap:wrap}
+  .comp .stat{font-size:12px;color:var(--muted)}
+  .comp .stat b{display:block;font-family:'Fraunces',serif;font-size:18px;color:var(--ink);font-weight:700}
+  .comp .role{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--blue);margin-bottom:6px}
+  .comp .desc{font-size:14px;color:var(--ink-2)}
+  .comp .tagline{font-style:italic;font-family:'Fraunces',serif;font-size:15px;color:var(--ink);margin:8px 0}
+
+  /* matriz posicionamento */
+  .matrix-wrap{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:var(--shadow);margin-top:20px}
+
+  /* tabela de forças (barras) */
+  .force-tbl{display:flex;flex-direction:column;gap:18px;margin-top:20px}
+  .force-row .ft-h{font-weight:800;font-size:14px;color:var(--ink);margin-bottom:10px}
+  .force-bars{display:grid;grid-template-columns:160px 1fr;gap:8px 14px;align-items:center}
+  .force-bars .fb-name{font-size:13px;color:var(--ink-2);font-weight:600}
+  .force-bars .fb-track{background:#ECE8DD;border-radius:99px;height:18px;position:relative;overflow:hidden}
+  .force-bars .fb-fill{height:100%;border-radius:99px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:11px;font-weight:800;color:#fff}
+
+  .tag{display:inline-block;font-size:11px;font-weight:800;padding:3px 9px;border-radius:7px;letter-spacing:.02em}
+  .tag.crit{background:var(--red-soft);color:var(--red)} .tag.warn{background:var(--amber-soft);color:#B9791A} .tag.ok{background:var(--green-soft);color:var(--green)}
+
+  .callout{border-left:4px solid var(--blue);background:#EEF1FF;border-radius:0 14px 14px 0;padding:20px 22px;margin:8px 0 22px}
+  .callout h3{margin:0 0 6px;color:var(--blue);display:flex;align-items:center;gap:9px;font-size:17px}
+  .callout p{margin:0;font-size:14.5px;color:#26306b}
+  .alert{border-left:4px solid var(--amber);background:var(--amber-soft);border-radius:0 14px 14px 0;padding:20px 22px;margin:8px 0 22px}
+  .alert h3{margin:0 0 6px;color:#B9791A;display:flex;align-items:center;gap:9px;font-size:17px}
+  .alert p{margin:0;font-size:14.5px;color:#7c5a14}
+
+  .theme-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:16px}
+  .theme{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:16px 18px;box-shadow:var(--shadow)}
+  .theme .t{font-weight:800;color:var(--ink);font-size:14.5px;margin-bottom:4px;display:flex;gap:8px;align-items:center}
+  .theme .d{font-size:13px;color:var(--muted)}
+  .theme .freq{font-size:11px;font-weight:800;color:var(--blue);background:#EEF1FF;border-radius:6px;padding:2px 7px}
+
+  .repl{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:16px}
+  .repl .col{border-radius:16px;padding:22px}
+  .repl .do{background:var(--green-soft);border:1px solid #CDE6D2}
+  .repl .dont{background:var(--red-soft);border:1px solid #F2D4D5}
+  .repl h4{font-size:15px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .repl .do h4{color:#2E7D43} .repl .dont h4{color:#B0282C}
+  .repl ul{list-style:none} .repl li{position:relative;padding-left:22px;margin-bottom:10px;font-size:14px}
+  .repl .do li::before{content:"✓";position:absolute;left:0;color:var(--green);font-weight:800}
+  .repl .dont li::before{content:"✕";position:absolute;left:0;color:var(--red);font-weight:800}
+
+  /* tabs */
+  .tabbar{position:sticky;top:0;z-index:20;background:rgba(246,243,236,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .tabbar .wrap{display:flex;gap:8px;padding-top:12px;padding-bottom:12px}
+  .tab{font-family:'Manrope';font-weight:700;font-size:14px;color:var(--muted);background:none;border:1px solid transparent;cursor:pointer;padding:9px 18px;border-radius:100px;transition:.18s}
+  .tab:hover{color:var(--ink);background:rgba(20,18,12,.04)}
+  .tab[aria-selected="true"]{background:var(--ink);color:#F4F1E8;border-color:var(--ink)}
+  .tabpanel[hidden]{display:none}
+
+  /* reels list */
+  .rl-prof{margin-top:30px}
+  .rl-prof:first-child{margin-top:8px}
+  .rl-head{display:flex;align-items:baseline;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+  .rl-head .at{font-weight:800;color:var(--ink);font-size:18px}
+  .rl-head .mt{font-size:12.5px;color:var(--muted)}
+  .reel{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:14px 16px;box-shadow:var(--shadow);margin-bottom:10px}
+  .reel .mx{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:8px}
+  .reel .m{font-size:12px;color:var(--muted);font-weight:600}
+  .reel .m b{font-family:'Fraunces',serif;color:var(--ink);font-size:15px;margin-right:2px}
+  .reel .hook{font-size:14px;color:var(--ink-2)}
+  .reel .hook .lbl{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--blue);margin-right:6px}
+  .reel .cap{font-size:12.5px;color:var(--muted);margin-top:6px;font-style:italic}
+  .reel a{color:var(--blue);text-decoration:none;font-size:12px;font-weight:700}
+
+  footer{background:var(--ink);color:#B9B3A4;padding:40px 0;font-size:13px}
+  footer b{color:var(--lima)}
+
+  @media (max-width:760px){
+    .grid-2,.comp-grid,.theme-grid,.repl{grid-template-columns:1fr}
+    .kpis{grid-template-columns:1fr 1fr}
+    .force-bars{grid-template-columns:110px 1fr}
+  }
+  @media print{body{background:#fff}.hero,.callout,.alert{-webkit-print-color-adjust:exact;print-color-adjust:exact}section{padding:30px 0;break-inside:avoid}.comp,.card,.theme{break-inside:avoid}}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Creator Elite · Inteligência Competitiva</div>
+    <h1>Os 4 perfis que ela citou —<br><em>e a brecha que ninguém ocupa.</em></h1>
+    <p class="sub">Análise dos 80 reels mais recentes (20 por concorrente) que a mentorada listou como referência. O que viraliza no nicho, por que viraliza, e onde está o espaço em branco que o diferencial dela — vivência de obesidade e compulsão — pode dominar.</p>
+    <div class="meta-row">
+      <span class="chip"><b>4</b>&nbsp;concorrentes</span>
+      <span class="chip"><b>80</b>&nbsp;reels transcritos e analisados</span>
+      <span class="chip"><b>Nicho:</b>&nbsp;Nutrição / emagrecimento</span>
+      <span class="chip"><b>Objetivo:</b>&nbsp;10k → 30k</span>
+    </div>
+  </div>
+</header>
+
+<!-- TABS -->
+<nav class="tabbar" role="tablist" aria-label="Seções">
+  <div class="wrap">
+    <button class="tab" id="t-dossie" role="tab" aria-selected="true" aria-controls="tab-dossie">Dossiê competitivo</button>
+    <button class="tab" id="t-reels" role="tab" aria-selected="false" aria-controls="tab-reels">80 reels analisados</button>
+  </div>
+</nav>
+
+<!-- ============ PAINEL 1 ============ -->
+<div class="tabpanel" id="tab-dossie" role="tabpanel" aria-labelledby="t-dossie" tabindex="-1">
+
+<!-- 1. PANORAMA -->
+<section>
+  <div class="wrap">
+    <div class="kicker"><span class="dot"></span> Panorama</div>
+    <h2>O campeonato em que ela está jogando</h2>
+    <p class="lead">Quatro perfis, quatro tamanhos, quatro estratégias. A diferença de alcance entre eles não é sorte de algoritmo — é consequência direta de <b>persona e formato</b>. Mediana de plays = o número honesto (a média mente por causa de virais isolados).</p>
+    <div class="kpis">
+      <div class="kpi"><div class="h">@isabellalacerda_nutri</div><div class="n">1,63M</div><div class="l">seguidores</div><div class="n2">~310k plays (mediana)</div></div>
+      <div class="kpi"><div class="h">@nutriniquee</div><div class="n">198k</div><div class="l">seguidores</div><div class="n2">~67k plays (mediana)</div></div>
+      <div class="kpi"><div class="h">@nutri.dennisfugiwara</div><div class="n">186k</div><div class="l">seguidores</div><div class="n2">~38k plays (mediana)</div></div>
+      <div class="kpi"><div class="h">@lucaseducampos</div><div class="n">106k</div><div class="l">seguidores</div><div class="n2">~20k plays (mediana)</div></div>
+    </div>
+    <p style="margin-top:18px;font-size:14px;color:var(--muted)">Leitura rápida: <b>quanto mais entretenimento, maior o alcance.</b> Isabella (humor) tem 8x o seguidor de Monique e 5x a mediana. Lucas (técnico/denso) é o menor e o de menor alcance, apesar de autoridade alta. O mercado paga em alcance por <em>persona</em>, não por densidade de informação.</p>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- 2. MAPA DE POSICIONAMENTO -->
+<section>
+  <div class="wrap">
+    <div class="kicker"><span class="dot"></span> Quem é quem</div>
+    <h2>Mapa de posicionamento</h2>
+    <p class="lead">Cada um ocupa um arquétipo claro. Entender o arquétipo é entender o que copiar de cada um — e o que <b>não</b> tentar copiar.</p>
+    <div class="comp-grid" style="margin-top:22px">
+
+      <div class="comp">
+        <span class="rank">1</span>
+        <div class="at">@isabellalacerda_nutri</div>
+        <div class="nm">Isabella Lacerda · 1,63M</div>
+        <div class="stats">
+          <div class="stat"><b>~310k</b>mediana plays</div>
+          <div class="stat"><b>22,8k</b>likes médios</div>
+          <div class="stat"><b>625</b>coment. médios</div>
+        </div>
+        <div class="role">A Entertainer</div>
+        <div class="tagline">"A Nutri Sarcástica"</div>
+        <div class="desc">Nutrição é o pano de fundo; o produto é <b>entretenimento</b>. Reage a jogos de terror ("Sapella Games"), faz humor escrachado com palavrão, tem canal no YouTube e publis (Heinz, Growth). Viraliza com conteúdo que não é nem de nutrição (1,4M num react de game). Quando faz nutrição, embrulha em piada: "cardápio de água", "escala de bosta", "fruta é açúcar com embalagem bonita".</div>
+      </div>
+
+      <div class="comp">
+        <span class="rank">2</span>
+        <div class="at">@nutriniquee</div>
+        <div class="nm">Monique Fonseca · 198k</div>
+        <div class="stats">
+          <div class="stat"><b>~67k</b>mediana plays</div>
+          <div class="stat"><b>6,3k</b>likes médios</div>
+          <div class="stat"><b>168</b>coment. médios</div>
+        </div>
+        <div class="role">A Combatente</div>
+        <div class="tagline">"Burrice inflama"</div>
+        <div class="desc">Autoridade científica em modo de guerra contra a desinformação. Quase todo reel é um <b>react de refutação</b>: pega o vídeo de um "guru" e desmonta com evidência e indignação. Defende as canetas (Mojaro/Ozempic), ataca terrorismo nutricional e romantização da magreza. Forte em credibilidade; tom combativo cansa e gera concordância, não debate (comentários baixos pro alcance).</div>
+      </div>
+
+      <div class="comp">
+        <span class="rank">3</span>
+        <div class="at">@nutri.dennisfugiwara</div>
+        <div class="nm">Dennis Fugiwara · 186k</div>
+        <div class="stats">
+          <div class="stat"><b>~38k</b>mediana plays</div>
+          <div class="stat"><b>3,5k</b>likes médios</div>
+          <div class="stat"><b>175</b>coment. médios</div>
+        </div>
+        <div class="role">O Reativo Leve</div>
+        <div class="tagline">"sem sofrimento"</div>
+        <div class="desc">Nutrição esportiva (emagrecimento + hipertrofia). Vive de <b>dueto/react descontraído</b>: "tudo que como num dia", avaliando dietas de seguidoras e creators. Mais da metade dos reels analisados são reações a terceiros (vários com engajamento próprio baixo). Maior viral foi um vídeo de 3 segundos: "Pode me contratar, eu manjo." Carisma alto, conteúdo autoral baixo.</div>
+      </div>
+
+      <div class="comp">
+        <span class="rank">4</span>
+        <div class="at">@lucaseducampos</div>
+        <div class="nm">Lucas Eduardo Campos · 106k</div>
+        <div class="stats">
+          <div class="stat"><b>~20k</b>mediana plays</div>
+          <div class="stat"><b>1,5k</b>likes médios</div>
+          <div class="stat"><b>38</b>coment. médios</div>
+        </div>
+        <div class="role">O Técnico</div>
+        <div class="tagline">"SEM ACHISMO"</div>
+        <div class="desc">Ed. Física + Nutricionista. Conteúdo <b>denso e baseado em evidência</b>: resistência à insulina, lipedema, musculação x cardio, transtorno alimentar. Autoridade dupla altíssima, mas formato sóbrio e técnico limita o alcance — é o menor dos quatro. Notável: é o único que toca <b>comportamento e a "armadilha do shape dos sonhos"</b>, território da mentorada.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- 3. MATRIZ + RADAR DE FORÇAS -->
+<section>
+  <div class="wrap">
+    <div class="kicker"><span class="dot"></span> Onde está o espaço vazio</div>
+    <h2>O quadrante que ninguém ocupa</h2>
+    <p class="lead">Cruzando os dois eixos que mais importam neste nicho — <b>tom</b> (sóbrio ↔ entretenimento) e <b>relação com o público</b> (frieza técnica ↔ conexão por vivência) — aparece um espaço em branco no canto superior direito. É exatamente onde o diferencial da mentorada a coloca.</p>
+    <div class="matrix-wrap">
+      <svg id="matrix" viewBox="0 0 720 520" width="100%" role="img" aria-label="Matriz de posicionamento"></svg>
+    </div>
+    <p style="margin-top:14px;font-size:14px;color:var(--muted)">Ninguém combina <b>entretenimento/leveza</b> com <b>conexão de quem viveu o problema na pele</b>. Monique e Lucas têm autoridade mas frieza; Dennis tem leveza mas pouca profundidade emocional; Isabella tem entretenimento mas a persona é distância irônica, não acolhimento. A mentorada — ex-obesa (-40kg), ex-compulsão alimentar — é a única que pode falar de dentro.</p>
+
+    <h3>Força por eixo (0–10)</h3>
+    <div class="force-tbl" id="forces"></div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- 4. O QUE FUNCIONA -->
+<section>
+  <div class="wrap">
+    <div class="kicker"><span class="dot"></span> Padrões que se repetem</div>
+    <h2>O que faz um reel viralizar neste nicho</h2>
+    <p class="lead">Olhando os 80 reels juntos, os campeões de alcance seguem fórmulas claras e replicáveis — nenhuma delas exige edição elaborada.</p>
+    <div class="grid-2" style="margin-top:20px">
+      <div class="card">
+        <h4><span class="ico" style="background:var(--lima)">🎬</span> O REACT é o rei</h4>
+        <p style="font-size:14px">3 dos 4 vivem de reagir a conteúdo de terceiros — desmistificando com humor (Isabella), indignação (Monique) ou leveza (Dennis). É o formato de maior alcance e o <b>tecnicamente mais simples</b>: gravar reagindo a um vídeo na tela. Resolve direto a dor da mentorada ("não sei fazer vídeo dinâmico").</p>
+      </div>
+      <div class="card">
+        <h4><span class="ico" style="background:#FBE9E9">🔥</span> Polêmica + desinformação como combustível</h4>
+        <p style="font-size:14px">Pegar uma "fala absurda" viral (caneta, fruta, dieta carnívora, água com sal) e refutar. Entrega validação pro público que concorda + autoridade pra quem dá nome aos bois. Quase todo top reel começa com a frase polêmica do outro.</p>
+      </div>
+      <div class="card">
+        <h4><span class="ico" style="background:#EEF1FF">🎯</span> Gancho na primeira frase</h4>
+        <p style="font-size:14px">Sem aquecimento. Os virais abrem com a tese ou a provocação: "Fruta é açúcar com embalagem bonita", "Não existe vício em açúcar", "Construir massa muscular é sobre sobrevivência". A primeira frase carrega o vídeo inteiro.</p>
+      </div>
+      <div class="card">
+        <h4><span class="ico" style="background:#E7F3E9">💬</span> Persona &gt; informação</h4>
+        <p style="font-size:14px">O alcance segue a personalidade, não a densidade. Isabella prova: um react de game (zero nutrição) faz 1,4M. O nicho recompensa quem tem <b>jeito reconhecível</b>. A vivência da mentorada é a persona dela — não precisa inventar um personagem.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- 5. TEMAS / PAUTA -->
+<section>
+  <div class="wrap">
+    <div class="kicker"><span class="dot"></span> Pauta pronta</div>
+    <h2>Os temas que se repetem entre os 4</h2>
+    <p class="lead">Estes assuntos apareceram em vários perfis ao mesmo tempo — são as "ondas" quentes do nicho agora. Cada um é uma pauta que ela pode abordar pela ótica dela (comportamento + vivência), e não pela briga técnica.</p>
+    <div class="theme-grid">
+      <div class="theme"><div class="t"><span class="freq">4/4</span> Canetas emagrecedoras</div><div class="d">Mojaro / Ozempic / tirzepatida. Todos abordam — defesa, crítica, "verdades que ninguém conta". Ângulo dela: o que a caneta NÃO resolve (o comportamento por trás da compulsão).</div></div>
+      <div class="theme"><div class="t"><span class="freq">4/4</span> Fruta / açúcar / "vício"</div><div class="d">"Fruta é vilã?", "não existe vício em açúcar". Tema recorrente e polarizador. Ângulo dela: relação emocional com o doce em quem tem compulsão.</div></div>
+      <div class="theme"><div class="t"><span class="freq">3/4</span> Transtorno alimentar &amp; magreza tóxica</div><div class="d">Romantização da magreza, "shape dos sonhos que virou pesadelo", fisiculturismo que adoece. Território nobre da mentorada — ela viveu isso.</div></div>
+      <div class="theme"><div class="t"><span class="freq">3/4</span> Terrorismo nutricional / cortar alimentos</div><div class="d">Refutar quem demoniza pão, carbo, glúten. Ângulo dela: por que a restrição extrema alimenta a compulsão.</div></div>
+      <div class="theme"><div class="t"><span class="freq">3/4</span> Proteína / suplementação</div><div class="d">"Quanto de proteína", whey, creatina, "desejo de açúcar = falta de proteína". Mais técnico — usar com parcimônia.</div></div>
+      <div class="theme"><div class="t"><span class="freq">2/4</span> Dietas da moda (carnívora, da selva, jejum)</div><div class="d">React a dietas extremas e gurus. Ângulo dela: por que dietas radicais quebram quem já tem histórico de descontrole.</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- 6. A BRECHA -->
+<section>
+  <div class="wrap">
+    <div class="kicker"><span class="dot"></span> A jogada</div>
+    <h2>A brecha da mentorada</h2>
+    <div class="callout">
+      <h3>💡 O posicionamento que está livre</h3>
+      <p><b>"A nutri que esteve do outro lado."</b> Os 4 concorrentes falam SOBRE compulsão, obesidade e transtorno alimentar de fora — como observadores técnicos. A mentorada é a única que pode falar de DENTRO: perdeu 40kg, teve compulsão, e hoje atende exatamente esse público. É um diferencial impossível de copiar — e o nicho premia persona acima de tudo.</p>
+    </div>
+    <p class="lead">A tradução prática: ela não precisa vencer Monique na briga científica nem Isabella no humor. Ela pega <b>os mesmos temas quentes</b> (canetas, fruta, transtorno alimentar) no <b>mesmo formato campeão</b> (react simples), mas com a <b>única lente que ninguém tem</b>: a de quem sentou na cadeira do paciente.</p>
+    <div class="alert">
+      <h3>⚠️ Compliance é uma arma, não só um risco</h3>
+      <p>O nicho inteiro flerta com o limite do CFN — resultado de pacientes, antes/depois, promessa de emagrecimento. A mentorada pode transformar o rigor ético em diferencial de marca: "a nutri que não te promete milagre". Isso reforça justamente o posicionamento de acolhimento e honestidade, e a protege enquanto cresce.</p>
+    </div>
+  </div>
+</section>
+
+<div class="div"></div>
+
+<!-- 7. REPLICAR / EVITAR -->
+<section>
+  <div class="wrap">
+    <div class="kicker"><span class="dot"></span> Plano de ação</div>
+    <h2>O que replicar — e o que evitar</h2>
+    <div class="repl">
+      <div class="col do">
+        <h4>✓ Replicar</h4>
+        <ul>
+          <li><b>Formato REACT</b> como base — gravar reagindo a um vídeo viral de nutrição/dieta. Simples, sem edição elaborada, é o que mais entrega.</li>
+          <li><b>Gancho na 1ª frase</b> — abrir com a tese ou a provocação, nunca com "oi gente".</li>
+          <li><b>Surfar os temas quentes</b> (canetas, fruta, transtorno alimentar) enquanto estão em alta — mas sempre pela ótica do comportamento e da vivência.</li>
+          <li><b>Persona reconhecível</b> — a vivência dela (-40kg, ex-compulsão) como marca registrada, repetida nos ganchos.</li>
+          <li><b>Leveza da Isabella, sem a escrachada</b> — humor acolhedor que torna o tema digerível.</li>
+        </ul>
+      </div>
+      <div class="col dont">
+        <h4>✕ Evitar</h4>
+        <ul>
+          <li><b>Tom combativo da Monique</b> — gera concordância, não conexão. Para quem tem compulsão, indignação afasta; acolhimento aproxima.</li>
+          <li><b>Densidade técnica do Lucas</b> — conteúdo "denso demais" tem o menor alcance do grupo. Profundidade na consulta, simplicidade no reel.</li>
+          <li><b>Depender de dueto/react de terceiros como o Dennis</b> — o conteúdo autoral (a história e a fala dela) é o ativo que não pode ser copiado.</li>
+          <li><b>Antes/depois e promessa de resultado</b> — risco ético do CFN e contradiz o posicionamento de honestidade.</li>
+          <li><b>Conteúdo fora do nicho atrás de viral</b> — foi o que derrubou o engajamento dela nos últimos 6 meses. Alcance amplo que não converte é vaidade.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /tab-dossie -->
+
+<!-- ============ PAINEL 2: REELS ============ -->
+<div class="tabpanel" id="tab-reels" role="tabpanel" aria-labelledby="t-reels" tabindex="-1" hidden>
+  <section>
+    <div class="wrap">
+      <div class="kicker"><span class="dot"></span> Base de dados</div>
+      <h2>Os 80 reels, com gancho transcrito</h2>
+      <p class="lead">Top 20 reels mais recentes de cada perfil, ordenados por alcance. Gancho = primeiras frases transcritas do áudio (Whisper). É a matéria-prima da análise acima.</p>
+      <div id="reels-root" style="margin-top:10px"></div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    Dossiê de inteligência competitiva · <b>Creator Elite</b> · gerado a partir de 80 reels transcritos e analisados. Documento interno e confidencial.
+  </div>
+</footer>
+
+<script>
+  // ===== Dados de forças (0-10) =====
+  const COLORS = {
+    isabella:'#0B2FFF', monique:'#E5484D', dennis:'#F0A52B', lucas:'#3F9E54', mentorada:'#16140F'
+  };
+  const PERFIS = [
+    {key:'isabella', nome:'@isabellalacerda_nutri', x:5.0, y:9.5},
+    {key:'monique',  nome:'@nutriniquee',          x:3.8, y:5.2},
+    {key:'dennis',   nome:'@nutri.dennisfugiwara', x:4.8, y:7.0},
+    {key:'lucas',    nome:'@lucaseducampos',        x:6.0, y:3.8},
+    {key:'mentorada',nome:'MENTORADA (alvo)',       x:9.0, y:6.2, target:true},
+  ];
+  const FORCES = [
+    {h:'Alcance / viralização', rows:[['@isabellalacerda_nutri',10,'isabella'],['@nutriniquee',7,'monique'],['@nutri.dennisfugiwara',6,'dennis'],['@lucaseducampos',4,'lucas']]},
+    {h:'Autoridade científica', rows:[['@lucaseducampos',9,'lucas'],['@nutriniquee',9,'monique'],['@nutri.dennisfugiwara',7,'dennis'],['@isabellalacerda_nutri',7,'isabella']]},
+    {h:'Entretenimento / persona', rows:[['@isabellalacerda_nutri',10,'isabella'],['@nutri.dennisfugiwara',7,'dennis'],['@nutriniquee',5,'monique'],['@lucaseducampos',4,'lucas']]},
+    {h:'Conteúdo autoral (vs. react de terceiros)', rows:[['@lucaseducampos',7,'lucas'],['@isabellalacerda_nutri',6,'isabella'],['@nutriniquee',4,'monique'],['@nutri.dennisfugiwara',3,'dennis']]},
+    {h:'Foco em comportamento / vivência', rows:[['@lucaseducampos',7,'lucas'],['@nutriniquee',6,'monique'],['@isabellalacerda_nutri',5,'isabella'],['@nutri.dennisfugiwara',5,'dennis']]},
+  ];
+
+  // ===== Matriz 2x2 =====
+  (function(){
+    const svg=document.getElementById('matrix');
+    const ns='http://www.w3.org/2000/svg';
+    const X0=80,Y0=40,W=560,H=420; // área de plot
+    const sx=v=>X0+(v/10)*W;
+    const sy=v=>Y0+H-(v/10)*H;
+    function el(t,a){const e=document.createElementNS(ns,t);for(const k in a)e.setAttribute(k,a[k]);return e;}
+    // fundo do quadrante "vazio" (sup direito)
+    svg.appendChild(el('rect',{x:sx(5),y:sy(10),width:W/2,height:H/2,fill:'rgba(220,255,105,.28)'}));
+    const lbl=el('text',{x:sx(7.5),y:sy(9.4),'text-anchor':'middle','font-family':'Manrope','font-size':12,'font-weight':800,fill:'#7a8a2b'});lbl.textContent='ESPAÇO EM BRANCO';svg.appendChild(lbl);
+    // eixos
+    svg.appendChild(el('line',{x1:sx(5),y1:Y0,x2:sx(5),y2:Y0+H,stroke:'#D9D3C4','stroke-width':1.5}));
+    svg.appendChild(el('line',{x1:X0,y1:sy(5),x2:X0+W,y2:sy(5),stroke:'#D9D3C4','stroke-width':1.5}));
+    // labels de eixo
+    function axlabel(x,y,txt,anchor,it){const t=el('text',{x,y,'text-anchor':anchor,'font-family':'Manrope','font-size':12,'font-weight':700,fill:'#6E6857'});if(it)t.setAttribute('font-style','italic');t.textContent=txt;svg.appendChild(t);}
+    axlabel(X0+W/2,Y0+H+34,'CONEXÃO POR VIVÊNCIA  →','middle');
+    axlabel(X0,Y0+H+34,'← frieza técnica','start');
+    const ytop=el('text',{x:18,y:Y0+12,'font-family':'Manrope','font-size':12,'font-weight':700,fill:'#6E6857'});ytop.textContent='entretenimento';ytop.setAttribute('transform',`rotate(-90 18 ${Y0+90})`);svg.appendChild(ytop);
+    const ybot=el('text',{x:18,y:Y0+H,'font-family':'Manrope','font-size':12,'font-weight':700,fill:'#6E6857'});ybot.textContent='sóbrio / técnico';ybot.setAttribute('transform',`rotate(-90 18 ${Y0+H})`);svg.appendChild(ybot);
+    // pontos
+    PERFIS.forEach(p=>{
+      const cx=sx(p.x),cy=sy(p.y),col=COLORS[p.key];
+      if(p.target){
+        svg.appendChild(el('circle',{cx,cy,r:13,fill:'none',stroke:col,'stroke-width':2,'stroke-dasharray':'4 3'}));
+      }
+      svg.appendChild(el('circle',{cx,cy,r:8,fill:col,stroke:'#fff','stroke-width':2}));
+      const t=el('text',{x:cx,y:cy-16,'text-anchor':'middle','font-family':'Manrope','font-size':12.5,'font-weight':800,fill:p.target?col:'#16140F'});
+      t.textContent=p.nome.replace('@','@'); svg.appendChild(t);
+    });
+  })();
+
+  // ===== Barras de força =====
+  (function(){
+    const root=document.getElementById('forces');
+    root.innerHTML=FORCES.map(f=>`
+      <div class="force-row">
+        <div class="ft-h">${f.h}</div>
+        <div class="force-bars">
+          ${f.rows.map(([nm,sc,key])=>`
+            <div class="fb-name">${nm}</div>
+            <div class="fb-track"><div class="fb-fill" style="width:${sc*10}%;background:${COLORS[key]}">${sc}</div></div>
+          `).join('')}
+        </div>
+      </div>`).join('');
+  })();
+
+  // ===== Reels (dados embutidos) =====
+  const REELS_DATA = /*__REELS_DATA__*/[{"handle":"nutriniquee","nome":"Monique Fonseca | Nutricionista","seguidores":197827,"mediana":66724,"reels":[{"p":409886,"l":14175,"c":265,"h":"Essa notícia me foi sugerida ontem. Ingrid Guimarães usou o caneta emagrecadora para perder 3  quilos. Perdi a alegria de viver. Esse foi o preço de caberem um vestido. Caberem uma  calça jeans não va","cap":"\"Monique, mas o que você acha do fato da Ingrid ter usado o medicamento de forma indiscriminada?\" . Não importa, acredito que a gente precis"},{"p":261308,"l":18726,"c":305,"h":"Mas também, a pessoa com obesidade emagrece usando manjaro é fácil.  Você vai tratar diabetes com manjaro? Aí é fácil, né?  Vai tratar hipertensão com luz artana? Aí é moleza.  Você vai tratar sua inf","cap":"Saúde não segue uma lógica do que é mais fácil ou difícil, mas do que temos evidência de funcionamento para melhorar a qualidade de vida do "},{"p":204894,"l":11097,"c":352,"h":"Essa corrida não é o melhor esporte porque ela envelhece muito.  Quem se vê não vê maratonista bonita, você não vê maratonista homem bonito.  Esteticamente ela te destrói.  E com o passar dos anos, pr","cap":"Lembrando que eu entendo mesmo da parte da nutrição, então qualquer profissional de educação física, fisioterapeuta ou outros que souberem F"},{"p":149743,"l":10711,"c":117,"h":"É, não é fibra, né? É alface, pipinho, no abobrinho, tomate, melão. O nome realmente não é fibra.  Que legal, galera! Desestimular o consumo de frutas vegetais e outros alimentos em  nature é tudo que","cap":"Eu já vi esse vídeo sendo postado por umas três contas diferentes, além de ter visto outras variantes em vídeos cheios de cortes dinâmicos. "},{"p":139458,"l":7711,"c":130,"h":"Construir massa muscular não é sobre estética, é sobre sobrevivência.  Mas como estimular transtorno alimentar na própria audiência da mais like e por ser  mais polêmico, esses são os conteúdos que ch","cap":"O vídeo original é da @leticiaperuchin ❤️ . CUIDADO COM A FALSA DICOTOMIA: Ler o reconhecimento dos problemas de romantizar magreza extrema "},{"p":132973,"l":7945,"c":143,"h":"É uma grande perda de tempo ficar enchendo a sua dieta de alimento gostoso só porque cabe caloricamente.  Ai, mas o nutri da rede social diz que o doce de leite é menos calórico que a castanha.  É, es","cap":"Não estou dizendo que fazer um processo gradativo não seja importante ou que seja errado, mas estou te alertando sobre a importância de foca"},{"p":126932,"l":8799,"c":334,"h":"Uma blogueira muito famosa do nicho terrorismo nutricional e bloqueio de comentário para  que ninguém tenha a possibilidade de apontar a minha desinformação na minha própria postagem,  publicou esse v","cap":"Não é sobre incentivar o consumo, mas é sobre comunicar com honestidade.  . \"Mas eu tirei e me senti melhor\" Ok, então possívelmente você te"},{"p":105818,"l":4884,"c":261,"h":"Te mandaram colocar uma pitada de sal integral, de sal grosso na água,  porque contém mais de 80 minerais, mas te explicaram que esses minerais  estão em traços tão insignificantes para te ajudar na i","cap":"Achei que essa história estava morrendo, mas recebi diversas vezes o mesmo vídeo viral de uns dias atrás, Nele, uma querida com mais de 1 mi"},{"p":93793,"l":4730,"c":107,"h":"Eu estou muito seca, eu estou com um rote, eu só gosto de minhas mãos.  Eu não posso me dar mais rote, eu não posso me dar mais rote.  Eu estou com um rote, eu estou com um rote, eu estou com um rote.","cap":"Se você esperar 1 minuto e meio, vai aprender de fato se sua “meta proteica” faz sentido pra você.  . ATENÇÃO: O vídeo não substitui analise"},{"p":68223,"l":3700,"c":99,"h":"O padrão de corpo que a internet vem impondo exige um aproximamento muito maior de um adoecimento  do que de um estilo de vida saudável.  Esse vídeo não é sobre o atleta de fisiculturismo que faleceu","cap":"Esse vídeo foi bem desconfortável, porque o imediatismo na chuva de conteúdos sobre essa tragedia me assustou bastante, apesar de entender e"},{"p":65226,"l":4798,"c":131,"h":"Mas é óbvio que você não vai emagrecer comendo tudo o que você gosta todos os dias.  Eu estou falando com quem gostaria de perder pelo menos 20kg, porque quem quer reduzir um  pouquinho de gordura cor","cap":"A frase inicial é muito mais pra chamar atenção, então escutem o vídeo todo porque eu tenho uma real preocupação com a forma como reeducação"},{"p":62851,"l":4424,"c":112,"h":"Quando uma pessoa doeste porque estava fazendo uso de esteroides anabolizantes ou qualquer  outra substância para estética, isso não é um problema exclusivo da pessoa que adoeceu,  mas é um problema d","cap":"ESCLARECENDO UM PONTO QUE SENTI QUE FICOU SUPERFICIAL:  Os aprendizados antecedem a entrada na rede social. Seria errado afirmar que um caus"},{"p":60763,"l":4535,"c":167,"h":"Esse é um vídeo para te provar que o que funciona não funciona na internet.  Por quê? Porque as pessoas não querem ouvir o que funciona.  Elas querem uma solução fácil comando simples de ser seguido","cap":"Se você tiver alguma dica de como melhorar a atenção plena durante a refeição e/ou lentificar a mastigação, deixe nos comentários 😊 . Me sen"},{"p":53916,"l":4709,"c":299,"h":"Uou, para essa é a Blitz do algoritmo.  Eu vou fazer um check-list com vocês se você passar e lesou sem responder  sim para nenhuma dessas perguntas se você está liberado.  Agora se você responder sim","cap":"Esqueci de algo? . Lembrando que eu tenho vídeos onde explico afundo todos os tópicos abordados aqui. Se for do seu interesse, basta procura"},{"p":51921,"l":4073,"c":136,"h":"Gente, vamos alinhar uma coisa aqui rapidinho. Estava rolando o feed, apareceu um vídeo assim.  Por que comer frutas em excesso pode estar atrapalhando seu processo de emagrecimento?  Fruta? Comer fru","cap":"Muito cuidado conteúdos de guru animal based, porque são conselhos muito mais pautados em ideologia do que em evidência e fisiologia. Come a"},{"p":47653,"l":2532,"c":99,"h":"Se você está com desejo de açúcar, seu corpo está precisando de proteína.  Então você engere ovos, carne, frango, whey protein.  Quando você está com desejo de salgadinho, seu corpo está precisando de","cap":"Não existem só as opções de não sentir vontade ou atender todas elas, mas para desenvolver melhor capacidade de definir quando atender ou nã"},{"p":44383,"l":3587,"c":145,"h":"É por isso que eu acho que todo mundo deveria se revoltar com vídeos que culpam alimentos específicos  pelo aumento da obesidade, da diabetes ou do que for.  Eu fui ao mercado agora e a diferença de p","cap":"Isso foi um desabafo no story sobre algo que vim refletindo na volta do mercado no último domingo: A maneira como a internet facilmente conc"},{"p":37792,"l":1462,"c":41,"h":"Esse comentário é um bom exemplo do motivo pelo qual as canetas para tratamento de obesidade  são revolucionárias, não por elas substituírem outras partes do tratamento, mas justamente  pela possibili","cap":"Claramente jamais será possível analisar de forma exata tudo que envolve a escolha alimentar de alguém por meio de um comentário - se com um"},{"p":31943,"l":1798,"c":69,"h":"Oi tio da Marcela, tudo bem?  Possivelmente o senhor está assistindo alguns vídeos assim.  Tentando entender como falam que pode consumir óleo vegetal porque é saudável para o corpo,  mas não pode jog","cap":"Se você não for feito de material PVC, está liberado.  . Fiquem em paz: Eu troquei o nome da pessoa que mandou mensagem para preservar a ide"},{"p":16051,"l":750,"c":61,"h":"As chamadas dietas bíblicas têm ganhado força entre influenciadores cristãos americanos,  mas acende alerta por períodos longos de jejum e restrição de nutrientes.  A proposta, que aparece em perfis c","cap":"Se você é cristão, então muito cuidado para que não explorem sua fé como produto.  . Uma dieta não é adequada ou boa apenas por incentivar o"}]},{"handle":"isabellalacerda_nutri","nome":"Isabella Lacerda | Nutricionista","seguidores":1626435,"mediana":310136,"reels":[{"p":1493018,"l":57237,"c":1416,"h":"Ai, vou militarizar um pouquinho.  Só um chuchuquinho, só um chuchuquinho.  Assim, parece ser um jogo bem humorado, com bastante piadinha.  Porra, até com sal tão bicha.  Olha que louca, olha que louc","cap":"🚨VÍDEO NO MEU CANAL DO YOUTUBE🚨  Reagindo a Bayonetta  Link está nos stories! Se não encontrar lá, tem o link para o meu canal do youtube na"},{"p":1441026,"l":46406,"c":1311,"h":"As fezes que não sujam anos ao serem evacuadas podem ser consideradas saudáveis?  Você sabia que na faculdade a gente aprende a escala de bosta?  A escala de Bristone, na verdade, né?  Mas eu carinhos","cap":"Escala de 💩🫶"},{"p":981586,"l":34417,"c":509,"h":"Ai, tô muito animada!  Bom, estamos aqui de looking o growth,  toda linda, toda trabalhada, tá rasgado,  quer gostar, tá rasgou.  Tudo bem?  Flip!  Gente, é hoje.  Hoje, hoje, hoje.  Hoje é.  Hoje é.","cap":"Eu também não me ajudo, a cada episódio eu escolho um movimento pior que o último 😭  Look da @growthsupplements 🏷️NUTRIDUALIPA | Tamanho M"},{"p":698969,"l":33186,"c":381,"h":"Porque a maior néis verde e barraquinha é tão superior a normal?  Porque a normal não te dá de arreia suprema que a maior néis verde e barraquinha te dá.  Quais frutas e exercícios você recomenda pra","cap":"Eu não me formei pra isso"},{"p":521629,"l":44059,"c":1807,"h":"Vocês mandam e eu reajudo  Vamos falar com esse romantismo em cima da fruta, tá?  Como se fosse um alimento sagrado e maculado  A verdade é, fruta é açúcar com embalagem biológica bonita  E dependendo","cap":"Fruta não é o vilão"},{"p":478026,"l":44880,"c":2378,"h":"Vocês já ouviram falar de um cardápio de água?  Pois é, uma de vocês me mandou isso aqui.  E eu preciso chocar, mas pessoal, eu vamos lá.  Veja os benefícios e qualidades e escolha a água ideal pra vo","cap":"Cardápio de água é de cair o c* da bunda"},{"p":426806,"l":20446,"c":390,"h":"Eu sei que eu to um pouco atrasada, mas p...  P...  Um bouquet de monjaro!  Mostre que ta todo mundo do doido da cabeça, sem falar que ta todo mundo do doido da cabeça.  Eu não sei em que momento isso","cap":"Mas que ideia mais cretina"},{"p":400979,"l":24799,"c":373,"h":"Eu como pão todos os dias e era só que loucura, eu não engordei.  Eu como pão no café da manhã, às vezes no lanche da tarde e às vezes até no jantar  e olha só que loucura, eu não engordei.  Porque o","cap":"Todo dia eu como o meu pãozinho da @pullmanoficial @plusvitaoficial com pasta de amendoim, banana, canela, flor de sal, fiozin de mel na air"},{"p":329228,"l":23783,"c":841,"h":"e esporte não promove saúde, promove performance e rendimento.  O que eu vou falar aqui não são de pessoas que fazem musculação três vezes na semana  ou de pessoas que correm cinco quilômetros no fina","cap":"Esporte não promove saúde."},{"p":314668,"l":21385,"c":453,"h":"Cetose. Eu estou vendo muitos elatões e picaretas vendendo cetose aqui nas redes sociais como se fosse um grande mousse.  Quando na verdade não é. Então só para esclarecer, a cetose é basicamente um e","cap":"Cetose não é legal e bacaninha.  🗞️ The Ketogenic Diet: Clinical Applications, Evidence-based Indications, and Implementation  🗞️ Metabolic "},{"p":305604,"l":11913,"c":276,"h":"palavras que eu nunca consegui pronunciar em outras línguas  é que eu sempre quero falar o Word e palavra, é que um LANG  p... me pega muito  desde criança  essa não vai  ao dedo... hum... eu confundo","cap":"Quem mais me ajudou a melhorar a minha pronuncia foram as aulas da @idiomaindependente e foi com muito esforço que a minha professoressa de "},{"p":297742,"l":18445,"c":706,"h":"Desde 1991, o planejamento alimentar é exclusivo e privado do nutricionista, sendo por lei apenas  o nutricionista, o profissional da área da saúde, capaz e que dedicou a sua vida acadêmica  para isso","cap":"Ficou claro?"},{"p":292982,"l":12724,"c":203,"h":"Aí eu sigo todos os conselhos dessa blogueira, porque ela é magra.","cap":"⚠️ Ser magra não é diploma, não é motivo para vender curso, não pode dar conselhos nutricionais. Até porque, 85% de chance desse corpo ter s"},{"p":266358,"l":13390,"c":429,"h":"O último vídeo que eu faço desse quadro porque eu to cansada de ser cansada no Twitter.  Muitas vezes sem motivo.  Para fins educativos, o endocrinologista é um médico que atua nas disfunções hormonai","cap":"Ficou claro?"},{"p":235844,"l":7792,"c":97,"h":"O que que o mundo fitness tem agora com o moce, gente?  Vocês querem fazer com esse grande moce?  Não aguento mais moce, eu não quero moce!  Essa chia não acaba nunca!  Você sabe de quando é essa chia","cap":"🚨VÍDEO NO MEU CANAL DO YOUTUBE🚨  Sapella na cozinha #33 | Horroroso mousse de chia  Link está nos stories! Se não encontrar lá, tem o link p"},{"p":207711,"l":9956,"c":213,"h":"Sapela Games!  Tem!  Nenhum de vocês veio na caixinha de perguntas da quinta e perguntou por que você não reage  a jogos de terror e eu amo coisas de terror.  Eu amo, amo, amo.  Corre!  Corre, filha d","cap":"🚨VÍDEO NO MEU CANAL DO YOUTUBE🚨  Sapella Games #1 | Reagindo a Outlast  Link está nos stories! Se não encontrar lá, tem o link para o meu ca"},{"p":205565,"l":11397,"c":192,"h":"Se você acha que você está repondo sais minerais tomando água com sal,  sendo que você não come uma misera fruta no seu dia,  você está fazendo merda.  Se você acha que comendo 1 kg de carne vermelha","cap":"1. Sal contém traços de minerais, uma banana tem mais minerais do que o sal. Além disso, o seu treino é fofo e não precisa de sal para repor"},{"p":184462,"l":10734,"c":148,"h":"Ai eu não consigo controlar o final de semana!  É porque você tá tratando o final de semana como uma exceção, quando na verdade ele é só mais um dia da sua semana.  O final de semana, só aqueles dois","cap":"Final de semana também é dia de semana"},{"p":142008,"l":4601,"c":86,"h":"E a Heinz que me chamou por um jantar?  E é óbvio que eu fui, né?  Então vem comigo ver como foi.  Eu tive a imensa honra de ser convidada para esse momento especial  e sendo uma amante eterna de ketc","cap":"Depois de experimentar o Ketchup Heinz Zero*, eu acho que ele vai se tornar o meu novo ketchup preferido ❤️  *zero adição de açúcares @heinz"},{"p":106479,"l":5237,"c":299,"h":"Vocês mandam e eu reajudo.  Gente, ele é pastor. Nossa, eu já tô vendo a minha mãe me ligando.  Então vamos tentar ser bem, bem, bem elegante.  O primeiro ponto que eu achei engraçada é que, ai, não q","cap":"Café com óleo de coco é o novo venvanse"}]},{"handle":"nutri.dennisfugiwara","nome":"Dennis Fugiwara | Nutricionista Esportivo","seguidores":186020,"mediana":38381,"reels":[{"p":798692,"l":42543,"c":1967,"h":"Pode me contratar. Eu manjo.  É isso.  Te confiar em mim.","cap":"É só isso… 🫠🫠🫠"},{"p":178356,"l":3,"c":142,"h":"Olha a estratégia da imensa!  Nós podes comer com um cardinatinha, né?  Eu queria...  Pode!  Mesed, posta com Mesed, pessoal!  Bet não pode não!  Não posso!  Então, o nutri libera um pãozinho desse, h","cap":"O óbvio as vezes precisa ser dito, mas óbvio pra mim as vezes não é pra você!  Dica de ouro da @ediribeirof #fyp #emagrecimento #emagrecimen"},{"p":170510,"l":6294,"c":520,"h":"e vir e mexe eu faço o e para mim e para ela e aí na internet  eu vou ficar matando em cima de mim  eu dou leite com o e na mamadeira para minha filha pequena  incrível  eu dou o e eu dou creatina par","cap":"Resumindo: criança não precisa suplementar com whey protein"},{"p":110042,"l":7907,"c":71,"h":"Tu já parou para pensar que, quanto mais pesado você treina musculação, mais massa muscular você tem.  Quanto mais massa muscular você tem, melhora a sua sensibilidade insulina.  Quanto melhora a sua","cap":"Esse vídeo foi uma tradução do vídeo da @vickyvitkay_  . . O conteúdo original você encontra no perfil dela ou no link: https://www.instagra"},{"p":105393,"l":11450,"c":80,"h":"Tudo que eu come em cutting, mas lembrando que eu não faço acompanhamento com nutricionista, então...  Tudo que ela come em cutting e ela não faz acompanhamento com nutricionista.  Kai, estou eu como","cap":"Ela fez um cutting sem nutricionista e mandou BEM DEMAIS! @jhennifer_2306"},{"p":77233,"l":3,"c":83,"h":"Há um tempo atrás eu gravei um vídeo analisando um pouco a transformação da Sofia Bianco  e o quão essa perda de gordura torna um físico com um aspecto um pouco mais musculoso  justamente por demonstr","cap":"A Sophia Bianco está longe de um quadro de desnutrição, e o shape atual dela ainda é composto por mais massa muscular do que o da maioria qu"},{"p":63759,"l":3,"c":71,"h":"Hoje faz um ano que eu decidi mudar, mudar não que eu sou  O Thais Carla chora após perder 100kg em um ano e relembra a trajetória  Mudou minha vida cara  E bom que ela mudou a trajetória de vida dela","cap":"Autoaceitação é PRIMORDIAL, quando pensamos no tratamento da obesidade.  Não podemos deixar a autoaceitação iniba a busca pelo tratamento. A"},{"p":52503,"l":3,"c":130,"h":"Hoje uma nutria me disse que eu não poderia comer cenoura, bóbora, banana e kiwi  Primeiramente me desculpa, me desculpa por essa profissional que tá feito isso com você  Nem todos os intrisso em ines","cap":"Ela foi em uma consulta com uma nutricionista burra! 🥶😅 . . Ib: rafaelaszza"},{"p":48533,"l":2252,"c":63,"h":"Seguindo uma dieta montada pelo chat e PT por um dia.  Seguindo uma dieta montada pelo chat e PT por um dia.  Vamos dar uma olhada.  No café da manhã foram dois ovos inteiros, 50 gramas de pão, 10 gra","cap":"Dieta do Chat GPT vale a pena?! #emagrecimento #fyp #dieta #chatgptprompts #fypシ"},{"p":39929,"l":3,"c":83,"h":"produtos super faturados que eu comprei para deixar a dieta mais gostosa  produtos super faturados que ela compra para deixar a dieta mais gostosa  pelo menos ao não estar desperdiçando dinheiro dela","cap":"Seu superfaturamento da dieta vale a pena @paula.beatriizz !! Mandou bem em absolutamente tudo, eu acho que o investimento vale 🤓👏🏻"},{"p":36833,"l":3,"c":28,"h":"Tudo que eu como no meu dia pra emagrecer.  Nossa bebê, mas tudo que a bebê come um dia pra emagrecer.  Vamos dar uma olhada.  Você já é tão magra.  Todo dia alguém me fala isso e me entobreta.  Mas é","cap":"Dieta da @bibicorreiia emagrecer pós viagem em resort All-Inclusive! 😎🫵🏻"},{"p":36527,"l":3,"c":62,"h":"Eu vou ensinar você que é pobre f*** da lascada, aí emagrecer.  Eu sou um...  Ela vai ensinar você que é pobre f*** da lascada emagrecer.  Fica aqui no vídeo.  Exonista, ainda não.  Blogueira fitness","cap":"A dieta de pobre da @taiara_santoos tá aprovadíssima! 😂🫵🏻👏🏻"},{"p":32745,"l":3,"c":27,"h":"Alimentos que a gente tem que cortar na nossa vida. O pão, né? Se a gente não cortar, como é que a gente vai comer?  Hehehe, tá certo.  Hmm, que del...  Meu amigo, um que blanche bonito, cara.  Não fa","cap":"“Comer saudável” é definitivamente o que vai te auxiliar a se manter saudável no longo prazo, mas você precisa APRENDER A “COMER SAUDÁVEL”. "},{"p":32380,"l":3,"c":11,"h":"Estratégias que eu uso para comer o que eu gosto sem exagerar nas calorias.  Durante um dia, o seu corpo usa uma certa quantidade de calorias como energia.  E quando você consumir mais do que gasta, e","cap":"Hoje foi dia de rodízio de comida coreana 🇰🇷 E essas são estratégias para manter o déficit calórico que eu aprendi com o nutri. OBS: só de f"},{"p":31543,"l":3,"c":12,"h":"Bora acompanhar o treino de uma obesa que decidiu vira atleta de fisiculturismo.  Bora acompanhar o treino de uma obesa que decidiu vira atleta de fisiculturismo.  Bom, no primeiro exercício a gente j","cap":"Treinão BRABO! @maludiazr mandou bem DEMAIS!"},{"p":31112,"l":3,"c":22,"h":"Sabia que tomar 2 scoops de whey de uma vez não vai te dar o dobro de músculo?  Você sabia que tomar 2 scoops de whey de uma vez não te dá o dobro de músculo?  Vamos dar uma olhada  Não adianta comer","cap":"Não existe limite te absorção de proteína por refeição.  Mas existe um limite na utilização dessa proteína pelo músculo. . . Na prática, a i"},{"p":28496,"l":3,"c":21,"h":"fala comigo bebê, vou mostrar pra vocês o treino de Laura que me ajudou a sair disso pra isso em dois meses  é isso em dois meses?  Fique Nere!  no brincadeira, não estou acusando ninguém de nada  vou","cap":"Treinão que fez essa mutação na @lildudaa! 🤓🫵🏻"},{"p":28385,"l":3,"c":33,"h":"Vamos para mais um, tudo que eu come um dia para emagrecer?  E não, aqui você não vai me ver comendo loucuras, corta um carboidrato, come algum passarinho,  eu vou te mostrar a alimentação que eu fiz","cap":"Dietinha que fez e faz @paula.beatriizz manter/continuar emagrecendo! 😎🫵🏻"},{"p":20903,"l":3,"c":61,"h":"Tem um cardio pra mulher que é super interessante, a musculação é insubstituível, ponto.  Mas um cardio interessantíssimo é esteira, não corrida pelo amor de Deus, espenca tudo.  Ô, pô, na senhora tu","cap":"“Corrida despenca tudo” 🫪🤡  #fyp #emagrecimento #corridaderua"},{"p":18055,"l":3,"c":24,"h":"partir de 6 repetições você já tem empertrofia, vamos ver o que ele vai falar no escort  tem séries que eu faço com 6 repetições porque é o meu limite, não vai dar 8  isso é excelente, entendi  e me p","cap":"4 de 15 gera hipertrofia. 3 de 8 também.  O que suas series tem que ter em comum é PROXIMIDADE DA FALHA. . . *a adequação do volume de trein"}]},{"handle":"lucaseducampos","nome":"Lucas Eduardo Campos | Nutrição e Musculação","seguidores":106097,"mediana":20165,"reels":[{"p":101343,"l":9495,"c":77,"h":"10 anos de experiência com emagrecimento resolidos em um vídeo e calculados pra você  Vamos lá, 10 anos de experiência emagrecimento  Mais calorias do que comer ou emagrecer  40 anos menopausa, subnom","cap":"Básicão de emagrecimento @nicholasdesapersonal"},{"p":68255,"l":4206,"c":80,"h":"o fisiculturismo normaliza o absurdo.  Se você for dar conselho para qualquer pessoa, para ela ser mais saudável, o que você vai dizer?  Para ela treinar e se alimentar bem, ser consistente com isso.","cap":"Eu fiz um vídeo mais longo elaborando esse pensamento em outra rede. É difícil abstrair e olhar um panorama geral, mas, é necessário"},{"p":65250,"l":3,"c":135,"h":"Esse que eu estou segurando é uma câmera termográfica.  Ele é um instrumento que nos ajuda a avaliar o nível de inflamação no corpo.  E como ele atenta essa inflamação?  Tá rindo porque aí, caralho.","cap":"mercado de lipedema é complexo bicho"},{"p":45416,"l":1548,"c":6,"h":"Eu tenho síndrome do varo policístico e sempre falaram que nessa condição era difícil emagrecer  e que para os meus sintomas melhorarem eu precisava emagrecer?  É verdade, parece contraditório mas é i","cap":"Como reduzir a resistência a insulina @ornellatoscan"},{"p":44977,"l":2659,"c":81,"h":"Se o esforço não vence o talento, a internet que este comvencei desse discurso, só que  a verdade é que você precisa entender isso o quanto antes, que essa ideia de que basta  você se esforçar, que vo","cap":"Não vence"},{"p":30161,"l":1089,"c":135,"h":"Gravidade 4 semanas fazendo o carnívoro há pouco tempo.  O marido disse para comer mais frutas e menos carne.  O que fazer?  Ai meu Deus.  Sendo que seu marido está lá na época das cavernas, hein?  El","cap":"Vai caçar fruta no mercado maridão"},{"p":28088,"l":718,"c":27,"h":"Verdades que ninguém te conta um sobremonjado.  O monjaro não é só pra tirar sua fome.  Ele vai sim inibir o apetite, mas ele não faz só isso.  Além dele, inibir o apetite ele vai retardar os baseamen","cap":"É um fármaco revolucionário, deve ser utilizado, no contexto correto. Se tivermos recomendação para lipedema em pessoas que não precisam per"},{"p":23697,"l":1116,"c":21,"h":"Da série, americanos não comem bem e eu posso provar.  Olha que os meus amigos trouxeram de almoço.  Vamos ver, né?  Lembrando que esse é o país que muita gente diz que...  Nossa, aí ó...  O Estado Un","cap":"Eles realmente não sabem comer"},{"p":22538,"l":1307,"c":13,"h":"Não existe viz sem açúcar, você só gosta de comer.  E não é açúcar, são alimentos que contêm açúcar, gordura, são alimentos altamente palatáveis.  Isso é muito diferente.  Sabe de onde que vem a infor","cap":"Não existe"},{"p":20908,"l":1054,"c":25,"h":"Três formas de identificar pessoas burras.  Três formas de identificar pessoas burras, vamos ver.  Sssss, número um. Você fala assim,  eu gosto mais de pizza do que de macarrão.  Aí ela pega e respond","cap":"um bom tutorial"},{"p":19423,"l":1176,"c":25,"h":"Não precisa de muito para ser saudável.  Sabe o quanto de exercício você realmente precisa?  3 a 4 vezes de musculação ou um exercício resistido na semana.  Pode ser calistenia.  Se qualquer outro tip","cap":"Não complique mais que o necessário"},{"p":19074,"l":1021,"c":12,"h":"cientistas inventaram uma doença que não existe e a inteligência artificial agiu como se ela fosse real  Podria muito bem seu episódio de Black Mirror, mas aconteceu de verdade  Em 2024, essa pesquisa","cap":"Ela está em todo lugar"},{"p":18121,"l":563,"c":33,"h":"A geração que mais treina também é a que mais vai sofrer com problemas no quadril.  E não, não é sobre fazer musculação que eu estou falando.  É sobre a geração que mais se cuida, mas está cultivando","cap":"Faltaram as referências"},{"p":17892,"l":1115,"c":21,"h":"Mas para ficar tranquilo, o cardio não vai acabar com o resultado da musculação.  Sabe o quanto você precisaria correr a ponto de você se preocupar com corrida para impactar  os seus resultados?  Uma","cap":"Pode correr tranquilo"},{"p":16835,"l":449,"c":20,"h":"café é um veneno me doi profundamente falar isso porque eu consumir café por  anos eu amo café e sempre amei mas isso aqui é só a mais pura e honesta  verdade existem micotocinas encontradas a maioria","cap":"Coitado do café"},{"p":15396,"l":697,"c":8,"h":"a magreza já é um status social, uma demonstração de status há muito tempo,  mas hoje ela adquire uma nova característica, hoje as pessoas se orgulham,  que elas são mais magras que as outras, utiliza","cap":"Magreza ganhando atualizações"},{"p":13971,"l":523,"c":11,"h":"internet pode atrapalhar os seus resultados com o treinamento.  Se eu pudesse escolher um erro que as pessoas cometem e que provavelmente impacta negativamente  o resultado, esse erro é mudar o treino","cap":"Fomo"},{"p":11430,"l":516,"c":9,"h":"Eu cheguei no corpo dos meus sonhos e ele virou um pesadelo.  Pode acontecer muitas vezes, né?  Porque é depender do que você faz para chegar nesse corpo.  Você vai ter alteração de comportamento,  tr","cap":"A armadilha do shape dos sonhos"},{"p":10177,"l":350,"c":31,"h":"aí turma boa tarde e nesse vídeo eu vou contar pra vocês porque que eu abandonei a dieta da selva  opa mais um porque ele abandonou a dieta da selva?  será? porque será hein?  por mais que eu faça uma","cap":"Mais um"},{"p":9070,"l":219,"c":4,"h":"não adianta tomar vários suplementos de uma vez.  Isso acontece porque boa parte dos suplementos que funcionam,  apesar de serem poucos, possuem janelas de tempo diferentes para a ação, vários deles.","cap":"Não adianta"}]}]/*__END__*/;
+  (function(){
+    const root=document.getElementById('reels-root');
+    const fmt=n=>n>=1000?(n/1000).toFixed(n>=100000?0:1).replace('.0','')+'k':String(n);
+    const esc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    root.innerHTML=REELS_DATA.map(prof=>`
+      <div class="rl-prof">
+        <div class="rl-head">
+          <span class="at">@${esc(prof.handle)}</span>
+          <span class="mt">${esc(prof.nome)} · ${fmt(prof.seguidores)} seguidores · mediana ${fmt(prof.mediana)} plays</span>
+        </div>
+        ${prof.reels.map((r,i)=>`
+          <div class="reel">
+            <div class="mx">
+              <span class="m"><b>#${i+1}</b></span>
+              <span class="m"><b>${fmt(r.p)}</b>plays</span>
+              <span class="m"><b>${fmt(r.l)}</b>likes</span>
+              <span class="m"><b>${fmt(r.c)}</b>coment.</span>
+            </div>
+            <div class="hook"><span class="lbl">Gancho</span>${esc(r.h)}…</div>
+            ${r.cap?`<div class="cap">legenda: ${esc(r.cap)}</div>`:''}
+          </div>`).join('')}
+      </div>`).join('');
+  })();
+
+  // ===== Tabs =====
+  (function(){
+    const tabs=[...document.querySelectorAll('.tab')];
+    function select(id){
+      tabs.forEach(t=>t.setAttribute('aria-selected', t.id==='t-'+id));
+      document.getElementById('tab-dossie').hidden = id!=='dossie';
+      document.getElementById('tab-reels').hidden = id!=='reels';
+      window.scrollTo({top:0,behavior:'instant' in window?'instant':'auto'});
+    }
+    tabs.forEach(t=>t.addEventListener('click',()=>select(t.id.replace('t-',''))));
+  })();
+</script>
+
+</body>
+</html>
