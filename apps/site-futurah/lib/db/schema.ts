@@ -160,4 +160,6 @@ export interface MarketingAnalise {
   // prova de economia enxuta (1 tela): faixa de investimento + áreas
   investimentoFaixa: InvestimentoFaixa;
   investimentoAreas: AreaInvestimento[];
+  // pergunta aberta opcional — material livre pra IA personalizar os problemas
+  perrengue?: string;
 }

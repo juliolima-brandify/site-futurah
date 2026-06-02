@@ -163,6 +163,18 @@ export interface PilarData {
   /** ~140 chars. Explicação curta do score. */
   descricao: string;
   grupo: GrupoPilar;
+  // Campos da narrativa "problema → por que custa → como a IA resolve",
+  // preenchidos só pros pilares de dor (score baixo). null nos saudáveis.
+  /** O que está travando, em 1 frase. */
+  problema?: string | null;
+  /** Por que isso custa crescimento/dinheiro. */
+  impacto?: string | null;
+  /** Como um agente de IA da Futurah resolve (execução é com a gente). */
+  solucaoIA?: string | null;
+  /** Estado atual, curto, pra contraste visual (ex: "3h", "0%"). */
+  antes?: string | null;
+  /** Estado com IA, curto, pra contraste (ex: "10s", "65%"). */
+  depois?: string | null;
 }
 
 export interface PilaresData {

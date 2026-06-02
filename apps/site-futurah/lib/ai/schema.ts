@@ -34,6 +34,29 @@ const pilarSchema = z.object({
   descricao: z
     .string()
     .describe("Frase curta (~140 chars) explicando o score com base nas respostas do lead"),
+  // Narrativa só pros pilares de DOR (score <= 5). null nos saudáveis.
+  problema: z
+    .string()
+    .nullable()
+    .describe("Só se score<=5: o que está travando, 1 frase direta em 2ª pessoa. Senão null."),
+  impacto: z
+    .string()
+    .nullable()
+    .describe("Só se score<=5: por que isso custa crescimento/dinheiro, 1 frase concreta. Senão null."),
+  solucaoIA: z
+    .string()
+    .nullable()
+    .describe(
+      "Só se score<=5: como um agente de IA da Futurah resolve, específico e exemplificado (a execução é feita pela Futurah, não algo que o lead monta sozinho). Senão null.",
+    ),
+  antes: z
+    .string()
+    .nullable()
+    .describe("Só se score<=5: estado atual curtíssimo pra contraste (máx ~8 chars, ex '3h', '0%'). Senão null."),
+  depois: z
+    .string()
+    .nullable()
+    .describe("Só se score<=5: estado com IA curtíssimo (máx ~8 chars, ex '10s', '65%'). Senão null."),
 });
 
 const pilaresSchema = z.object({

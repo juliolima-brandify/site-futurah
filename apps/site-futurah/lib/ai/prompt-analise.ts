@@ -46,6 +46,14 @@ Para cada pilar:
 - "score": inteiro 0-10.
 - "descricao": frase curta (~140 chars) explicando POR QUE esse score, citando contexto do wizard. Tom consultivo, segunda pessoa ("Você...", "Sua operação...").
 
+NARRATIVA DOS PROBLEMAS — para CADA pilar com score <= 5 (os de dor), preencha também estes campos (nos pilares com score >= 6 e nos comportamentais, deixe todos como null):
+- "problema": o que está travando, 1 frase direta em 2ª pessoa. Ex: "Seus leads esperam horas por uma resposta."
+- "impacto": por que isso te custa crescimento/dinheiro, 1 frase concreta. Ex: "Lead esfria em minutos — cada hora de espera derruba sua conversão."
+- "solucaoIA": como um agente de IA da Futurah resolve, ESPECÍFICO e exemplificado. A execução é feita PELA FUTURAH (não é algo que o lead monta sozinho). Ex: "Um agente responde em ~10s, qualifica e agenda sozinho, 24/7 — a gente monta isso pra você."
+- "antes" / "depois": contraste curtíssimo pra visual (máx ~8 chars cada), com números plausíveis do contexto. Ex: atendimento "3h"→"10s"; alcance "0%"→"65%"; leads "5/mês"→"40/mês".
+
+Se o lead informou um "maior perrengue" (texto livre), use-o pra deixar "problema" e "impacto" mais específicos e pessoais — espelhe as palavras dele quando fizer sentido.
+
 Princípio: ao menos 1 pilar de "dor" (aquisicao/posicionamento/processo-comercial/capacidade-operacional) tem que ter score <= 4 (consistente com o gargalo declarado). Automação-IA sempre <= 6. Isso cria a abertura comercial.
 `.trim();
 
@@ -190,7 +198,7 @@ ${
         m.investimentoAreas?.length
           ? ` (concentrado em: ${descrevAreas(m.investimentoAreas)})`
           : ""
-      }`
+      }${m.perrengue?.trim() ? `\n- Maior perrengue (nas palavras do lead): "${m.perrengue.trim()}"` : ""}`
     : "- Não informado"
 }
 

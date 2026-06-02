@@ -21,6 +21,7 @@ type StepKey =
   | 'ia-hoje'
   | 'investimento'
   | 'velocidade'
+  | 'perrengue'
   | 'contato';
 
 const WHATSAPP_LINK = whatsappFundadorLink(WHATSAPP_MSG_CALL);
@@ -169,6 +170,7 @@ export default function ApplicationWizard() {
   const [iaHoje, setIaHoje] = useState('');
   const [investimentoFaixa, setInvestimentoFaixa] = useState('');
   const [velocidade, setVelocidade] = useState('');
+  const [perrengue, setPerrengue] = useState('');
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
@@ -199,6 +201,7 @@ export default function ApplicationWizard() {
       'ia-hoje',
       'investimento',
       'velocidade',
+      'perrengue',
       'contato',
     ],
     [],
@@ -242,6 +245,8 @@ export default function ApplicationWizard() {
         return investimentoFaixa !== '';
       case 'velocidade':
         return velocidade !== '';
+      case 'perrengue':
+        return true; // opcional — pode pular
       case 'contato':
         return contatoOk;
       default:
@@ -308,6 +313,7 @@ export default function ApplicationWizard() {
         iaHoje,
         investimentoFaixa,
         investimentoAreas: [],
+        perrengue: perrengue.trim() || undefined,
       },
     };
 
@@ -559,6 +565,28 @@ export default function ApplicationWizard() {
                     onClick={() => setVelocidade(option.value)}
                   />
                 ))}
+              </div>
+            </div>
+          )}
+
+          {currentStep === 'perrengue' && (
+            <div className="space-y-6">
+              <QuestionTitle eyebrow="Quase lá">
+                Em uma frase, qual é o seu maior perrengue hoje?
+              </QuestionTitle>
+              <p className="text-[13px] text-black/50 text-center">
+                Opcional — mas quanto mais específico, mais preciso fica seu
+                diagnóstico.
+              </p>
+              <div className="max-w-[520px] mx-auto">
+                <textarea
+                  value={perrengue}
+                  onChange={(e) => setPerrengue(e.target.value)}
+                  placeholder="Ex: demoro horas pra responder lead e perco venda; meu conteúdo não engaja; gasto com anúncio e não converte..."
+                  rows={4}
+                  autoFocus
+                  className="w-full px-4 py-3 rounded-xl border border-black/10 focus:outline-none focus:ring-2 focus:ring-[#0B2FFF]/30 text-[15px] resize-none"
+                />
               </div>
             </div>
           )}
