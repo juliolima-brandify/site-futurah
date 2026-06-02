@@ -3,7 +3,12 @@ import type {
   EconomiaFuncionario,
   EconomiaPlataforma,
 } from "@/components/proposta/types";
-import type { EquipeAnalise, PlataformasAnalise } from "@/lib/db";
+import type {
+  EquipeAnalise,
+  PlataformasAnalise,
+  MarketingAnalise,
+  AreaInvestimento,
+} from "@/lib/db";
 import {
   CATALOGO_CARGOS,
   CATALOGO_PLATAFORMAS,
@@ -188,6 +193,80 @@ export function calcularEconomia(
       subtitulo:
         "Agende uma Sessão Estratégica — a gente detalha cada substituição e o cronograma de implementação.",
       botao: "Agendar Sessão Estratégica",
+      href: "#contato",
+    },
+  };
+}
+
+// Ponto médio mensal de cada faixa de investimento declarada no wizard.
+const INVESTIMENTO_PONTO_MEDIO: Record<string, number> = {
+  "ate-2k": 1500,
+  "2-8k": 5000,
+  "8-20k": 13000,
+  "20-50k": 32000,
+  "50k+": 70000,
+};
+
+// Quanto de cada área de investimento a IA da Futurah tipicamente absorve.
+// Áreas operacionais (comercial/atendimento) são as mais substituíveis;
+// ferramentas só em parte (sempre sobra um núcleo de SaaS).
+const AREA_FATOR_SUBSTITUICAO: Record<AreaInvestimento, number> = {
+  comercial: 0.55,
+  atendimento: 0.65,
+  trafego: 0.4,
+  conteudo: 0.5,
+  ferramentas: 0.35,
+};
+
+/**
+ * Prova de economia enxuta para o diagnóstico de marketing IA-first.
+ *
+ * Em vez de mapear cargo a cargo (wizard antigo), parte da faixa única de
+ * investimento mensal declarada + as áreas onde esse dinheiro é concentrado,
+ * e estima quanto a operação assistida por IA libera. Determinístico — sem IA.
+ *
+ * Renderiza só `totais.economiaMensal` na `/analise` (as listas detalhadas
+ * `funcionarios`/`plataformas` ficam vazias; só propostas estáticas as usam).
+ */
+export function calcularEconomiaMarketing(
+  marketing: MarketingAnalise | null,
+): EconomiaPrevistaData | null {
+  if (!marketing) return null;
+
+  const custoAtualMensal = INVESTIMENTO_PONTO_MEDIO[marketing.investimentoFaixa] ?? 5000;
+
+  const areas = marketing.investimentoAreas ?? [];
+  // Fator médio de substituição das áreas marcadas. Sem áreas → assume 0.45.
+  const fatorMedio =
+    areas.length > 0
+      ? areas.reduce((acc, a) => acc + (AREA_FATOR_SUBSTITUICAO[a] ?? 0.4), 0) /
+        areas.length
+      : 0.45;
+
+  const economiaMensal = Math.round(custoAtualMensal * fatorMedio);
+  const custoProjetadoMensal = custoAtualMensal - economiaMensal;
+  const economiaAnual = economiaMensal * 12;
+
+  return {
+    eyebrow: "Raio-X de investimento",
+    titulo: "Quanto do seu investimento a IA libera todo mês",
+    subtitulo:
+      "Estimativa a partir do que você investe hoje em operação de marketing e vendas. Número exato sai na call com um fundador.",
+    funcionarios: [],
+    plataformas: [],
+    totais: {
+      custoAtualMensal,
+      custoProjetadoMensal,
+      economiaMensal,
+      economiaAnual,
+    },
+    observacao:
+      "Estimativa baseada na faixa de investimento declarada e nas áreas onde a IA da Futurah costuma atuar. O plano definitivo sai após o diagnóstico completo.",
+    cta: {
+      titulo: "Quer ver pra onde esse valor pode ir?",
+      subtitulo:
+        "Fale com um dos fundadores — a gente detalha onde a IA entra no seu funil e o que isso libera de caixa.",
+      botao: "Falar com um fundador",
       href: "#contato",
     },
   };

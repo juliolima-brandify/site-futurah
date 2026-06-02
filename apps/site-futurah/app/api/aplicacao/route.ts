@@ -1,6 +1,6 @@
 import { NextResponse, after } from "next/server";
 import { nanoid } from "nanoid";
-import { db, analises, type EquipeAnalise, type PlataformasAnalise } from "@/lib/db";
+import { db, analises, type MarketingAnalise } from "@/lib/db";
 import { gerarAnaliseEmBackground } from "@/lib/ai/gerar";
 import {
   consume,
@@ -17,8 +17,7 @@ interface Body {
   momento?: string;
   gargalo?: string;
   velocidade?: string;
-  equipe?: EquipeAnalise;
-  plataformas?: PlataformasAnalise;
+  marketing?: MarketingAnalise;
 }
 
 function normalizeHandle(input: string): string {
@@ -105,8 +104,7 @@ export async function POST(request: Request) {
         momento: body.momento,
         gargalo: body.gargalo,
         velocidade: body.velocidade,
-        equipe: body.equipe ?? null,
-        plataformas: body.plataformas ?? null,
+        marketing: body.marketing ?? null,
       })
       .returning({ id: analises.id, slug: analises.slug });
 

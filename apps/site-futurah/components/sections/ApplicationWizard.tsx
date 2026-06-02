@@ -6,16 +6,23 @@ import { useRouter, useSearchParams } from 'next/navigation';
 type StepKey =
   | 'analise'
   | 'momento'
+  | 'canais'
+  | 'volume'
+  | 'conteudo'
+  | 'resposta'
   | 'gargalo'
+  | 'ia-hoje'
+  | 'investimento'
   | 'velocidade'
-  | 'headcount'
-  | 'cargos'
-  | 'custo-funcionario'
-  | 'plataformas'
-  | 'custo-plataformas'
   | 'nome'
   | 'email'
   | 'whatsapp';
+
+// WhatsApp de um dos fundadores — CTA de contato direto no fim do wizard.
+const WHATSAPP_FUNDADOR_DISPLAY = '+55 34 99254-8114';
+const WHATSAPP_FUNDADOR_LINK =
+  'https://wa.me/5534992548114?text=' +
+  encodeURIComponent('Oi! Acabei de fazer o diagnóstico no site e queria falar com um fundador.');
 
 const optionsMomento = [
   {
@@ -38,122 +45,80 @@ const optionsMomento = [
   },
 ];
 
+const optionsCanais = [
+  { value: 'organico', label: 'Conteúdo orgânico / redes sociais' },
+  { value: 'pago', label: 'Tráfego pago (Meta, Google)' },
+  { value: 'indicacao', label: 'Indicação / boca a boca' },
+  { value: 'outbound', label: 'Prospecção ativa (outbound)' },
+  { value: 'nao-sei', label: 'Não sei dizer — é inconstante' },
+];
+
+const optionsVolume = [
+  { value: 'ate-10', label: 'Até 10 por mês' },
+  { value: '10-50', label: '10 a 50 por mês' },
+  { value: '50-200', label: '50 a 200 por mês' },
+  { value: '200+', label: 'Mais de 200 por mês' },
+  { value: 'nao-medido', label: 'Não meço isso' },
+];
+
+const optionsConteudo = [
+  { value: 'eu', label: 'Eu mesmo, quando dá tempo' },
+  { value: 'equipe', label: 'Tenho equipe / social media' },
+  { value: 'agencia', label: 'Agência terceirizada' },
+  { value: 'quase-nao', label: 'Quase não produzo' },
+];
+
+const optionsResposta = [
+  { value: 'minutos', label: 'Em minutos' },
+  { value: 'horas', label: 'Em algumas horas' },
+  { value: 'dia-seguinte', label: 'No dia seguinte ou mais' },
+  { value: 'sem-processo', label: 'Não tenho processo definido' },
+];
+
 const optionsGargalo = [
   {
     value: 'trafego',
-    label: '“Gasto com anúncios e o telefone não toca.”',
-    note: 'Diagnóstico: Problema de Tráfego/Qualificação.',
+    label: '“Não chegam leads suficientes.”',
+    note: 'Diagnóstico: gargalo de Aquisição.',
   },
   {
     value: 'posicionamento',
-    label: '“Chegam muitos curiosos que acham caro.”',
-    note: 'Diagnóstico: Problema de Posicionamento/Branding.',
+    label: '“Chega gente, mas acham caro.”',
+    note: 'Diagnóstico: gargalo de Posicionamento.',
   },
   {
     value: 'processo',
-    label: '“Minha equipe demora para atender e perco vendas.”',
-    note: 'Diagnóstico: Problema de Processo Comercial.',
+    label: '“Recebo leads, mas eles escapam.”',
+    note: 'Diagnóstico: gargalo de Conversão.',
   },
   {
     value: 'gestao',
-    label: '“Sou escravo da operação / Não tenho tempo.”',
-    note: 'Diagnóstico: Problema de Gestão/Automação.',
+    label: '“Sou escravo da operação, sem tempo de crescer.”',
+    note: 'Diagnóstico: gargalo de Gestão / Automação.',
   },
 ];
 
-const optionsVelocidade = [
-  { value: 'prioridade', label: 'Sim, é prioridade total.' },
-  { value: 'validar', label: 'Sim, mas preciso validar o investimento.' },
-  { value: 'pesquisando', label: 'Não, estou apenas pesquisando mercado.' },
+const optionsIaHoje = [
+  { value: 'nunca', label: 'Nunca usei' },
+  { value: 'frustrou', label: 'Já tentei e me frustrei' },
+  { value: 'pontual', label: 'Uso pontual (ChatGPT etc.)' },
+  { value: 'estruturado', label: 'Uso estruturado no negócio' },
 ];
 
-const optionsHeadcount = [
-  { value: 'solo', label: 'Só eu (solo)' },
-  { value: '2-5', label: '2 a 5 pessoas' },
-  { value: '6-10', label: '6 a 10 pessoas' },
-  { value: '11-25', label: '11 a 25 pessoas' },
-  { value: '26-50', label: '26 a 50 pessoas' },
-  { value: '50+', label: 'Mais de 50 pessoas' },
+const optionsInvestimento = [
+  { value: 'ate-2k', label: 'Até R$ 2 mil' },
+  { value: '2-8k', label: 'R$ 2 mil – R$ 8 mil' },
+  { value: '8-20k', label: 'R$ 8 mil – R$ 20 mil' },
+  { value: '20-50k', label: 'R$ 20 mil – R$ 50 mil' },
+  { value: '50k+', label: 'Acima de R$ 50 mil' },
 ];
 
-const cargosDisponiveis = [
-  { value: 'sdr', label: 'SDR / Pré-vendas' },
-  { value: 'atendente-whatsapp', label: 'Atendente de WhatsApp' },
-  { value: 'agendadora', label: 'Agendadora / Secretária' },
-  { value: 'suporte-n1', label: 'Suporte / Atendimento N1' },
-  { value: 'qualificador', label: 'Qualificador de leads' },
-  { value: 'social-media', label: 'Social media junior' },
-  { value: 'gestor-trafego', label: 'Gestor de tráfego' },
-  { value: 'webdesigner', label: 'Webdesigner' },
-  { value: 'financeiro-op', label: 'Financeiro operacional' },
-  { value: 'recepcionista', label: 'Recepcionista' },
-];
-
-const optionsCustoFuncionario = [
-  { value: 'ate-2k', label: 'Até R$ 2.000' },
-  { value: '2-3.5k', label: 'R$ 2.000 – R$ 3.500' },
-  { value: '3.5-5.5k', label: 'R$ 3.500 – R$ 5.500' },
-  { value: '5.5-9k', label: 'R$ 5.500 – R$ 9.000' },
-  { value: '9-15k', label: 'R$ 9.000 – R$ 15.000' },
-  { value: '15k+', label: 'Acima de R$ 15.000' },
-];
-
-const plataformasDisponiveis: {
-  grupo: string;
-  itens: { value: string; label: string }[];
-}[] = [
-  {
-    grupo: 'CRM',
-    itens: [
-      { value: 'rd-station', label: 'RD Station' },
-      { value: 'hubspot', label: 'HubSpot' },
-      { value: 'pipedrive', label: 'Pipedrive' },
-      { value: 'ploomes', label: 'Ploomes' },
-      { value: 'kommo', label: 'Kommo' },
-    ],
-  },
-  {
-    grupo: 'Atendimento',
-    itens: [
-      { value: 'zendesk', label: 'Zendesk' },
-      { value: 'intercom', label: 'Intercom' },
-      { value: 'tawk', label: 'Tawk' },
-      { value: 'zenvia', label: 'Zenvia' },
-      { value: 'take-blip', label: 'Take Blip' },
-    ],
-  },
-  {
-    grupo: 'Agendamento',
-    itens: [
-      { value: 'calendly', label: 'Calendly' },
-      { value: 'tidycal', label: 'TidyCal' },
-      { value: 'reservio', label: 'Reservio' },
-    ],
-  },
-  {
-    grupo: 'WhatsApp / Chatbot',
-    itens: [
-      { value: 'twilio', label: 'Twilio' },
-      { value: '360dialog', label: '360dialog' },
-      { value: 'z-api', label: 'Z-API' },
-      { value: 'blip', label: 'Blip' },
-    ],
-  },
-  {
-    grupo: 'Email marketing',
-    itens: [
-      { value: 'mailchimp', label: 'Mailchimp' },
-      { value: 'activecampaign', label: 'ActiveCampaign' },
-    ],
-  },
-];
-
-const optionsCustoPlataformas = [
-  { value: 'ate-500', label: 'Até R$ 500' },
-  { value: '500-1.5k', label: 'R$ 500 – R$ 1.500' },
-  { value: '1.5-3k', label: 'R$ 1.500 – R$ 3.000' },
-  { value: '3-8k', label: 'R$ 3.000 – R$ 8.000' },
-  { value: '8k+', label: 'Acima de R$ 8.000' },
+const areasInvestimento = [
+  { value: 'comercial', label: 'Time comercial / vendas' },
+  { value: 'atendimento', label: 'Atendimento / suporte' },
+  { value: 'trafego', label: 'Gestão de tráfego' },
+  { value: 'conteudo', label: 'Produção de conteúdo' },
+  { value: 'ferramentas', label: 'Ferramentas / SaaS' },
 ];
 
 const OptionCard: React.FC<{
@@ -220,15 +185,15 @@ export default function ApplicationWizard() {
 
   const [siteName, setSiteName] = useState('');
   const [momento, setMomento] = useState('');
+  const [canais, setCanais] = useState('');
+  const [volume, setVolume] = useState('');
+  const [conteudo, setConteudo] = useState('');
+  const [resposta, setResposta] = useState('');
   const [gargalo, setGargalo] = useState('');
+  const [iaHoje, setIaHoje] = useState('');
+  const [investimentoFaixa, setInvestimentoFaixa] = useState('');
+  const [investimentoAreas, setInvestimentoAreas] = useState<string[]>([]);
   const [velocidade, setVelocidade] = useState('');
-  const [headcount, setHeadcount] = useState('');
-  const [cargos, setCargos] = useState<string[]>([]);
-  const [cargosOutros, setCargosOutros] = useState('');
-  const [custoFuncionario, setCustoFuncionario] = useState('');
-  const [plataformas, setPlataformas] = useState<string[]>([]);
-  const [plataformasOutras, setPlataformasOutras] = useState('');
-  const [custoPlataformas, setCustoPlataformas] = useState('');
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
@@ -252,13 +217,14 @@ export default function ApplicationWizard() {
     const base: StepKey[] = [
       'analise',
       'momento',
+      'canais',
+      'volume',
+      'conteudo',
+      'resposta',
       'gargalo',
+      'ia-hoje',
+      'investimento',
       'velocidade',
-      'headcount',
-      'cargos',
-      'custo-funcionario',
-      'plataformas',
-      'custo-plataformas',
     ];
     const contato: StepKey[] = [];
     if (!nameFromUrl) contato.push('nome');
@@ -281,20 +247,22 @@ export default function ApplicationWizard() {
         return siteName.trim().length > 0;
       case 'momento':
         return momento !== '';
+      case 'canais':
+        return canais !== '';
+      case 'volume':
+        return volume !== '';
+      case 'conteudo':
+        return conteudo !== '';
+      case 'resposta':
+        return resposta !== '';
       case 'gargalo':
         return gargalo !== '';
+      case 'ia-hoje':
+        return iaHoje !== '';
+      case 'investimento':
+        return investimentoFaixa !== '';
       case 'velocidade':
         return velocidade !== '';
-      case 'headcount':
-        return headcount !== '';
-      case 'cargos':
-        return cargos.length > 0 || cargosOutros.trim().length > 0;
-      case 'custo-funcionario':
-        return custoFuncionario !== '';
-      case 'plataformas':
-        return plataformas.length > 0 || plataformasOutras.trim().length > 0;
-      case 'custo-plataformas':
-        return custoPlataformas !== '';
       case 'nome':
         return nome.trim().length > 0;
       case 'email':
@@ -308,15 +276,14 @@ export default function ApplicationWizard() {
     currentStep,
     siteName,
     momento,
+    canais,
+    volume,
+    conteudo,
+    resposta,
     gargalo,
+    iaHoje,
+    investimentoFaixa,
     velocidade,
-    headcount,
-    cargos,
-    cargosOutros,
-    custoFuncionario,
-    plataformas,
-    plataformasOutras,
-    custoPlataformas,
     nome,
     email,
     whatsapp,
@@ -344,15 +311,9 @@ export default function ApplicationWizard() {
 
   const goBack = () => setStepIndex((idx) => Math.max(idx - 1, 0));
 
-  const toggleCargo = (value: string) => {
-    setCargos((prev) =>
-      prev.includes(value) ? prev.filter((c) => c !== value) : [...prev, value],
-    );
-  };
-
-  const togglePlataforma = (value: string) => {
-    setPlataformas((prev) =>
-      prev.includes(value) ? prev.filter((p) => p !== value) : [...prev, value],
+  const toggleArea = (value: string) => {
+    setInvestimentoAreas((prev) =>
+      prev.includes(value) ? prev.filter((a) => a !== value) : [...prev, value],
     );
   };
 
@@ -373,22 +334,15 @@ export default function ApplicationWizard() {
       momento,
       gargalo,
       velocidade,
-      equipe:
-        headcount && custoFuncionario
-          ? {
-              headcount,
-              cargos,
-              cargosOutros: cargosOutros.trim() || undefined,
-              custoMedioFaixa: custoFuncionario,
-            }
-          : undefined,
-      plataformas: custoPlataformas
-        ? {
-            items: plataformas,
-            outras: plataformasOutras.trim() || undefined,
-            custoTotalFaixa: custoPlataformas,
-          }
-        : undefined,
+      marketing: {
+        canais,
+        volume,
+        conteudo,
+        resposta,
+        iaHoje,
+        investimentoFaixa,
+        investimentoAreas,
+      },
     };
 
     setSubmitting(true);
@@ -455,13 +409,14 @@ export default function ApplicationWizard() {
         <div className="space-y-8">
           {currentStep === 'analise' && (
             <div className="space-y-8">
-              <QuestionTitle eyebrow="A transição">
+              <QuestionTitle eyebrow="Diagnóstico de marketing">
                 {nomeFromUrlFallback(nameFromUrl)}
-                Mapeando sua presença digital
+                Vamos montar seu diagnóstico
               </QuestionTitle>
               <p className="text-black/60 text-[15px] text-center max-w-[520px] mx-auto">
-                Cole o site ou @instagram do seu negócio. Vamos cruzar com os
-                sinais de mercado antes das próximas perguntas.
+                Comece pelo site ou @instagram do seu negócio. São poucas
+                perguntas — no fim você recebe um diagnóstico do seu funil e de
+                onde a IA pode destravar crescimento.
               </p>
 
               <div className="flex flex-col gap-3 max-w-[480px] mx-auto">
@@ -479,14 +434,14 @@ export default function ApplicationWizard() {
                   disabled={isAnalyzing || !siteName.trim()}
                   className="w-full px-6 py-4 rounded-xl bg-[#111] text-white font-medium hover:bg-[#0B2FFF] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {isAnalyzing ? 'Analisando...' : 'Iniciar análise'}
+                  {isAnalyzing ? 'Preparando...' : 'Começar diagnóstico'}
                 </button>
               </div>
 
               {isAnalyzing ? (
                 <div className="flex items-center justify-center gap-3 text-black/50 text-sm">
                   <div className="w-4 h-4 border-2 border-black/20 border-t-[#0B2FFF] rounded-full animate-spin" />
-                  Analisando sinais de mercado e posicionamento...
+                  Preparando seu diagnóstico...
                 </div>
               ) : null}
             </div>
@@ -494,7 +449,7 @@ export default function ApplicationWizard() {
 
           {currentStep === 'momento' && (
             <div className="space-y-6">
-              <QuestionTitle eyebrow="Pergunta 1">
+              <QuestionTitle eyebrow="Seu momento">
                 Em qual fase sua empresa se encontra hoje?
               </QuestionTitle>
               <div className="grid gap-3 max-w-[560px] mx-auto w-full">
@@ -511,10 +466,82 @@ export default function ApplicationWizard() {
             </div>
           )}
 
+          {currentStep === 'canais' && (
+            <div className="space-y-6">
+              <QuestionTitle eyebrow="Aquisição · 1/3">
+                De onde vêm seus clientes hoje?
+              </QuestionTitle>
+              <div className="grid gap-3 max-w-[560px] mx-auto w-full">
+                {optionsCanais.map((option) => (
+                  <OptionCard
+                    key={option.value}
+                    title={option.label}
+                    selected={canais === option.value}
+                    onClick={() => setCanais(option.value)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {currentStep === 'volume' && (
+            <div className="space-y-6">
+              <QuestionTitle eyebrow="Aquisição · 2/3">
+                Quantos leads novos você recebe por mês?
+              </QuestionTitle>
+              <div className="grid gap-3 grid-cols-1 md:grid-cols-2 max-w-[560px] mx-auto w-full">
+                {optionsVolume.map((option) => (
+                  <OptionCard
+                    key={option.value}
+                    title={option.label}
+                    selected={volume === option.value}
+                    onClick={() => setVolume(option.value)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {currentStep === 'conteudo' && (
+            <div className="space-y-6">
+              <QuestionTitle eyebrow="Aquisição · 3/3">
+                Quem produz seu conteúdo e com que frequência?
+              </QuestionTitle>
+              <div className="grid gap-3 max-w-[560px] mx-auto w-full">
+                {optionsConteudo.map((option) => (
+                  <OptionCard
+                    key={option.value}
+                    title={option.label}
+                    selected={conteudo === option.value}
+                    onClick={() => setConteudo(option.value)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {currentStep === 'resposta' && (
+            <div className="space-y-6">
+              <QuestionTitle eyebrow="Conversão · 1/2">
+                Quando um lead chega, em quanto tempo ele é respondido?
+              </QuestionTitle>
+              <div className="grid gap-3 grid-cols-1 md:grid-cols-2 max-w-[560px] mx-auto w-full">
+                {optionsResposta.map((option) => (
+                  <OptionCard
+                    key={option.value}
+                    title={option.label}
+                    selected={resposta === option.value}
+                    onClick={() => setResposta(option.value)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
           {currentStep === 'gargalo' && (
             <div className="space-y-6">
-              <QuestionTitle eyebrow="Pergunta 2">
-                O que está impedindo sua empresa de dobrar o lucro hoje?
+              <QuestionTitle eyebrow="Conversão · 2/2">
+                O que mais trava o crescimento da sua empresa hoje?
               </QuestionTitle>
               <div className="grid gap-3 max-w-[560px] mx-auto w-full">
                 {optionsGargalo.map((option) => (
@@ -530,143 +557,84 @@ export default function ApplicationWizard() {
             </div>
           )}
 
+          {currentStep === 'ia-hoje' && (
+            <div className="space-y-6">
+              <QuestionTitle eyebrow="Maturidade em IA">
+                Você já usa IA ou automação no seu marketing?
+              </QuestionTitle>
+              <p className="text-[13px] text-black/50 text-center">
+                Sem julgamento. Quem já tentou e se frustrou costuma destravar
+                rápido com o acompanhamento certo.
+              </p>
+              <div className="grid gap-3 grid-cols-1 md:grid-cols-2 max-w-[560px] mx-auto w-full">
+                {optionsIaHoje.map((option) => (
+                  <OptionCard
+                    key={option.value}
+                    title={option.label}
+                    selected={iaHoje === option.value}
+                    onClick={() => setIaHoje(option.value)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {currentStep === 'investimento' && (
+            <div className="space-y-6">
+              <QuestionTitle eyebrow="Investimento atual">
+                Quanto você investe por mês em marketing e operação comercial?
+              </QuestionTitle>
+              <div className="grid gap-3 grid-cols-1 md:grid-cols-2 max-w-[560px] mx-auto w-full">
+                {optionsInvestimento.map((option) => (
+                  <OptionCard
+                    key={option.value}
+                    title={option.label}
+                    selected={investimentoFaixa === option.value}
+                    onClick={() => setInvestimentoFaixa(option.value)}
+                  />
+                ))}
+              </div>
+              <div className="max-w-[620px] mx-auto space-y-2">
+                <p className="text-[13px] text-black/50 text-center">
+                  Onde esse valor é mais concentrado? (opcional)
+                </p>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {areasInvestimento.map((area) => (
+                    <ChipOption
+                      key={area.value}
+                      label={area.label}
+                      selected={investimentoAreas.includes(area.value)}
+                      onClick={() => toggleArea(area.value)}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
           {currentStep === 'velocidade' && (
             <div className="space-y-6">
-              <QuestionTitle eyebrow="Pergunta 3">
-                Se desenharmos um Plano de Aceleração para os próximos 90 dias,
+              <QuestionTitle eyebrow="Prontidão">
+                Se desenharmos um plano de crescimento para os próximos 90 dias,
                 você estaria pronto para começar?
               </QuestionTitle>
               <div className="grid gap-3 max-w-[560px] mx-auto w-full">
-                {optionsVelocidade.map((option) => (
+                {[
+                  { value: 'prioridade', label: 'Sim, é prioridade total.' },
+                  {
+                    value: 'validar',
+                    label: 'Sim, mas preciso validar o investimento.',
+                  },
+                  {
+                    value: 'pesquisando',
+                    label: 'Não, estou apenas pesquisando mercado.',
+                  },
+                ].map((option) => (
                   <OptionCard
                     key={option.value}
                     title={option.label}
                     selected={velocidade === option.value}
                     onClick={() => setVelocidade(option.value)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {currentStep === 'headcount' && (
-            <div className="space-y-6">
-              <QuestionTitle eyebrow="Operação · 1/5">
-                Quantas pessoas trabalham na sua empresa?
-              </QuestionTitle>
-              <div className="grid gap-3 grid-cols-1 md:grid-cols-2 max-w-[560px] mx-auto w-full">
-                {optionsHeadcount.map((opt) => (
-                  <OptionCard
-                    key={opt.value}
-                    title={opt.label}
-                    selected={headcount === opt.value}
-                    onClick={() => setHeadcount(opt.value)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {currentStep === 'cargos' && (
-            <div className="space-y-6">
-              <QuestionTitle eyebrow="Operação · 2/5">
-                Quais cargos existem na sua equipe hoje?
-              </QuestionTitle>
-              <p className="text-[13px] text-black/50 text-center">
-                Marque todos que se aplicam. Use o campo abaixo pra cargos que
-                não estão na lista.
-              </p>
-              <div className="flex flex-wrap gap-2 justify-center max-w-[620px] mx-auto">
-                {cargosDisponiveis.map((cargo) => (
-                  <ChipOption
-                    key={cargo.value}
-                    label={cargo.label}
-                    selected={cargos.includes(cargo.value)}
-                    onClick={() => toggleCargo(cargo.value)}
-                  />
-                ))}
-              </div>
-              <div className="max-w-[480px] mx-auto">
-                <input
-                  type="text"
-                  value={cargosOutros}
-                  onChange={(e) => setCargosOutros(e.target.value)}
-                  placeholder="Outros cargos (separe por vírgula)"
-                  className="w-full px-4 py-3 rounded-xl border border-black/10 focus:outline-none focus:ring-2 focus:ring-[#0B2FFF]/30 text-sm"
-                />
-              </div>
-            </div>
-          )}
-
-          {currentStep === 'custo-funcionario' && (
-            <div className="space-y-6">
-              <QuestionTitle eyebrow="Operação · 3/5">
-                Qual o custo médio mensal por funcionário?
-              </QuestionTitle>
-              <div className="grid gap-3 grid-cols-1 md:grid-cols-2 max-w-[560px] mx-auto w-full">
-                {optionsCustoFuncionario.map((opt) => (
-                  <OptionCard
-                    key={opt.value}
-                    title={opt.label}
-                    selected={custoFuncionario === opt.value}
-                    onClick={() => setCustoFuncionario(opt.value)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {currentStep === 'plataformas' && (
-            <div className="space-y-6">
-              <QuestionTitle eyebrow="Operação · 4/5">
-                Quais plataformas sua empresa paga hoje?
-              </QuestionTitle>
-              <p className="text-[13px] text-black/50 text-center">
-                Marque todas que usa — agrupadas por tipo.
-              </p>
-              <div className="space-y-5 max-w-[620px] mx-auto">
-                {plataformasDisponiveis.map((grupo) => (
-                  <div key={grupo.grupo} className="space-y-2">
-                    <div className="text-[11px] font-semibold uppercase tracking-wider text-black/50 text-center">
-                      {grupo.grupo}
-                    </div>
-                    <div className="flex flex-wrap gap-2 justify-center">
-                      {grupo.itens.map((item) => (
-                        <ChipOption
-                          key={item.value}
-                          label={item.label}
-                          selected={plataformas.includes(item.value)}
-                          onClick={() => togglePlataforma(item.value)}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="max-w-[480px] mx-auto">
-                <input
-                  type="text"
-                  value={plataformasOutras}
-                  onChange={(e) => setPlataformasOutras(e.target.value)}
-                  placeholder="Outras plataformas (separe por vírgula)"
-                  className="w-full px-4 py-3 rounded-xl border border-black/10 focus:outline-none focus:ring-2 focus:ring-[#0B2FFF]/30 text-sm"
-                />
-              </div>
-            </div>
-          )}
-
-          {currentStep === 'custo-plataformas' && (
-            <div className="space-y-6">
-              <QuestionTitle eyebrow="Operação · 5/5">
-                Quanto você paga por mês no total em plataformas?
-              </QuestionTitle>
-              <div className="grid gap-3 grid-cols-1 md:grid-cols-2 max-w-[560px] mx-auto w-full">
-                {optionsCustoPlataformas.map((opt) => (
-                  <OptionCard
-                    key={opt.value}
-                    title={opt.label}
-                    selected={custoPlataformas === opt.value}
-                    onClick={() => setCustoPlataformas(opt.value)}
                   />
                 ))}
               </div>
@@ -694,7 +662,7 @@ export default function ApplicationWizard() {
           {currentStep === 'email' && (
             <div className="space-y-6">
               <QuestionTitle eyebrow="Contato">
-                Qual o melhor e-mail pra te enviar a análise?
+                Qual o melhor e-mail pra te enviar o diagnóstico?
               </QuestionTitle>
               <div className="max-w-[420px] mx-auto">
                 <input
@@ -711,8 +679,8 @@ export default function ApplicationWizard() {
 
           {currentStep === 'whatsapp' && (
             <div className="space-y-6">
-              <QuestionTitle eyebrow="Última etapa · Perfil pré-aprovado">
-                Pra qual WhatsApp nosso consultor deve enviar os detalhes?
+              <QuestionTitle eyebrow="Última etapa">
+                Pra qual WhatsApp enviamos seu diagnóstico?
               </QuestionTitle>
               <div className="max-w-[420px] mx-auto space-y-3">
                 <input
@@ -724,8 +692,26 @@ export default function ApplicationWizard() {
                   className="w-full px-4 py-4 rounded-xl border border-black/10 focus:outline-none focus:ring-2 focus:ring-[#0B2FFF]/30 text-[16px] text-center"
                 />
                 <p className="text-[13px] text-black/50 text-center">
-                  Usado apenas para entregar sua análise e agendar a Sessão
+                  Usado apenas para entregar seu diagnóstico e agendar a Sessão
                   Estratégica.
+                </p>
+              </div>
+
+              <div className="max-w-[460px] mx-auto pt-4 mt-2 border-t border-black/10 text-center">
+                <p className="text-[13px] text-black/50">
+                  Por trás da IA, tem gente. Fale com um dos fundadores da
+                  Futurah.
+                </p>
+                <a
+                  href={WHATSAPP_FUNDADOR_LINK}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 mt-3 px-5 py-2.5 rounded-xl border border-[#0B2FFF]/30 text-[#0B2FFF] font-medium text-[14px] hover:bg-[#F4F6FF] transition-colors"
+                >
+                  Chamar no WhatsApp
+                </a>
+                <p className="text-[12px] text-black/35 mt-2">
+                  {WHATSAPP_FUNDADOR_DISPLAY}
                 </p>
               </div>
             </div>
@@ -762,7 +748,7 @@ export default function ApplicationWizard() {
                 disabled={!canAdvance || submitting}
                 className="px-6 py-3 rounded-xl bg-[#111] text-white font-medium hover:bg-[#0B2FFF] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {submitting ? 'Enviando...' : 'Enviar ➔'}
+                {submitting ? 'Enviando...' : 'Ver meu diagnóstico ➔'}
               </button>
             )}
           </div>

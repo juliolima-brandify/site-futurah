@@ -1,15 +1,10 @@
 import { eq } from "drizzle-orm";
 import { generateObject } from "ai";
-import {
-  db,
-  analises,
-  type EquipeAnalise,
-  type PlataformasAnalise,
-} from "@/lib/db";
+import { db, analises, type MarketingAnalise } from "@/lib/db";
 import { analiseModel } from "./gateway";
 import { analiseGeradaSchema } from "./schema";
 import { buildPrompt } from "./prompt-analise";
-import { calcularEconomia } from "./economia";
+import { calcularEconomiaMarketing } from "./economia";
 import { enviarEmailAnalisePronta } from "@/lib/email/resend";
 import type { AnaliseGeradaConteudo, PilarData } from "@/components/proposta/types";
 
@@ -115,8 +110,7 @@ export async function gerarAnaliseEmBackground(analiseId: string): Promise<void>
       .set({ status: "gerando", updatedAt: new Date() })
       .where(eq(analises.id, analiseId));
 
-    const equipe = (row.equipe as EquipeAnalise | null) ?? null;
-    const plataformas = (row.plataformas as PlataformasAnalise | null) ?? null;
+    const marketing = (row.marketing as MarketingAnalise | null) ?? null;
 
     const { system, user } = buildPrompt({
       instagramHandle: row.instagramHandle,
@@ -124,8 +118,7 @@ export async function gerarAnaliseEmBackground(analiseId: string): Promise<void>
       momento: row.momento ?? "",
       gargalo: row.gargalo ?? "",
       velocidade: row.velocidade ?? "",
-      equipe,
-      plataformas,
+      marketing,
     });
 
     const { object: parsed } = await generateObject({
@@ -136,7 +129,7 @@ export async function gerarAnaliseEmBackground(analiseId: string): Promise<void>
       temperature: 0.7,
     });
 
-    const economia = calcularEconomia(equipe, plataformas);
+    const economia = calcularEconomiaMarketing(marketing);
 
     // Snapshot imutável da URL da agenda (Calendly etc.). Lemos da env aqui
     // pra que análises antigas não fiquem com link quebrado se a URL global

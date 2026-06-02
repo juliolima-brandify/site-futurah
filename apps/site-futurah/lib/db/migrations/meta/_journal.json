@@ -29,6 +29,13 @@
       "when": 1777036680171,
       "tag": "0003_supreme_frog_thor",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1780405924840,
+      "tag": "0004_smart_magma",
+      "breakpoints": true
     }
   ]
 }

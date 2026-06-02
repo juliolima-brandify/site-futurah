@@ -41,9 +41,13 @@ export const analises = pgTable(
     gargalo: text("gargalo"),
     velocidade: text("velocidade"),
 
-    // qualificação operacional (step 5 do wizard)
+    // qualificação operacional (deprecated — wizard antigo focado em corte de custo)
     equipe: jsonb("equipe"),
     plataformas: jsonb("plataformas"),
+
+    // diagnóstico de marketing IA-first (wizard atual) — funil + maturidade IA
+    // + prova de economia enxuta. Ver MarketingAnalise.
+    marketing: jsonb("marketing"),
 
     // dados externos / gerados
     dadosScraped: jsonb("dados_scraped"),
@@ -117,4 +121,43 @@ export interface PlataformasAnalise {
   items: string[];
   outras?: string;
   custoTotalFaixa: CustoPlataformasFaixa;
+}
+
+// ── Diagnóstico de marketing IA-first (wizard atual) ──────────────────────
+export type CanaisAquisicao =
+  | "organico"
+  | "pago"
+  | "indicacao"
+  | "outbound"
+  | "nao-sei";
+export type VolumeLeads = "ate-10" | "10-50" | "50-200" | "200+" | "nao-medido";
+export type ProducaoConteudo = "eu" | "equipe" | "agencia" | "quase-nao";
+export type TempoResposta =
+  | "minutos"
+  | "horas"
+  | "dia-seguinte"
+  | "sem-processo";
+export type MaturidadeIA = "nunca" | "frustrou" | "pontual" | "estruturado";
+export type InvestimentoFaixa =
+  | "ate-2k"
+  | "2-8k"
+  | "8-20k"
+  | "20-50k"
+  | "50k+";
+export type AreaInvestimento =
+  | "comercial"
+  | "atendimento"
+  | "trafego"
+  | "conteudo"
+  | "ferramentas";
+
+export interface MarketingAnalise {
+  canais: CanaisAquisicao;
+  volume: VolumeLeads;
+  conteudo: ProducaoConteudo;
+  resposta: TempoResposta;
+  iaHoje: MaturidadeIA;
+  // prova de economia enxuta (1 tela): faixa de investimento + áreas
+  investimentoFaixa: InvestimentoFaixa;
+  investimentoAreas: AreaInvestimento[];
 }
