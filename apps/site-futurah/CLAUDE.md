@@ -148,29 +148,30 @@ Fonte padrão: **Neue Haas Grotesk Display** (carregada localmente via `lib/font
 
 ### Fluxo de Análise (pipeline interno)
 
-**Estado (2026-05-15):** fluxo **end-to-end funcional, publicação direta sem revisão humana** — wizard estilo typeform → API → AI Gateway → `/analise/[slug]` numa **página única enxuta** (callout de valor na mesa + slider de maturidade + radar de pilares + cards + CTA + fundadores). Sem Header, sem Footer. Resultado aparece na própria página de espera após ~10-30s. Email transacional via Resend dispara em paralelo (best-effort, não bloqueia publicação) com link pra análise + CTA pra Sessão Estratégica.
+**Estado (2026-06-02):** virada para **marketing IA-first + call-first**. O wizard `/aplicacao` deixou de ser sobre corte de custo operacional (RH/SaaS) e passou a diagnosticar o **funil de marketing**; a `/analise` deixou de ser o "diagnóstico completo" e virou uma **prévia** — o diagnóstico profundo é feito na **call** (WhatsApp de um fundador). Fluxo: wizard typeform → API → AI Gateway → `/analise/[slug]` (prévia) → CTA WhatsApp. Publicação direta sem revisão humana; resultado aparece na página de espera após ~10-30s. Email transacional via Resend segue em paralelo (best-effort).
+
+> **Decisões de produto que guiam essa área** (não inferir do código antigo): (1) eixo = **marketing/crescimento**, não economia operacional; (2) o diagnóstico profundo é **na call**, a página só dá prévia; (3) CTA final sempre **WhatsApp do fundador** (`lib/contato.ts`), não agenda/Calendly; (4) cada problema na prévia segue a narrativa **problema → por que custa → como a IA resolve**, com gancho "a Futurah monta isso pra você" (a solução é algo que o lead não executa sozinho). O número do WhatsApp fica centralizado em `lib/contato.ts`.
 
 #### Entradas (dois caminhos)
 1. **Home** → `components/sections/Contact.tsx` coleta `nome + email + site/@` → `POST /api/contact` (grava em `leads` do Payload) → `router.push('/aplicacao?name=&email=&social=')`.
 2. **Direto** em `/aplicacao` sem query params — nome e email são coletados no próprio wizard, em steps dedicados.
 
 #### Wizard (`components/sections/ApplicationWizard.tsx`)
-Layout **typeform** (uma pergunta por tela, centralizado, sem sidebar). Steps dinâmicos via `useMemo` (9-12 telas conforme caminho):
+Layout **typeform** (uma pergunta por tela). Ordem fixa, validada por pesquisa de quiz funnels (perguntas fáceis primeiro → deal-breakers no fim → gate de contato logo antes da prévia):
 
-1. `analise` — site/@instagram + animação fake de 2s
+1. `analise` — site/@instagram + animação de transição de 2s (copy honesta, **não** faz scraping — isso é decidido na call)
 2. `momento` — fase do negócio (validação/tração/escala)
-3. `gargalo` — dor principal (tráfego/posicionamento/processo/gestão)
-4. `velocidade` — prontidão
-5. `headcount` — tamanho da equipe (Operação 1/5)
-6. `cargos` — multi-select com catálogo + campo livre (Operação 2/5)
-7. `custo-funcionario` — faixa de custo médio (Operação 3/5)
-8. `plataformas` — multi-select agrupado (CRM/Atendimento/Agendamento/WhatsApp/Email) + campo livre (Operação 4/5)
-9. `custo-plataformas` — faixa de custo total mensal (Operação 5/5)
-10. `nome` *(só caminho 2)*
-11. `email` *(só caminho 2)*
-12. `whatsapp` + submit
+3. `canais` — de onde vêm os clientes (orgânico/pago/indicação/outbound/não-sei)
+4. `gargalo` — maior gargalo de crescimento (tráfego/posicionamento/processo/gestão)
+5. `volume` — leads novos por mês
+6. `resposta` — tempo de resposta ao lead (minutos/horas/dia-seguinte/sem-processo)
+7. `ia-hoje` — maturidade em IA (nunca/frustrou/pontual/estruturado)
+8. `investimento` — faixa de investimento mensal em marketing+operação (deal-breaker)
+9. `velocidade` — prontidão pra começar (deal-breaker)
+10. `perrengue` — **pergunta aberta opcional** (textarea): "qual seu maior perrengue?" — material livre pra IA personalizar os problemas
+11. `contato` — **gate único e coeso**: nome + WhatsApp + email numa tela só, enquadrado como "pra onde liberamos seu diagnóstico". Nome/email são pulados se vierem por query (`?name=&email=`). Tem link discreto pro WhatsApp do fundador.
 
-Enter avança, `autoFocus` nos inputs. Validação por step em `canAdvance` — botão "Continuar" fica desabilitado sem resposta.
+As respostas viram o objeto `marketing` (jsonb, ver `MarketingAnalise` em `lib/db/schema.ts`). Enter avança, `autoFocus`, validação por step em `canAdvance`.
 
 #### Ingestão — `POST /api/aplicacao` (`app/api/aplicacao/route.ts`)
 Valida `email` e `instagramHandle`, normaliza handle (remove `@`/URL), gera `slug` via `nanoid(22)`, INSERT em `analises` (status `pendente_dados`, tipo `express`), agenda `gerarAnaliseEmBackground(id)` via **`after()`** do `next/server` (roda fora do response cycle mas dentro do budget da função serverless — sem `after()`, Vercel pode cortar antes do gateway responder). Retorna `{ id, slug }`. Wizard redireciona para `/aplicacao/recebido/[slug]`.
@@ -181,10 +182,10 @@ Orquestrador assíncrono. Fluxo:
 2. Muda status → `gerando`.
 3. Monta prompt (`lib/ai/prompt-analise.ts`) descrevendo o lead com labels humanas e o shape esperado de `AnaliseData` (inclui o briefing dos 6 pilares — ver "Pilares" abaixo).
 4. Chama o **Vercel AI Gateway** via `generateObject({ model: gateway('openai/gpt-4.1-mini'), schema: analiseGeradaSchema, … })`. Modelo configurável via `AI_GATEWAY_MODEL` (precisa do prefixo do provider). O zod schema (`lib/ai/schema.ts`) valida o output em runtime — não há mais `JSON.parse` manual.
-5. **Calcula `economiaPrevista` programaticamente** em `lib/ai/economia.ts` — cruza `equipe.cargos` e `plataformas.items` com o catálogo (`lib/ai/catalogo.ts`) para produzir a tabela "custo atual vs projetado + total de economia". Não delega números à IA (evita alucinação).
-6. **Deriva 2 pilares comportamentais** (Maturidade, Velocidade) programaticamente a partir de `momento` / `velocidade` do wizard — sem IA, sem alucinação. Merge com os 6 pilares gerados pela IA → total de 8 pilares em `conteudo.pilares.pilares`.
+5. **Calcula `economiaPrevista`** via `calcularEconomiaMarketing(marketing)` em `lib/ai/economia.ts` — estimativa a partir da faixa de investimento declarada + áreas (determinístico, sem IA). **OBS:** essa economia **não é mais renderizada na `/analise`** (a seção "R$ na mesa" saiu no call-first); fica no `conteudo` por compat. A função antiga `calcularEconomia(equipe, plataformas)` (catálogo de cargos/SaaS) segue existindo só pro modelo legado.
+6. **Pilares (8):** a IA gera 6 (`schema.ts`/`prompt-analise.ts`), cada **pilar de dor (score ≤ 5)** vem com a narrativa `problema` / `impacto` / `solucaoIA` / `antes` / `depois` (os saudáveis vêm com esses campos `null`). +2 pilares comportamentais (Maturidade, Velocidade) derivados em código a partir de `momento`/`velocidade`. Merge → 8 em `conteudo.pilares.pilares`. O prompt usa o `perrengue` (texto livre) pra personalizar os problemas.
 7. Salva `conteudo` + status → `publicada` direto (`publishedAt = now()`). **Sem revisão humana no caminho.**
-8. Dispara `enviarEmailAnalisePronta` (Resend) com link da análise + CTA pra `agendaUrl`. **Isolado em try/catch interno** — falha de email só loga `[ai/gerar] resend falhou`, NÃO marca a análise como `falhou` (ela já publicou). Sem `RESEND_API_KEY`: helper retorna `{ skipped: true }` silenciosamente.
+8. Dispara `enviarEmailAnalisePronta` (Resend). **Isolado em try/catch interno** — falha de email só loga `[ai/gerar] resend falhou`, NÃO marca a análise como `falhou` (ela já publicou). Sem `RESEND_API_KEY`: helper retorna `{ skipped: true }` silenciosamente.
 
 Se falhar em qualquer etapa (exceto Resend), grava `status='falhou'` + `revisorNotas` com a mensagem.
 
@@ -195,19 +196,22 @@ Se falhar em qualquer etapa (exceto Resend), grava `status='falhou'` + `revisorN
 #### Layout da `/analise/[slug]`
 Página única, focada em diagnóstico + abertura comercial. Não importa Header nem Footer (o `(site)/layout.tsx` também não monta esses chrome — eles só vêm via `PageProposta` em propostas estáticas).
 
-Ordem fixa:
-1. `AnaliseTracker` — client component invisível (`siteId='futurah'`, dispara `analise_view` + `analise_scroll_50/90` via IntersectionObserver e seta `window.__FUTURAH_ANALISE_SLUG__` pra os CTAs).
-2. `ValorNaMesaSection` — callout vermelho "Sua operação está deixando R$ X,XX na mesa todos os meses" (lê `economiaPrevista.totais.economiaMensal`).
-3. `MaturidadeSlider` — slider gradiente vermelho→amarelo→verde, posição = score do pilar `maturidade`.
-4. `RadarPilares` — radar SVG octogonal de 8 vértices. viewBox 800x720, raio 200, labels com pílula colorida por faixa de score (≤4 vermelho, 5-7 amarelo, ≥8 verde). Sem libs externas — SVG inline server-rendered.
-5. `PilaresCards` — lista de 8 cards (bolinha + nome + descrição curta + pill `N/10`).
-6. `CtaTeaserSection` — bloco escuro "O plano de ação completo está pronto" com CTA pra `agendaUrl`. Instrumentado via `AnaliseCTA location="teaser"`.
-7. `TeamTestimonialSection` — fundadores (Julio + Vinicius).
+A `/analise` é a **prévia** (não o diagnóstico completo). Ordem fixa:
+1. `AnaliseTracker` — client component invisível (`siteId='futurah'`, dispara `analise_view` + `analise_scroll_50/90` e seta `window.__FUTURAH_ANALISE_SLUG__` pra os CTAs).
+2. `MaturidadeSlider` — slider gradiente vermelho→amarelo→verde, posição = score do pilar `maturidade`.
+3. `RadarPilares` — radar SVG octogonal de 8 vértices (severidade por cor: ≤4 vermelho, 5-7 amarelo, ≥8 verde). SVG inline server-rendered.
+4. `PilaresCards` — **narrativa por problema**: separa os pilares de dor (score ≤ 5 com narrativa) num bloco "Seus maiores vazamentos de crescimento" (ordenados piores primeiro), cada card com `problema → impacto → solucaoIA` + contraste **antes→depois** + gancho pra call; pilares saudáveis viram chips compactos ("o que já está de pé"). Degrada gracioso pra análises antigas sem os campos novos (vira só chips).
+5. `CtaCallSection` — bloco escuro "Seu diagnóstico completo a gente faz junto" → CTA **WhatsApp do fundador** (`lib/contato.ts`, msg pré-preenchida). Instrumentado via `AnaliseCTA location="teaser"`. (Substituiu o `CtaTeaserSection`, que apontava pra agenda — esse só é usado em propostas estáticas agora.)
+6. `TeamTestimonialSection` — fundadores (Julio + Vinicius).
 
-Todos os componentes de proposta tradicionais (`Hero`, `Retrato`, `Diagnostico`, `Tese`, `Frentes`, `BancoIdeias`, `Fases`, `Escopo`, `Potencial`, `Economia` detalhada, `Encerramento`, `MiniFaq`) **continuam existindo** mas só são usados pelas propostas estáticas via `PageProposta`. Análise gerada não toca neles.
+**Removido da `/analise` no call-first:** `ValorNaMesaSection` (economia "R$ na mesa") — não cabe quando o diagnóstico é na call. O componente ainda existe pra propostas estáticas.
+
+**Rota de preview:** `app/(site)/analise/preview/page.tsx` renderiza a prévia com dados mock (sem DB/IA), `noindex` — usada pra revisar layout. **Temporária**, remover após validação.
+
+Todos os componentes de proposta tradicionais (`Hero`, `Retrato`, `Diagnostico`, `Tese`, `Frentes`, `BancoIdeias`, `Fases`, `Escopo`, `Potencial`, `Economia` detalhada, `Encerramento`, `MiniFaq`) **continuam existindo** mas só são usados pelas propostas estáticas via `PageProposta`.
 
 #### O que ainda falta
-- **Scraping real do Instagram**: IA hoje só tem os dados do wizard; `dados_scraped` fica `null`. Pipeline externo (n8n/worker Python) ainda não existe — B3 do gap plan.
+- **Scraping real do Instagram**: **descopado do site** (decisão 2026-06-02) — a análise profunda do perfil é feita na call, não automatizada. `dados_scraped` segue `null`; a IA usa só os dados do wizard pra montar a prévia.
 - **Stripe** pra `tipo='completa'` — B7. Hoje só `express` é gerado (grátis).
 - **`tenant_id` em `analises`** — B6. Schema atual é sem tenant; análises não são isoladas por cliente da agência.
 - **Tracking em `analise_eventos`** — H4 (Postgres). Tabela + índice existem mas não populadas; tracking real vai pro Analytics Engine via tracker-worker.
@@ -221,13 +225,13 @@ Todo o código de geração fica aqui, server-only.
 | Arquivo | Responsabilidade |
 |---|---|
 | `gateway.ts` | Cliente do **Vercel AI Gateway** via `@ai-sdk/gateway`. Exporta `analiseModel()` + `ANALISE_MODEL`. Em prod (deploy Vercel) autentica via OIDC; em dev local exige `AI_GATEWAY_API_KEY`. |
-| `schema.ts` | Schema **zod** enxuto do output da IA: SÓ `meta` (title/description da página HTML) + `pilares.pilares` (6 pilares). Nada mais. Maturidade/Velocidade são derivados em `gerar.ts` a partir do wizard. `economiaPrevista` é calculada em `economia.ts`. `agendaUrl` vem da env. Reduzido em 2026-05-11 — antes incluía hero/retrato/diagnostico/tese/frentes/banco/fases/escopo/potencial/encerramento/faq que não eram mais renderizados. Cada chave dos pilares vem de enum estrito (`aquisicao`, `posicionamento`, `processo-comercial`, `capacidade-operacional`, `stack-plataformas`, `automacao-ia`), score 0-10 inteiro, descrição ~140 chars. |
+| `schema.ts` | Schema **zod** do output da IA: `meta` (title/description) + `pilares.pilares` (6 pilares). Cada pilar: chave (enum: `aquisicao`, `posicionamento`, `processo-comercial`, `capacidade-operacional`, `stack-plataformas`, `automacao-ia`), score 0-10, `descricao` ~140 chars, e a **narrativa** `problema`/`impacto`/`solucaoIA`/`antes`/`depois` (`nullable` — preenchida só pros de dor score≤5). Maturidade/Velocidade derivados em `gerar.ts`. |
 | `catalogo.ts` | **Catálogo de substituição** — source of truth do "o que a Futurah substitui". Dois maps: `CATALOGO_CARGOS` (10 cargos: sdr, atendente-whatsapp, agendadora, suporte-n1, qualificador, social-media, gestor-trafego, webdesigner, financeiro-op, recepcionista) e `CATALOGO_PLATAFORMAS` (19 SaaS agrupados em CRM/Atendimento/Agendamento/WhatsApp/Email). Cada entry tem `{ label, substituivel: boolean, como/alternativa: string }`. Também `CUSTO_ESTIMADO_CARGO` e `CUSTO_ESTIMADO_PLATAFORMA` (pontos de referência em R$). |
-| `economia.ts` | `calcularEconomia(equipe, plataformas)` determinístico — monta `EconomiaPrevistaData` cruzando respostas do wizard com o catálogo. Fator de escala por headcount e ajuste por faixa de custo. Totaliza `custoAtualMensal`/`custoProjetadoMensal`/`economiaMensal`/`economiaAnual` + CTA para Sessão Estratégica. |
-| `prompt-analise.ts` | `buildPrompt(input)` retorna `{ system, user }`. System = persona Futurah enxuta + regras gerais + `META_BRIEF` (instruções pro title/description da página) + `PILARES_BRIEF` (critérios de calibração por gargalo/momento pra cada um dos 6 pilares — força que ≥1 pilar de "dor" fique ≤4 e automação-IA sempre ≤5, pra criar abertura comercial). User = dados do lead com labels humanizadas. Reduzido em 2026-05-11 — antes incluía regras pra `{{highlight}}`/`{{italic}}` em tese/encerramento, que sumiram do output. |
+| `economia.ts` | **`calcularEconomiaMarketing(marketing)`** (atual) — estima economia a partir da faixa de investimento + áreas declaradas no wizard. `calcularEconomia(equipe, plataformas)` (legado, catálogo de cargos/SaaS) segue existindo só pro modelo antigo. **OBS:** a economia não é mais renderizada na `/analise` no fluxo call-first. |
+| `prompt-analise.ts` | `buildPrompt(input)` retorna `{ system, user }`. System = persona Futurah **marketing IA-first** + `META_BRIEF` + `PILARES_BRIEF` (calibra os 6 pilares por sinais de **funil**: canal, volume, tempo de resposta, maturidade IA; força ≥1 pilar de dor ≤4 e automação-IA ≤6; manda gerar a narrativa problema/impacto/solucaoIA/antes/depois pros pilares de dor). User = dados do lead (inclui o `perrengue` livre, quando houver). |
 | `gerar.ts` | `gerarAnaliseEmBackground(id)` — orquestrador. Inclui `derivarPilaresComportamentais(momento, velocidade)` que produz 2 pilares âncora sem IA (Maturidade: validação=3/tração=6/escala=8; Velocidade: pesquisando=2/validar=6/prioridade=9). Merge com 6 pilares da IA → 8 totais. Salva `conteudo` como **`AnaliseGeradaConteudo`** (não `AnaliseData` — subset enxuto). Publica direto com `status='publicada'` (sem revisão humana). |
 
-**Como estender o catálogo** (ex: adicionar o cargo "copywriter"):
+**Como estender o catálogo** (legado — só afeta `calcularEconomia`/propostas estáticas; o wizard atual não usa mais cargos/SaaS):
 1. Adicionar entry em `CATALOGO_CARGOS` (`lib/ai/catalogo.ts`) com `substituivel`/`como`.
 2. Adicionar estimativa em `CUSTO_ESTIMADO_CARGO`.
 3. Adicionar opção em `cargosDisponiveis` (`components/sections/ApplicationWizard.tsx`) para aparecer no wizard.
