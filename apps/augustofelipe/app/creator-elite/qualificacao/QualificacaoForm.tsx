@@ -7,19 +7,14 @@ type FormData = {
   email: string;
   whatsapp: string;
   instagram: string;
-
   seguidores: string;
   monetiza: string;
-
   faturamento: string;
   nicho: string;
-
   necessidade: string;
   travamento: string;
-
   investimentoAnterior: string;
   prontoParaComecar: string;
-
   maiorDor: string;
   porQueAugusto: string;
 };
@@ -145,42 +140,74 @@ const STEPS: Step[] = [
     },
   },
   {
-    key: "situacao",
-    label: "Situação atual",
+    key: "seguidores",
+    label: "Seguidores",
     validate: (d) => {
       const e: Errors = {};
       if (!d.seguidores) e.seguidores = "Escolha uma opção.";
+      return e;
+    },
+  },
+  {
+    key: "monetiza",
+    label: "Monetização",
+    validate: (d) => {
+      const e: Errors = {};
       if (!d.monetiza) e.monetiza = "Escolha uma opção.";
       return e;
     },
   },
   {
-    key: "faturamento-nicho",
-    label: "Faturamento & nicho",
+    key: "faturamento",
+    label: "Faturamento",
     validate: (d) => {
       const e: Errors = {};
       if (!d.faturamento) e.faturamento = "Escolha uma faixa.";
+      return e;
+    },
+  },
+  {
+    key: "nicho",
+    label: "Nicho",
+    validate: (d) => {
+      const e: Errors = {};
       if (d.nicho.trim().length < 10)
         e.nicho = "Descreva seu nicho (mínimo 10 caracteres).";
       return e;
     },
   },
   {
-    key: "encaixe",
+    key: "necessidade",
     label: "O que você precisa",
     validate: (d) => {
       const e: Errors = {};
       if (!d.necessidade) e.necessidade = "Escolha uma opção.";
+      return e;
+    },
+  },
+  {
+    key: "travamento",
+    label: "O que está travando",
+    validate: (d) => {
+      const e: Errors = {};
       if (!d.travamento) e.travamento = "Escolha uma opção.";
       return e;
     },
   },
   {
-    key: "comprometimento",
-    label: "Comprometimento",
+    key: "investimento-anterior",
+    label: "Investimento anterior",
     validate: (d) => {
       const e: Errors = {};
       if (!d.investimentoAnterior) e.investimentoAnterior = "Escolha uma opção.";
+      return e;
+    },
+  },
+  {
+    key: "pronto-para-comecar",
+    label: "Prontidão",
+    validate: (d) => {
+      const e: Errors = {};
       if (!d.prontoParaComecar) e.prontoParaComecar = "Escolha uma opção.";
       return e;
     },
@@ -419,7 +446,7 @@ function IntroScreen({
   onRestart: () => void;
 }) {
   return (
-    <div className="min-h-screen bg-neutral-50 text-neutral-900 flex flex-col">
+    <div className="min-h-dvh bg-neutral-50 text-neutral-900 flex flex-col">
       <main className="flex-1 px-6 py-16 max-w-2xl mx-auto w-full">
         <p className="text-xs uppercase tracking-[0.18em] text-neutral-500 font-semibold">
           Augusto Felipe · Mentoria
@@ -489,7 +516,7 @@ function IntroScreen({
 
 function SubmittingScreen() {
   return (
-    <div className="min-h-screen bg-neutral-50 grid place-items-center px-6">
+    <div className="min-h-dvh bg-neutral-50 grid place-items-center px-6">
       <div className="text-center">
         <div className="mx-auto w-12 h-12 rounded-full border-4 border-neutral-200 border-t-neutral-900 animate-spin" />
         <p className="mt-6 text-neutral-700 font-medium">
@@ -503,7 +530,7 @@ function SubmittingScreen() {
 
 function SuccessScreen() {
   return (
-    <div className="min-h-screen bg-neutral-50 flex flex-col">
+    <div className="min-h-dvh bg-neutral-50 flex flex-col">
       <main className="flex-1 grid place-items-center px-6 py-16">
         <div className="max-w-xl w-full text-center">
           <div className="mx-auto w-20 h-20 rounded-full bg-emerald-100 grid place-items-center text-4xl">
@@ -546,7 +573,7 @@ function FormShell({
   const pct = ((stepIdx + 1) / total) * 100;
 
   return (
-    <div className="min-h-screen bg-neutral-50 text-neutral-900 flex flex-col">
+    <div className="min-h-dvh bg-neutral-50 text-neutral-900 flex flex-col">
       <header className="sticky top-0 z-10 bg-neutral-50/90 backdrop-blur border-b border-neutral-200">
         <div className="h-1 w-full bg-neutral-200">
           <div
@@ -569,40 +596,42 @@ function FormShell({
         </div>
       </header>
 
-      <main className="flex-1 px-6 py-10 max-w-2xl mx-auto w-full">
-        {children}
+      <div className="flex-1 flex flex-col max-w-2xl mx-auto w-full">
+        <div className="flex-1 px-6 pt-10 pb-4">
+          {children}
+        </div>
 
-        {submitError && (
-          <p className="mt-6 text-sm text-rose-600 text-center">{submitError}</p>
-        )}
-
-        <button
-          onClick={onNext}
-          type="button"
-          className="mt-10 w-full py-4 rounded-2xl bg-neutral-900 text-white font-semibold text-lg hover:bg-neutral-800 transition"
-        >
-          {isFinal ? "Enviar respostas" : "Continuar →"}
-        </button>
-        <p className="mt-3 text-center text-xs text-neutral-400">
-          Dica: aperte{" "}
-          <kbd className="px-1.5 py-0.5 border border-neutral-300 rounded text-[10px]">
-            Enter
-          </kbd>{" "}
-          pra avançar (ou{" "}
-          <kbd className="px-1.5 py-0.5 border border-neutral-300 rounded text-[10px]">
-            Ctrl
-          </kbd>
-          +
-          <kbd className="px-1.5 py-0.5 border border-neutral-300 rounded text-[10px]">
-            Enter
-          </kbd>{" "}
-          nos campos longos).
-        </p>
-      </main>
-
-      <footer className="text-center text-xs text-neutral-400 py-6">
-        Suas respostas ficam salvas automaticamente no seu navegador.
-      </footer>
+        <div className="px-6 pb-8">
+          {submitError && (
+            <p className="mb-4 text-sm text-rose-600 text-center">{submitError}</p>
+          )}
+          <button
+            onClick={onNext}
+            type="button"
+            className="w-full py-4 rounded-2xl bg-neutral-900 text-white font-semibold text-lg hover:bg-neutral-800 transition"
+          >
+            {isFinal ? "Enviar respostas" : "Continuar →"}
+          </button>
+          <p className="mt-3 text-center text-xs text-neutral-400">
+            Dica: aperte{" "}
+            <kbd className="px-1.5 py-0.5 border border-neutral-300 rounded text-[10px]">
+              Enter
+            </kbd>{" "}
+            pra avançar (ou{" "}
+            <kbd className="px-1.5 py-0.5 border border-neutral-300 rounded text-[10px]">
+              Ctrl
+            </kbd>
+            +
+            <kbd className="px-1.5 py-0.5 border border-neutral-300 rounded text-[10px]">
+              Enter
+            </kbd>{" "}
+            nos campos longos).
+          </p>
+          <p className="mt-4 text-center text-xs text-neutral-400">
+            Suas respostas ficam salvas automaticamente no seu navegador.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
@@ -634,37 +663,97 @@ function StepBody({
           onSubmit={onSubmit}
         />
       );
-    case "situacao":
+    case "seguidores":
       return (
-        <SituacaoStep
-          data={data}
-          errors={errors}
-          setField={setField}
+        <RadioStep
+          title="Quantos seguidores você tem hoje?"
+          name="seguidores"
+          options={SEGUIDORES}
+          value={data.seguidores}
+          onChange={(v) => setField("seguidores", v)}
+          error={errors.seguidores}
         />
       );
-    case "faturamento-nicho":
+    case "monetiza":
       return (
-        <FaturamentoNichoStep
-          data={data}
-          errors={errors}
-          setField={setField}
+        <RadioStep
+          title="Você já monetiza seu Instagram?"
+          name="monetiza"
+          options={MONETIZACOES}
+          value={data.monetiza}
+          onChange={(v) => setField("monetiza", v)}
+          error={errors.monetiza}
+        />
+      );
+    case "faturamento":
+      return (
+        <RadioStep
+          title="Qual é o seu faturamento mensal médio hoje?"
+          helper="Considere só o que vem do Instagram (publi, produtos próprios, serviços, infoprodutos)."
+          name="faturamento"
+          options={FATURAMENTOS}
+          value={data.faturamento}
+          onChange={(v) => setField("faturamento", v)}
+          error={errors.faturamento}
+        />
+      );
+    case "nicho":
+      return (
+        <TextareaStep
+          title="Qual é o seu nicho?"
+          helper="Em 1 ou 2 frases — tema, público, ângulo."
+          value={data.nicho}
+          onChange={(v) => setField("nicho", v)}
+          error={errors.nicho}
           onSubmit={onSubmit}
+          minLen={10}
+          maxLen={300}
+          rows={4}
+          placeholder="Ex: Treino funcional pra mães de bebês de até 1 ano, em casa, sem equipamento."
         />
       );
-    case "encaixe":
+    case "necessidade":
       return (
-        <EncaixeStep
-          data={data}
-          errors={errors}
-          setField={setField}
+        <RadioStep
+          title="O que descreve melhor o que você precisa agora?"
+          name="necessidade"
+          options={NECESSIDADES}
+          value={data.necessidade}
+          onChange={(v) => setField("necessidade", v)}
+          error={errors.necessidade}
         />
       );
-    case "comprometimento":
+    case "travamento":
       return (
-        <ComprometimentoStep
-          data={data}
-          errors={errors}
-          setField={setField}
+        <RadioStep
+          title="Como você descreveria o que está travando você hoje?"
+          name="travamento"
+          options={TRAVAMENTOS}
+          value={data.travamento}
+          onChange={(v) => setField("travamento", v)}
+          error={errors.travamento}
+        />
+      );
+    case "investimento-anterior":
+      return (
+        <RadioStep
+          title="Já investiu em mentoria ou curso de conteúdo antes?"
+          name="investimentoAnterior"
+          options={INVESTIMENTOS}
+          value={data.investimentoAnterior}
+          onChange={(v) => setField("investimentoAnterior", v)}
+          error={errors.investimentoAnterior}
+        />
+      );
+    case "pronto-para-comecar":
+      return (
+        <RadioStep
+          title="Você está pronto para começar agora?"
+          name="prontoParaComecar"
+          options={PRONTIDAO}
+          value={data.prontoParaComecar}
+          onChange={(v) => setField("prontoParaComecar", v)}
+          error={errors.prontoParaComecar}
         />
       );
     case "maior-dor":
@@ -787,199 +876,6 @@ function IdentificacaoStep({
   );
 }
 
-// -- Situação atual --
-
-function SituacaoStep({
-  data,
-  errors,
-  setField,
-}: {
-  data: FormData;
-  errors: Errors;
-  setField: <K extends keyof FormData>(key: K, value: FormData[K]) => void;
-}) {
-  return (
-    <div>
-      <StepTitle>Como está seu perfil hoje?</StepTitle>
-      <StepHelper>Duas perguntas rápidas sobre sua situação atual.</StepHelper>
-
-      <div className="mt-8">
-        <div className="text-sm font-semibold text-neutral-700 mb-3">
-          Quantos seguidores você tem hoje?
-        </div>
-        <RadioGroup
-          name="seguidores"
-          options={SEGUIDORES}
-          value={data.seguidores}
-          onChange={(v) => setField("seguidores", v)}
-          error={errors.seguidores}
-        />
-      </div>
-
-      <div className="mt-10">
-        <div className="text-sm font-semibold text-neutral-700 mb-3">
-          Você já monetiza seu Instagram?
-        </div>
-        <RadioGroup
-          name="monetiza"
-          options={MONETIZACOES}
-          value={data.monetiza}
-          onChange={(v) => setField("monetiza", v)}
-          error={errors.monetiza}
-        />
-      </div>
-    </div>
-  );
-}
-
-// -- Faturamento & nicho --
-
-function FaturamentoNichoStep({
-  data,
-  errors,
-  setField,
-  onSubmit,
-}: {
-  data: FormData;
-  errors: Errors;
-  setField: <K extends keyof FormData>(key: K, value: FormData[K]) => void;
-  onSubmit: () => void;
-}) {
-  return (
-    <div>
-      <StepTitle>Faturamento e nicho.</StepTitle>
-      <StepHelper>
-        Dois dados que ajudam a entender onde você está agora.
-      </StepHelper>
-
-      <div className="mt-8">
-        <div className="text-sm font-semibold text-neutral-700 mb-1">
-          Qual é o seu faturamento mensal médio hoje?
-        </div>
-        <p className="text-xs text-neutral-500 mb-3">
-          Considere só o que vem do Instagram (publi, produtos próprios,
-          serviços, infoprodutos).
-        </p>
-        <RadioGroup
-          name="faturamento"
-          options={FATURAMENTOS}
-          value={data.faturamento}
-          onChange={(v) => setField("faturamento", v)}
-          error={errors.faturamento}
-        />
-      </div>
-
-      <div className="mt-10">
-        <TextareaField
-          label="Qual é o seu nicho?"
-          helper="Em 1 ou 2 frases — tema, público, ângulo."
-          value={data.nicho}
-          onChange={(v) => setField("nicho", v)}
-          error={errors.nicho}
-          onSubmit={onSubmit}
-          minLen={10}
-          maxLen={300}
-          rows={3}
-          placeholder="Ex: Treino funcional pra mães de bebês de até 1 ano, em casa, sem equipamento."
-          autoFocus={false}
-        />
-      </div>
-    </div>
-  );
-}
-
-// -- Encaixe --
-
-function EncaixeStep({
-  data,
-  errors,
-  setField,
-}: {
-  data: FormData;
-  errors: Errors;
-  setField: <K extends keyof FormData>(key: K, value: FormData[K]) => void;
-}) {
-  return (
-    <div>
-      <StepTitle>O que você precisa agora?</StepTitle>
-      <StepHelper>
-        Essas respostas ajudam a entender qual formato de mentoria faz mais
-        sentido pra você.
-      </StepHelper>
-
-      <div className="mt-8">
-        <div className="text-sm font-semibold text-neutral-700 mb-3">
-          O que descreve melhor o que você precisa agora?
-        </div>
-        <RadioGroup
-          name="necessidade"
-          options={NECESSIDADES}
-          value={data.necessidade}
-          onChange={(v) => setField("necessidade", v)}
-          error={errors.necessidade}
-        />
-      </div>
-
-      <div className="mt-10">
-        <div className="text-sm font-semibold text-neutral-700 mb-3">
-          Como você descreveria o que está travando você hoje?
-        </div>
-        <RadioGroup
-          name="travamento"
-          options={TRAVAMENTOS}
-          value={data.travamento}
-          onChange={(v) => setField("travamento", v)}
-          error={errors.travamento}
-        />
-      </div>
-    </div>
-  );
-}
-
-// -- Comprometimento --
-
-function ComprometimentoStep({
-  data,
-  errors,
-  setField,
-}: {
-  data: FormData;
-  errors: Errors;
-  setField: <K extends keyof FormData>(key: K, value: FormData[K]) => void;
-}) {
-  return (
-    <div>
-      <StepTitle>Mais duas perguntas rápidas.</StepTitle>
-
-      <div className="mt-8">
-        <div className="text-sm font-semibold text-neutral-700 mb-3">
-          Já investiu em mentoria ou curso de conteúdo antes?
-        </div>
-        <RadioGroup
-          name="investimentoAnterior"
-          options={INVESTIMENTOS}
-          value={data.investimentoAnterior}
-          onChange={(v) => setField("investimentoAnterior", v)}
-          error={errors.investimentoAnterior}
-        />
-      </div>
-
-      <div className="mt-10">
-        <div className="text-sm font-semibold text-neutral-700 mb-3">
-          Você está pronto para começar agora?
-        </div>
-        <RadioGroup
-          name="prontoParaComecar"
-          options={PRONTIDAO}
-          value={data.prontoParaComecar}
-          onChange={(v) => setField("prontoParaComecar", v)}
-          error={errors.prontoParaComecar}
-        />
-      </div>
-    </div>
-  );
-}
-
 // -----------------------------------------------------------------------------
 // Atoms
 // -----------------------------------------------------------------------------
@@ -1085,6 +981,40 @@ function RadioGroup({
   );
 }
 
+function RadioStep({
+  title,
+  helper,
+  name,
+  options,
+  value,
+  onChange,
+  error,
+}: {
+  title: string;
+  helper?: string;
+  name: string;
+  options: string[];
+  value: string;
+  onChange: (v: string) => void;
+  error?: string;
+}) {
+  return (
+    <div>
+      <StepTitle>{title}</StepTitle>
+      {helper && <StepHelper>{helper}</StepHelper>}
+      <div className="mt-8">
+        <RadioGroup
+          name={name}
+          options={options}
+          value={value}
+          onChange={onChange}
+          error={error}
+        />
+      </div>
+    </div>
+  );
+}
+
 function TextareaStep({
   title,
   helper,
@@ -1095,6 +1025,7 @@ function TextareaStep({
   onSubmit,
   minLen,
   maxLen,
+  rows,
   placeholder,
 }: {
   title: string;
@@ -1106,6 +1037,7 @@ function TextareaStep({
   onSubmit: () => void;
   minLen: number;
   maxLen: number;
+  rows?: number;
   placeholder?: string;
 }) {
   return (
@@ -1128,7 +1060,7 @@ function TextareaStep({
           onSubmit={onSubmit}
           minLen={minLen}
           maxLen={maxLen}
-          rows={7}
+          rows={rows ?? 7}
           placeholder={placeholder}
           autoFocus
         />
