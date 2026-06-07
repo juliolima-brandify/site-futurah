@@ -120,3 +120,62 @@ export const LEAD: Lead = {
     ],
   },
 };
+
+// =============================================================================
+// MAPPER — lead real do Payload (form de qualificação) → shape do deck.
+// Campos do form preenchem os reais; o que NÃO vem do form (gancho derivado,
+// notasPerfil, oferta/preços) cai no default ou é derivado pra não vazar o
+// exemplo. As `answers` casam pelo texto exato da `question` (ver buildAnswers
+// em ../qualificacao/QualificacaoForm.tsx).
+// =============================================================================
+
+export type RawLeadAnswer = { step?: string; question?: string; value?: string };
+
+export type RawLead = {
+  nome?: string | null;
+  email?: string | null;
+  whatsapp?: string | null;
+  social?: string | null;
+  answers?: unknown;
+};
+
+export function mapLeadToDeck(raw: RawLead): Lead {
+  const answers: RawLeadAnswer[] = Array.isArray(raw.answers)
+    ? (raw.answers as RawLeadAnswer[])
+    : [];
+  const ans = (question: string) =>
+    answers.find((a) => a && a.question === question)?.value?.trim() ?? "";
+
+  const nome = (raw.nome ?? "").trim();
+  const seguidores = ans("Seguidores no Instagram") || LEAD.seguidores;
+  const nicho = ans("Nicho / tema principal") || LEAD.nicho;
+  const necessidade = ans("O que você precisa agora");
+
+  return {
+    ...LEAD, // mantém oferta (preços) e demais defaults
+    nome: nome || LEAD.nome,
+    primeiroNome: nome ? nome.split(/\s+/)[0] : LEAD.primeiroNome,
+    instagram: (raw.social ?? "").trim() || LEAD.instagram,
+    whatsapp: (raw.whatsapp ?? "").trim() || LEAD.whatsapp,
+
+    seguidores,
+    nicho,
+    faturamento: ans("Faturamento mensal médio") || LEAD.faturamento,
+    monetizacao: ans("Monetização atual") || LEAD.monetizacao,
+
+    precisaAgora: necessidade || LEAD.precisaAgora,
+    travaPrincipal: ans("O que está travando você hoje") || LEAD.travaPrincipal,
+    porqueAugusto:
+      ans("Por que busca uma mentoria com o Augusto agora") || LEAD.porqueAugusto,
+    prontidao: ans("Pronto para começar") || LEAD.prontidao,
+    jaFezMentoria:
+      ans("Investimento anterior em mentoria ou curso") || LEAD.jaFezMentoria,
+    dor: ans("Maior dor com o Instagram hoje") || LEAD.dor,
+
+    // Não vêm do form — derivar do real pra não exibir o exemplo numa call ao vivo.
+    gancho: `${seguidores} · ${nicho}`,
+    objetivo: necessidade || LEAD.objetivo,
+    prazo: ans("Pronto para começar") || LEAD.prazo,
+    notasPerfil: [], // diagnóstico ao vivo — Augusto preenche/edita
+  };
+}

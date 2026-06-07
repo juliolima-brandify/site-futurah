@@ -1,13 +1,22 @@
 "use client";
 
 import {
+  createContext,
   useCallback,
+  useContext,
   useEffect,
   useRef,
   useState,
   type ReactNode,
 } from "react";
-import { LEAD } from "./lead-data";
+import { LEAD, type Lead } from "./lead-data";
+
+// Lead atual (real, vindo do form de qualificação, ou o exemplo do LEAD).
+// Disponibilizado via contexto pra cada seção ler sem prop drilling.
+const LeadContext = createContext<Lead>(LEAD);
+function useLead() {
+  return useContext(LeadContext);
+}
 
 // -----------------------------------------------------------------------------
 // Deck de VENDAS + DIAGNÓSTICO — apresentado pra lead na call (a lead VÊ a tela).
@@ -27,7 +36,7 @@ const SECTION_LABELS = [
   "Dúvidas",
 ];
 
-export default function SessionDeck() {
+export default function SessionDeck({ lead = LEAD }: { lead?: Lead }) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
 
@@ -122,19 +131,21 @@ export default function SessionDeck() {
       </div>
 
       {/* Scroller */}
-      <div
-        ref={scrollerRef}
-        className="h-full w-full snap-y snap-mandatory overflow-y-scroll scroll-smooth"
-      >
-        <CapaSection />
-        <ContraCapaSection />
-        <IntroducaoSection />
-        <DiagnosticoSection />
-        <SolucoesSection />
-        <ComoFuncionaSection />
-        <PlanosSection />
-        <DuvidasSection />
-      </div>
+      <LeadContext.Provider value={lead}>
+        <div
+          ref={scrollerRef}
+          className="h-full w-full snap-y snap-mandatory overflow-y-scroll scroll-smooth"
+        >
+          <CapaSection />
+          <ContraCapaSection />
+          <IntroducaoSection />
+          <DiagnosticoSection />
+          <SolucoesSection />
+          <ComoFuncionaSection />
+          <PlanosSection />
+          <DuvidasSection />
+        </div>
+      </LeadContext.Provider>
     </div>
   );
 }
@@ -217,6 +228,7 @@ function CapaSection() {
 }
 
 function ContraCapaSection() {
+  const LEAD = useLead();
   return (
     <Section className="bg-gradient-to-b from-neutral-950 to-neutral-900">
       <div className="text-center">
@@ -297,6 +309,7 @@ function IntroducaoSection() {
 // -----------------------------------------------------------------------------
 
 function DiagnosticoSection() {
+  const LEAD = useLead();
   return (
     <Section className="bg-neutral-900">
       <Kicker>Diagnóstico</Kicker>
@@ -310,19 +323,21 @@ function DiagnosticoSection() {
         <DataCard label="Faturamento">{LEAD.faturamento}</DataCard>
         <DataCard label="Como monetiza">{LEAD.monetizacao}</DataCard>
       </div>
-      <div className="mt-8">
-        <div className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-fuchsia-400">
-          O que eu enxergo no seu perfil
+      {LEAD.notasPerfil.length > 0 && (
+        <div className="mt-8">
+          <div className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-fuchsia-400">
+            O que eu enxergo no seu perfil
+          </div>
+          <ul className="space-y-2.5">
+            {LEAD.notasPerfil.map((n, i) => (
+              <li key={i} className="flex gap-3 text-[15px] leading-relaxed text-neutral-200">
+                <span className="mt-1 text-fuchsia-500">→</span>
+                <span>{n}</span>
+              </li>
+            ))}
+          </ul>
         </div>
-        <ul className="space-y-2.5">
-          {LEAD.notasPerfil.map((n, i) => (
-            <li key={i} className="flex gap-3 text-[15px] leading-relaxed text-neutral-200">
-              <span className="mt-1 text-fuchsia-500">→</span>
-              <span>{n}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
+      )}
     </Section>
   );
 }
@@ -332,6 +347,7 @@ function DiagnosticoSection() {
 // -----------------------------------------------------------------------------
 
 function SolucoesSection() {
+  const LEAD = useLead();
   const alavancas = [
     {
       n: "01",
@@ -428,6 +444,7 @@ function ComoFuncionaSection() {
 // -----------------------------------------------------------------------------
 
 function PlanosSection() {
+  const LEAD = useLead();
   return (
     <Section className="bg-neutral-900">
       <Kicker>Opções da mentoria</Kicker>
@@ -483,6 +500,7 @@ function PlanosSection() {
 // -----------------------------------------------------------------------------
 
 function DuvidasSection() {
+  const LEAD = useLead();
   const faq = [
     {
       q: "Em quanto tempo vejo resultado?",
