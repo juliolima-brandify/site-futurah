@@ -18,6 +18,7 @@ import { LEAD } from "./lead-data";
 
 const SECTION_LABELS = [
   "Capa",
+  "Contra capa",
   "Introdução",
   "Diagnóstico",
   "Soluções",
@@ -126,6 +127,7 @@ export default function SessionDeck() {
         className="h-full w-full snap-y snap-mandatory overflow-y-scroll scroll-smooth"
       >
         <CapaSection />
+        <ContraCapaSection />
         <IntroducaoSection />
         <DiagnosticoSection />
         <SolucoesSection />
@@ -201,9 +203,26 @@ function DataCard({ label, children }: { label: string; children: ReactNode }) {
 
 function CapaSection() {
   return (
+    <section className="relative flex h-screen w-screen snap-start items-center justify-center overflow-hidden bg-black">
+      {/* Brand image only — 100% viewport width, full image visible */}
+      <div
+        className="absolute inset-0 bg-center bg-no-repeat"
+        style={{
+          backgroundImage: "url('/creator-elite/capa.png')",
+          backgroundSize: "100vw auto",
+        }}
+      />
+    </section>
+  );
+}
+
+function ContraCapaSection() {
+  return (
     <Section className="bg-gradient-to-b from-neutral-950 to-neutral-900">
       <div className="text-center">
-        <Kicker>Creator Elite · Diagnóstico Estratégico</Kicker>
+        <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-amber-300">
+          Creator Elite · Diagnóstico Estratégico
+        </p>
         <Title>
           {LEAD.nome}
           <span className="mt-2 block text-lg font-medium text-neutral-400">
