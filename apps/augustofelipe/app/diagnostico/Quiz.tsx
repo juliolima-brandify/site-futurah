@@ -51,6 +51,9 @@ const QUESTIONS: Question[] = [
 
 const LETTERS = ["A", "B", "C", "D"];
 
+// Checkout do workshop "Construindo um Viral" (R$ 47) — Cakto.
+const CHECKOUT_URL = "https://pay.cakto.com.br/6ffyvt6_881155";
+
 function ProgressBar({ pct }: { pct: number }) {
   return (
     <div className="h-1.5 w-full bg-neutral-200">
@@ -608,13 +611,19 @@ function CountdownPill() {
 }
 
 function CheckoutCTA({ label }: { label: string }) {
+  // Dispara InitiateCheckout (pixel×CAPI) em onPointerDown pra o evento sair
+  // antes da navegação pro Cakto. O Purchase é disparado pelo próprio Cakto.
+  const handleCheckout = () => {
+    trackConversion("InitiateCheckout", { value: 47, currency: "BRL" });
+  };
   return (
-    <button
-      type="button"
-      className="w-full py-4 rounded-2xl bg-emerald-500 text-white font-semibold text-lg hover:bg-emerald-600 transition"
+    <a
+      href={CHECKOUT_URL}
+      onPointerDown={handleCheckout}
+      className="block w-full py-4 rounded-2xl bg-emerald-500 text-center text-white font-semibold text-lg hover:bg-emerald-600 transition"
     >
       {label} →
-    </button>
+    </a>
   );
 }
 
@@ -1088,8 +1097,9 @@ export default function Quiz({ mode = "pitch" }: { mode?: QuizMode } = {}) {
     setAnswers((prev) => [...prev, answer]);
     if (step === 1) setStep(2);
     else if (step === 2) setStep(3);
-    // LeadCapture desativado por enquanto — pula direto pro resultado.
-    else if (step === 3) setStep("result");
+    // No pitch, captura o lead (gate) antes de liberar o resultado. No waitlist
+    // a captura é o próprio WaitlistStep, então pula direto pro resultado.
+    else if (step === 3) setStep(mode === "waitlist" ? "result" : "lead");
   };
 
   return (

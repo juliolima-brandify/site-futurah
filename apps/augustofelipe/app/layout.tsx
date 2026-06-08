@@ -13,6 +13,10 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   title: "Augusto Felipe",
   description: "Augusto Felipe — hub de landing pages, quizzes e análises.",
+  other: {
+    // Verificação de domínio no Meta Business (AEM / iOS 14.5+).
+    "facebook-domain-verification": "gef606lynfadexvjwsqatozy3nis2y",
+  },
 };
 
 export default function RootLayout({
