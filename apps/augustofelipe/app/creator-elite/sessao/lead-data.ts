@@ -90,10 +90,10 @@ export type Lead = {
 };
 
 export const LEAD: Lead = {
-  nome: "⚠️ TROCAR — nome dela",
-  primeiroNome: "⚠️ TROCAR",
-  instagram: "⚠️trocar", // sem @
-  whatsapp: "⚠️ TROCAR",
+  nome: "Stéfani Maia",
+  primeiroNome: "Stéfani",
+  instagram: "eustefanimaia", // sem @
+  whatsapp: "",
 
   seguidores: "Mais de 100.000",
   nicho: "DIY / reformas (obra)",
