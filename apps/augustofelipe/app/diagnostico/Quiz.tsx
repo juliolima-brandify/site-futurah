@@ -921,8 +921,8 @@ export function PitchStep() {
         <Image
           src="/construindo-um-viral/exemplo-diagnostico.png"
           alt="Exemplo de diagnóstico de perfil feito pela IA do Construindo um Viral"
-          width={695}
-          height={750}
+          width={647}
+          height={748}
           className="h-auto w-full"
         />
       </div>
