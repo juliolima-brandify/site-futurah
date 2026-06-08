@@ -38,6 +38,34 @@ export type Lead = {
   objetivo: string;
   prazo: string;
 
+  // Perfil real do Instagram (puxado via Apify — mock realista na seção 2)
+  perfil?: {
+    fullName: string;
+    username: string; // sem @
+    avatar: string; // path local em /public
+    bio: string; // pode conter \n
+    posts: number;
+    seguidores: number;
+    seguindo: number;
+    verificado: boolean;
+    link?: string; // externalUrl sem https://
+  };
+
+  // Scorecard — pontuação do perfil (após o Diagnóstico). Notas 0-10,
+  // cada uma com o porquê e a fonte. Avaliação curada, baseada em dados reais.
+  scorecard: {
+    notaGeral: number;
+    resumo: string;
+    baseadoEm: string;
+    criterios: { nome: string; nota: number; porque: string; fonte: string }[];
+  };
+
+  // Dream Outcome (Hormozi) — o "depois", o destino que a mentoria entrega
+  dreamOutcome: {
+    headline: string;
+    bullets: string[];
+  };
+
   // Diagnóstico ao vivo — bullets que VOCÊ fala olhando o perfil dela
   notasPerfil: string[];
 
@@ -46,11 +74,17 @@ export type Lead = {
     custoInacao: string;
     garantia: string;
     recomendado: string; // nome do plano que você sugere pra ela
+    // Value Stack (Hormozi) — tudo que entra na mentoria, com valor ancorado.
+    // A soma deve ficar MUITO acima do preço. ⚠️ valores são rascunho — TROCAR.
+    stack: { item: string; valor: string; nota?: string }[];
+    valorAncora: string; // soma percebida do stack (ex: "R$ 38.000")
+    urgencia: string; // escassez/por que decidir agora
     planos: {
       nome: string;
       duracao: string;
       preco: string;
       inclui: string[];
+      insignia?: string; // path da insígnia (bronze/prata/ouro)
     }[];
   };
 };
@@ -70,6 +104,18 @@ export const LEAD: Lead = {
   gancho:
     "100k+ em menos de 1 ano — mas presa na obra: fora do nicho, o alcance despenca.",
 
+  perfil: {
+    fullName: "Stéfani Maia",
+    username: "eustefanimaia",
+    avatar: "/creator-elite/eustefanimaia-avatar.jpg",
+    bio: "Transformando sonhos em patrimônio.\nHouse Flipping • Decoração • DIY\nVida real firmada na fé e na família. 🤍\nAssista aos episódios: 👇",
+    posts: 132,
+    seguidores: 149339,
+    seguindo: 661,
+    verificado: true,
+    link: "beacons.ai/eustefanimaia",
+  },
+
   precisaAgora:
     "Acompanhamento por um período curto pra executar um objetivo com suporte.",
   travaPrincipal: "Sabe exatamente o que precisa mudar — só precisa de direção.",
@@ -85,6 +131,61 @@ export const LEAD: Lead = {
     "Fazer o conteúdo simples alcançar mais gente, ganhar engajamento FORA do nicho, estabilizar os números e crescer mais rápido.",
   prazo: "Curto — quer começar já.",
 
+  scorecard: {
+    notaGeral: 5.3,
+    resumo:
+      "Base muito forte, teto travado. A tração já existe — o que falta é alavancar o alcance e construir uma renda própria.",
+    baseadoEm:
+      "Dados públicos do seu Instagram (alcance, frequência e formato dos posts) cruzados com as suas respostas na qualificação.",
+    criterios: [
+      {
+        nome: "Tração / Alcance",
+        nota: 8.5,
+        porque:
+          "149 mil seguidores em ~1 ano (perfil criado em jul/25). Crescimento muito acima da média — o ativo já existe.",
+        fonte: "Instagram: seguidores + data de criação do perfil",
+      },
+      {
+        nome: "Consistência de conteúdo",
+        nota: 6,
+        porque:
+          "132 publicações e presença ativa, mas o ritmo depende de produção pesada (obra) — frágil pra sustentar no algoritmo novo.",
+        fonte: "Instagram: volume de posts + sua resposta sobre produção",
+      },
+      {
+        nome: "Alcance fora do nicho",
+        nota: 3,
+        porque:
+          "O engajamento despenca em qualquer conteúdo fora de obra. O perfil está preso a um público estreito — seu maior teto de crescimento.",
+        fonte: "Sua resposta na qualificação (maior dor)",
+      },
+      {
+        nome: "Monetização própria",
+        nota: 2.5,
+        porque:
+          "Receita 100% de publi avulsa, sem produto próprio. O faturamento existe (R$ 5–20k), mas é refém de marca e sem previsibilidade.",
+        fonte: "Qualificação: faturamento + monetização atual",
+      },
+      {
+        nome: "Posicionamento / Autoridade",
+        nota: 6.5,
+        porque:
+          "Autoridade real no nicho de obra/DIY (contratos fixos, propostas recorrentes), mas o posicionamento é estreito demais pra escalar.",
+        fonte: "Instagram (bio/conteúdo) + qualificação",
+      },
+    ],
+  },
+
+  dreamOutcome: {
+    headline: "Daqui a 90 dias, seu perfil trabalha por você.",
+    bullets: [
+      "Conteúdo simples alcançando muito além da obra — você cresce sem depender de viral nem de produção gigante.",
+      "Um sistema de postagem leve que roda na sua rotina, mesmo nos dias de canteiro.",
+      "Uma renda própria e recorrente além da publi — e liberdade pra escolher (e cobrar mais caro) as marcas que aceitar.",
+      "Clareza total do próximo passo: nada de achismo, cada post com propósito.",
+    ],
+  },
+
   notasPerfil: [
     "100k+ em ~10 meses = tração real. O ativo já existe; o problema é alavancagem, não construção.",
     "Dependência de publi com 0 produto próprio = teto de faturamento e refém de marca. Aqui mora o maior upside.",
@@ -96,29 +197,100 @@ export const LEAD: Lead = {
   oferta: {
     custoInacao:
       "Cada mês com 100k+ sem produto próprio é faturamento recorrente deixado na mesa — e dependência total da publi.",
-    garantia: "⚠️ TROCAR — ex: garantia de execução / 7 dias (opcional)",
+    garantia:
+      "Garantia de execução: se você seguir o plano das calls e não tiver clareza do caminho na primeira semana, a gente refaz seu diagnóstico do zero — sem custo.",
     recomendado: "3 Meses", // ela pediu acompanhamento p/ executar com suporte
+    // ⚠️ VALORES DE ANCORAGEM SÃO RASCUNHO — TROCAR pelos números reais.
+    stack: [
+      {
+        item: "Calls estratégicas 1:1 com o Augusto",
+        valor: "R$ 18.000",
+        nota: "12 sessões ao vivo, direção cirúrgica pro seu perfil",
+      },
+      {
+        item: "Acesso à I.A Creator Elite",
+        valor: "R$ 6.000",
+        nota: "roteiros, ganchos e análise de conteúdo entre as calls",
+      },
+      {
+        item: "Diagnóstico estratégico do seu perfil",
+        valor: "R$ 3.000",
+        nota: "o mapa do que atacar primeiro",
+      },
+      {
+        item: "Grupo no WhatsApp + suporte contínuo",
+        valor: "R$ 4.000",
+        nota: "ajuste de rota sem esperar a próxima call",
+      },
+      {
+        item: "Sistema de conteúdo leve (frameworks)",
+        valor: "R$ 5.000",
+        nota: "pilares, ganchos e produção em lote",
+      },
+      {
+        item: "Bônus: trilha de monetização própria",
+        valor: "R$ 4.000",
+        nota: "como transformar audiência em renda recorrente",
+      },
+    ],
+    valorAncora: "R$ 40.000",
+    urgencia:
+      "São poucas vagas por turma pra manter o acompanhamento de perto — e o valor de hoje é exclusivo desta sessão.",
     planos: [
       {
         nome: "1 Call",
         duracao: "Sessão única",
         preco: "R$ 3.000",
         inclui: ["1 Call estratégica", "Acesso à I.A", "Diagnóstico"],
+        insignia: "/creator-elite/plano-1-bronze.webp",
       },
       {
         nome: "1 Mês",
         duracao: "30 dias",
         preco: "R$ 6.000",
-        inclui: ["1 Call", "Acesso à I.A", "Grupo no WhatsApp", "Diagnóstico"],
+        inclui: ["4 Calls", "Acesso à I.A", "Grupo no WhatsApp", "Diagnóstico"],
+        insignia: "/creator-elite/plano-2-prata.webp",
       },
       {
         nome: "3 Meses",
         duracao: "90 dias",
         preco: "R$ 10.000",
-        inclui: ["4 Calls", "Acesso à I.A", "Grupo no WhatsApp", "Diagnóstico"],
+        inclui: ["12 Calls", "Acesso à I.A", "Grupo no WhatsApp", "Diagnóstico"],
+        insignia: "/creator-elite/plano-3-ouro.webp",
       },
     ],
   },
+};
+
+// =============================================================================
+// MENTOR — dados do Augusto (Prova / Likelihood do Hormozi). Fixo, não vem do
+// lead. Métricas puxadas via Apify de @fidevidraceiro (2026-06-08).
+// =============================================================================
+export const MENTOR = {
+  nome: "Augusto Felipe",
+  username: "fidevidraceiro",
+  avatar: "/creator-elite/augustofelipe-avatar.jpg",
+  verificado: true,
+  resumo:
+    "Não é teoria. O Augusto construiu uma audiência de 765 mil pessoas com conteúdo fora do óbvio — é o caminho que ele já percorreu como creator, e é isso que ele vai te ajudar a fazer.",
+  metricas: [
+    { valor: "765 mil", label: "seguidores" },
+    { valor: "4,7 mi", label: "views no maior reel" },
+    { valor: "+340 mil", label: "curtidas num post" },
+    { valor: "615", label: "conteúdos publicados" },
+  ],
+  // 4 reels MAIS VISTOS (all-time), Apify @fidevidraceiro 2026-06-08.
+  // Instagram não expõe nº de compartilhamentos — só views/likes/comments.
+  reels: [
+    { thumb: "/creator-elite/reel-1.jpg", views: 4666858, likes: 231714, comments: 330 },
+    { thumb: "/creator-elite/reel-2.jpg", views: 4591570, likes: 318405, comments: 826 },
+    { thumb: "/creator-elite/reel-3.jpg", views: 4000115, likes: 246247, comments: 172 },
+    { thumb: "/creator-elite/reel-4.jpg", views: 3681215, likes: 340226, comments: 670 },
+    { thumb: "/creator-elite/reel-5.jpg", views: 3409377, likes: 315984, comments: 1350 },
+    { thumb: "/creator-elite/reel-6.jpg", views: 3328053, likes: 201482, comments: 401 },
+    { thumb: "/creator-elite/reel-7.jpg", views: 2582071, likes: 238999, comments: 166 },
+    { thumb: "/creator-elite/reel-8.jpg", views: 2490680, likes: 153176, comments: 163 },
+  ],
 };
 
 // =============================================================================
