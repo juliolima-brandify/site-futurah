@@ -3,6 +3,15 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { trackConversion } from "@futurah/tracker-sdk";
+import { MENTOR } from "../creator-elite/sessao/lead-data";
+
+// Formata contagem estilo Instagram (4666858 → "4,7 mi", 149339 → "149 mil").
+function igNum(n: number): string {
+  if (n >= 1_000_000)
+    return (n / 1_000_000).toFixed(1).replace(".0", "").replace(".", ",") + " mi";
+  if (n >= 10_000) return Math.round(n / 1000) + " mil";
+  return n.toLocaleString("pt-BR");
+}
 
 type Step = "intro" | 1 | 2 | 3 | "lead" | "result" | "pitch" | "waitlist";
 
@@ -595,12 +604,23 @@ function ResultStep({
 }
 
 function CountdownPill() {
-  const [seconds, setSeconds] = useState(155);
+  const DURATION = 15 * 60; // 15 min
+  const [seconds, setSeconds] = useState<number | null>(null);
   useEffect(() => {
-    if (seconds <= 0) return;
-    const t = setTimeout(() => setSeconds((s) => s - 1), 1000);
-    return () => clearTimeout(t);
-  }, [seconds]);
+    const KEY = "cv_countdown_end";
+    let end = Number(localStorage.getItem(KEY));
+    if (!end || Number.isNaN(end) || end < Date.now()) {
+      end = Date.now() + DURATION * 1000;
+      localStorage.setItem(KEY, String(end));
+    }
+    const tick = () =>
+      setSeconds(Math.max(0, Math.round((end - Date.now()) / 1000)));
+    tick();
+    const t = setInterval(tick, 1000);
+    return () => clearInterval(t);
+  }, []);
+  // null na 1ª render evita mismatch de hidratação.
+  if (seconds === null) return null;
   const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
   const ss = String(seconds % 60).padStart(2, "0");
   return (
@@ -627,6 +647,162 @@ function CheckoutCTA({ label }: { label: string }) {
   );
 }
 
+const FAQ_ITEMS = [
+  {
+    q: "Funciona pro meu nicho?",
+    a: "Sim. O Construindo um Viral é sobre o processo por trás de um conteúdo que viraliza — e isso vale pra qualquer nicho: arte, fitness, gastronomia, negócios, construção, moda. Você aprende a adaptar pra sua realidade.",
+  },
+  {
+    q: "Preciso de equipamento ou edição cara?",
+    a: "Não. Tudo é feito com o celular que você já tem. Sem câmera profissional, sem programa caro, sem equipe.",
+  },
+  {
+    q: "Em quanto tempo vejo resultado?",
+    a: "O foco é você aplicar já nos primeiros 7 dias. O diagnóstico do seu perfil vem com um plano específico pra começar a ajustar essa semana — o resultado depende da sua execução.",
+  },
+  {
+    q: "Como recebo o acesso?",
+    a: "Assim que o pagamento é aprovado, você recebe o acesso ao workshop e ao diagnóstico. É online: assiste quando e quantas vezes quiser.",
+  },
+  {
+    q: "O diagnóstico é genérico ou do meu perfil?",
+    a: "É do SEU perfil. A gente olha seu Instagram hoje — bio, conteúdo, consistência, métricas e posicionamento — e entrega uma nota em cada ponto com um plano de 7 dias.",
+  },
+  {
+    q: "E se eu não gostar?",
+    a: "Você tem 7 dias de garantia. Se aplicar o que o Augusto ensina e sentir que não valeu os R$ 47, é só mandar uma mensagem e devolvemos tudo. Sem burocracia.",
+  },
+];
+
+function FaqSection() {
+  const [open, setOpen] = useState<number | null>(null);
+  return (
+    <div className="mt-12">
+      <h3 className="text-xl md:text-2xl font-extrabold text-center leading-tight">
+        Perguntas frequentes
+      </h3>
+      <div className="mt-6 flex flex-col gap-3">
+        {FAQ_ITEMS.map((item, i) => (
+          <div
+            key={i}
+            className="overflow-hidden rounded-xl border border-neutral-200"
+          >
+            <button
+              type="button"
+              onClick={() => setOpen(open === i ? null : i)}
+              className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left"
+            >
+              <span className="text-[15px] font-semibold text-neutral-900">
+                {item.q}
+              </span>
+              <span className="shrink-0 text-xl text-neutral-400">
+                {open === i ? "−" : "+"}
+              </span>
+            </button>
+            {open === i && (
+              <p className="px-4 pb-4 text-[14px] leading-relaxed text-neutral-600">
+                {item.a}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function VslPlayer() {
+  const [playing, setPlaying] = useState(false);
+  const id = "ThYyzqhNLd4";
+  return (
+    <div className="mt-8 aspect-video max-w-md mx-auto rounded-2xl overflow-hidden bg-neutral-900 relative">
+      {playing ? (
+        <iframe
+          className="absolute inset-0 w-full h-full"
+          src={`https://www.youtube.com/embed/${id}?autoplay=1&rel=0`}
+          title="Como eu cheguei a 59M de views sem pagar nada"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+        />
+      ) : (
+        <button
+          type="button"
+          onClick={() => setPlaying(true)}
+          aria-label="Reproduzir vídeo"
+          className="group absolute inset-0 h-full w-full"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={`https://img.youtube.com/vi/${id}/maxresdefault.jpg`}
+            alt="Como eu cheguei a 59M de views sem pagar nada"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/30 transition group-hover:bg-black/20" />
+          <span className="absolute bottom-4 left-1/2 -translate-x-1/2 grid h-14 w-14 place-items-center rounded-full bg-red-600 transition group-hover:scale-105">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </span>
+        </button>
+      )}
+    </div>
+  );
+}
+
+function ReelsProof() {
+  const reels = MENTOR.reels.slice(0, 6);
+  return (
+    <div className="mt-12">
+      <h3 className="text-xl md:text-2xl font-extrabold text-center leading-tight">
+        Não é sorte. É{" "}
+        <span className="bg-yellow-300 px-1 box-decoration-clone">processo</span>.
+      </h3>
+      <p className="mt-3 text-center text-neutral-500">
+        Alguns dos reels do Augusto aplicando exatamente o que ele ensina no
+        workshop — sem pagar um real em anúncio.
+      </p>
+      <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+        {reels.map((r, i) => (
+          <div
+            key={i}
+            className="relative aspect-[3/4] overflow-hidden rounded-xl bg-neutral-900"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={r.thumb}
+              alt={`Reel ${i + 1}`}
+              className="h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 p-2">
+              <div className="flex items-center gap-1 text-[13px] font-bold text-white drop-shadow">
+                <svg viewBox="0 0 24 24" className="h-3 w-3 fill-white">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+                {igNum(r.views)}
+              </div>
+              <div className="mt-0.5 flex items-center gap-2 text-[10px] font-medium text-neutral-200">
+                <span className="flex items-center gap-0.5">
+                  <svg viewBox="0 0 24 24" className="h-2.5 w-2.5 fill-rose-400">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                  </svg>
+                  {igNum(r.likes)}
+                </span>
+                <span className="flex items-center gap-0.5">
+                  <svg viewBox="0 0 24 24" className="h-2.5 w-2.5 fill-neutral-300">
+                    <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
+                  </svg>
+                  {r.comments.toLocaleString("pt-BR")}
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function PitchStep() {
   return (
     <div className="px-6 py-8 max-w-xl mx-auto">
@@ -643,27 +819,9 @@ function PitchStep() {
         Chega de postar no escuro. Chega de adivinhar o que funciona.
       </p>
 
-      <div className="mt-8 aspect-video max-w-md mx-auto rounded-2xl overflow-hidden bg-neutral-900 relative">
-        <div className="absolute inset-0 grid place-items-center px-6 text-center text-white">
-          <div>
-            <p className="text-xs uppercase tracking-widest text-neutral-400">
-              VSL · Augusto Felipe · ~5 min
-            </p>
-            <p className="mt-2 font-semibold leading-tight">
-              Como eu cheguei a 59M de views sem pagar nada
-            </p>
-          </div>
-        </div>
-        <button
-          type="button"
-          aria-label="Reproduzir vídeo"
-          className="absolute bottom-4 left-1/2 -translate-x-1/2 w-14 h-14 rounded-full bg-red-600 grid place-items-center hover:scale-105 transition"
-        >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
-            <path d="M8 5v14l11-7z" />
-          </svg>
-        </button>
-      </div>
+      <VslPlayer />
+
+      <ReelsProof />
 
       <h3 className="mt-12 text-xl md:text-2xl font-extrabold text-center leading-tight">
         Chega de...
@@ -837,6 +995,8 @@ function PitchStep() {
           Eu só peço uma coisa: tenta de verdade antes de pedir o reembolso.
         </p>
       </div>
+
+      <FaqSection />
 
       <div className="mt-12 text-center">
         <p className="text-neutral-700">
