@@ -803,7 +803,7 @@ function ReelsProof() {
   );
 }
 
-function PitchStep() {
+export function PitchStep() {
   return (
     <div className="px-6 py-8 max-w-xl mx-auto">
       <CountdownPill />
