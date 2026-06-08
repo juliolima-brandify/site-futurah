@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "@futurah/tracker-sdk": "*",
+    "@types/pg": "^8.20.0",
     "next": "15.4.11",
+    "pg": "^8.20.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "resend": "^6.12.3"

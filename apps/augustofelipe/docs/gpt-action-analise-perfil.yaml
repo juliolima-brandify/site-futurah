@@ -1,0 +1,105 @@
+# OpenAPI schema da Action "Análise de Perfil" do Custom GPT "Construindo um Viral".
+# Cole isto em: builder do GPT -> Configure -> Actions -> Create new action -> Schema.
+#
+# Authentication (no mesmo painel):
+#   - Authentication Type: API Key
+#   - Auth Type: Bearer
+#   - API Key: <o mesmo valor de ANALISE_API_KEY configurado no Vercel>
+#
+# Privacy policy: aponte pra https://augustofelipe.com/privacidade (ou a que existir).
+#
+# IMPORTANTE: troque o `servers.url` se o domínio/preview mudar.
+
+openapi: 3.1.0
+info:
+  title: Análise de Perfil — Construindo um Viral
+  description: Puxa dados públicos do perfil do Instagram (bio, métricas e últimos posts) para o diagnóstico do aluno.
+  version: 1.0.0
+servers:
+  - url: https://augustofelipe.com
+paths:
+  /api/analise-perfil:
+    get:
+      operationId: analisarPerfil
+      summary: Busca dados do perfil do Instagram para diagnóstico
+      description: >
+        Recebe o @ do Instagram do aluno e retorna os dados públicos do perfil
+        (nome, bio, seguidores, seguindo, nº de posts, categoria, link) e os
+        últimos posts/Reels com legenda, curtidas, comentários e views.
+        Use estes dados reais para escrever o diagnóstico — não invente números.
+        Se "notes" vier preenchido ou "posts" vier vazio, peça ao aluno os dados
+        que faltam.
+      parameters:
+        - name: handle
+          in: query
+          required: true
+          description: O @ do Instagram do aluno (pode vir com @, sem @, ou como URL).
+          schema:
+            type: string
+        - name: email
+          in: query
+          required: true
+          description: >
+            Email do aluno (o do cadastro na área de membros). Usado para liberar
+            UMA análise gratuita por aluno. Sempre peça o email antes de chamar.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Dados do perfil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  allowed:
+                    type: boolean
+                    description: >
+                      false = aluno já usou a análise gratuita (não rode outra; veja "reason"/"message").
+                      true = liberado, use os dados.
+                  reason:
+                    type: string
+                    nullable: true
+                  fetchedFor:
+                    type: string
+                  profile:
+                    type: object
+                    properties:
+                      username: { type: string }
+                      fullName: { type: string }
+                      biography: { type: string }
+                      followers: { type: integer }
+                      following: { type: integer }
+                      posts: { type: integer }
+                      verified: { type: boolean }
+                      private: { type: boolean }
+                      category: { type: string }
+                      externalUrl: { type: string }
+                  posts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        kind: { type: string }
+                        caption: { type: string }
+                        likes: { type: integer }
+                        comments: { type: integer }
+                        views: { type: integer }
+                        durationSec: { type: number }
+                        timestamp: { type: string }
+                        url: { type: string }
+                  postsAvailable:
+                    type: integer
+                  notes:
+                    type: string
+                    nullable: true
+        "400":
+          description: Handle inválido
+        "401":
+          description: Não autorizado (API key errada)
+        "404":
+          description: Perfil não encontrado, privado, ou scrape falhou
+        "429":
+          description: Limite de requisições atingido
