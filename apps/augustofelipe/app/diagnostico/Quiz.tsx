@@ -715,7 +715,7 @@ function VslPlayer() {
   const [playing, setPlaying] = useState(false);
   const id = "ThYyzqhNLd4";
   return (
-    <div className="mt-8 aspect-video max-w-md mx-auto rounded-2xl overflow-hidden bg-neutral-900 relative">
+    <div className="mt-8 aspect-[4/5] max-w-md mx-auto rounded-2xl overflow-hidden bg-neutral-900 relative">
       {playing ? (
         <iframe
           className="absolute inset-0 w-full h-full"
@@ -917,8 +917,14 @@ export function PitchStep() {
         Não é uma análise genérica. É do seu perfil. Do jeito que ele está
         agora.
       </p>
-      <div className="mt-6 aspect-[4/3] rounded-2xl bg-neutral-100 grid place-items-center text-neutral-400 text-sm">
-        [print de exemplo de diagnóstico]
+      <div className="mt-6 overflow-hidden rounded-2xl border border-neutral-200 shadow-sm bg-white">
+        <Image
+          src="/construindo-um-viral/exemplo-diagnostico.png"
+          alt="Exemplo de diagnóstico de perfil feito pela IA do Construindo um Viral"
+          width={695}
+          height={750}
+          className="h-auto w-full"
+        />
       </div>
 
       <h3 className="mt-12 text-xl md:text-2xl font-extrabold text-center leading-tight">
