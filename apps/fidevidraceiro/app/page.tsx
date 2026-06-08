@@ -35,6 +35,7 @@ type LinkItem = {
 };
 
 const links: LinkItem[] = [
+  { label: "Garantir minha vaga", hint: "Workshop R$ 47 — do zero ao seu primeiro viral", url: "https://augustofelipe.com/construindo-um-viral", variant: "vibrant", external: true, image: "/links/construindo-viral-thumb.webp" },
   { label: "YouTube", icon: "youtube", url: "https://youtube.com/@fidevidraceiro", variant: "primary", external: true, image: "/links/youtube-thumb.webp" },
   { label: "Parcerias", icon: "email", hint: "fidevidraceiro@futurah.co", url: "mailto:fidevidraceiro@futurah.co", variant: "secondary" },
 ];
