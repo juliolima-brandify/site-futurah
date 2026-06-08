@@ -821,6 +821,14 @@ export function PitchStep() {
 
       <VslPlayer />
 
+      <div className="mt-6 text-center">
+        <CheckoutCTA label="Quero acessar por R$ 47" />
+        <p className="mt-2 text-sm text-neutral-500">
+          ou 2x de{" "}
+          <strong className="text-neutral-700">R$ 24,50</strong> sem juros
+        </p>
+      </div>
+
       <ReelsProof />
 
       <h3 className="mt-12 text-xl md:text-2xl font-extrabold text-center leading-tight">
