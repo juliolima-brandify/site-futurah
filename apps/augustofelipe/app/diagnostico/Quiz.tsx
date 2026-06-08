@@ -63,6 +63,26 @@ const LETTERS = ["A", "B", "C", "D"];
 // Checkout do workshop "Construindo um Viral" (R$ 47) — Cakto.
 const CHECKOUT_URL = "https://pay.cakto.com.br/6ffyvt6_881155";
 
+// Dados capturados no quiz, usados pra pré-preencher o checkout da Cakto.
+type LeadInfo = { name: string; email: string; whatsapp: string };
+
+// Monta a URL do checkout Cakto pré-preenchida. Params aceitos pela Cakto:
+// name, email, confirmEmail, phone (com DDI 55). Sem lead (ex.: página direta
+// /construindo-um-viral, sem formulário) → URL pura.
+function checkoutHref(lead?: LeadInfo | null): string {
+  if (!lead) return CHECKOUT_URL;
+  const p = new URLSearchParams();
+  if (lead.name) p.set("name", lead.name);
+  if (lead.email) {
+    p.set("email", lead.email);
+    p.set("confirmEmail", lead.email);
+  }
+  const digits = (lead.whatsapp || "").replace(/\D+/g, "");
+  if (digits.length >= 10) p.set("phone", `55${digits}`);
+  const qs = p.toString();
+  return qs ? `${CHECKOUT_URL}?${qs}` : CHECKOUT_URL;
+}
+
 function ProgressBar({ pct }: { pct: number }) {
   return (
     <div className="h-1.5 w-full bg-neutral-200">
@@ -176,7 +196,7 @@ function LeadCapture({
   onSubmitted,
 }: {
   answers: string[];
-  onSubmitted: () => void;
+  onSubmitted: (lead: LeadInfo) => void;
 }) {
   const [name, setName] = useState("");
   const [instagram, setInstagram] = useState("");
@@ -226,7 +246,11 @@ function LeadCapture({
         email: email.trim().toLowerCase(),
         phone: onlyDigits(whatsapp),
       });
-      onSubmitted();
+      onSubmitted({
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        whatsapp: onlyDigits(whatsapp),
+      });
     } catch {
       setSubmitError("Não foi possível enviar agora. Tente novamente.");
       setSubmitting(false);
@@ -630,7 +654,13 @@ function CountdownPill() {
   );
 }
 
-function CheckoutCTA({ label }: { label: string }) {
+function CheckoutCTA({
+  label,
+  lead,
+}: {
+  label: string;
+  lead?: LeadInfo | null;
+}) {
   // Dispara InitiateCheckout (pixel×CAPI) em onPointerDown pra o evento sair
   // antes da navegação pro Cakto. O Purchase é disparado pelo próprio Cakto.
   const handleCheckout = () => {
@@ -638,7 +668,7 @@ function CheckoutCTA({ label }: { label: string }) {
   };
   return (
     <a
-      href={CHECKOUT_URL}
+      href={checkoutHref(lead)}
       onPointerDown={handleCheckout}
       className="block w-full py-4 rounded-2xl bg-emerald-500 text-center text-white font-semibold text-lg hover:bg-emerald-600 transition"
     >
@@ -803,7 +833,7 @@ function ReelsProof() {
   );
 }
 
-export function PitchStep() {
+export function PitchStep({ lead }: { lead?: LeadInfo | null } = {}) {
   return (
     <div className="px-6 py-8 max-w-xl mx-auto">
       <CountdownPill />
@@ -822,7 +852,7 @@ export function PitchStep() {
       <VslPlayer />
 
       <div className="mt-6 text-center">
-        <CheckoutCTA label="Quero acessar por R$ 47" />
+        <CheckoutCTA label="Quero acessar por R$ 47" lead={lead} />
         <p className="mt-2 text-sm text-neutral-500">
           ou 2x de{" "}
           <strong className="text-neutral-700">R$ 24,50</strong> sem juros
@@ -986,7 +1016,7 @@ export function PitchStep() {
           ou 2x R$ 24,50 sem juros
         </p>
         <div className="mt-6">
-          <CheckoutCTA label="Quero construir meu viral" />
+          <CheckoutCTA label="Quero construir meu viral" lead={lead} />
         </div>
         <p className="mt-3 text-xs text-neutral-500">
           🔒 Pagamento seguro · Pix, cartão ou boleto
@@ -1026,7 +1056,7 @@ export function PitchStep() {
           começa hoje.
         </p>
         <div className="mt-6">
-          <CheckoutCTA label="Quero construir meu viral" />
+          <CheckoutCTA label="Quero construir meu viral" lead={lead} />
         </div>
         <p className="mt-3 text-xs text-neutral-500 italic">
           R$ 47 · Acesso imediato · Garantia de 7 dias
@@ -1252,6 +1282,7 @@ function WaitlistStep({ answers }: { answers: string[] }) {
 export default function Quiz({ mode = "pitch" }: { mode?: QuizMode } = {}) {
   const [step, setStep] = useState<Step>("intro");
   const [answers, setAnswers] = useState<string[]>([]);
+  const [lead, setLead] = useState<LeadInfo | null>(null);
 
   const finalStep: Step = mode === "waitlist" ? "waitlist" : "pitch";
 
@@ -1285,12 +1316,18 @@ export default function Quiz({ mode = "pitch" }: { mode?: QuizMode } = {}) {
           <QuestionStep idx={Number(step) - 1} onAnswer={handleAnswer} />
         )}
         {step === "lead" && (
-          <LeadCapture answers={answers} onSubmitted={() => setStep("result")} />
+          <LeadCapture
+            answers={answers}
+            onSubmitted={(d) => {
+              setLead(d);
+              setStep("result");
+            }}
+          />
         )}
         {step === "result" && (
           <ResultStep answers={answers} onContinue={() => setStep(finalStep)} />
         )}
-        {step === "pitch" && <PitchStep />}
+        {step === "pitch" && <PitchStep lead={lead} />}
         {step === "waitlist" && <WaitlistStep answers={answers} />}
       </main>
       <footer className="text-center text-xs text-neutral-400 py-6">
