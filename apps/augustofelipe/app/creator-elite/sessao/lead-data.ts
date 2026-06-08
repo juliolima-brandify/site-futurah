@@ -102,7 +102,7 @@ export const LEAD: Lead = {
     "Vive de publi (contratos fixos + propostas de campanha) — mas SEM produto próprio. No form marcou “ainda não monetizo”.",
 
   gancho:
-    "100k+ em menos de 1 ano — mas presa na obra: fora do nicho, o alcance despenca.",
+    "149 mil seguidores em menos de 1 ano — o conteúdo já funciona. Mas o alcance vive preso à obra: fora do nicho, ele despenca. O teto não é talento, é posicionamento.",
 
   perfil: {
     fullName: "Stéfani Maia",

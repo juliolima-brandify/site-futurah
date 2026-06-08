@@ -9,7 +9,11 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { Boldonse } from "next/font/google";
 import { LEAD, MENTOR, type Lead } from "./lead-data";
+
+// Fonte display dos títulos das seções (Google Fonts), usada em caixa alta.
+const boldonse = Boldonse({ subsets: ["latin"], weight: "400", display: "swap" });
 
 // Lead atual (real, vindo do form de qualificação, ou o exemplo do LEAD).
 // Disponibilizado via contexto pra cada seção ler sem prop drilling.
@@ -191,9 +195,17 @@ function Kicker({ children }: { children: ReactNode }) {
   );
 }
 
-function Title({ children }: { children: ReactNode }) {
+function Title({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
-    <h2 className="text-3xl font-extrabold leading-[1.15] tracking-tight text-white md:text-5xl">
+    <h2
+      className={`${boldonse.className} text-[1.5rem] uppercase leading-[1.5] text-white md:text-[2.25rem] ${className}`}
+    >
       {children}
     </h2>
   );
@@ -367,33 +379,42 @@ function ContraCapaSection() {
   const LEAD = useLead();
   const p = LEAD.perfil;
   return (
-    <Section className="bg-white">
-      <div className="text-center">
-        <p className="mb-5 text-xs font-semibold uppercase tracking-[0.2em] text-amber-600">
-          Creator Elite · Diagnóstico Estratégico
-        </p>
-        {p ? (
-          <InstagramProfileCard perfil={p} />
-        ) : (
-          <>
-            <Title>
-              {LEAD.nome}
-              <span className="mt-2 block text-lg font-medium text-neutral-400">
+    <section className="flex h-screen w-full snap-start items-center justify-center bg-white px-5 py-6">
+      <div className="grid w-full max-w-6xl items-center gap-6 md:grid-cols-2 md:gap-8">
+        {/* Esquerda: textos */}
+        <div className="text-left">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-amber-600">
+            Creator Elite · Diagnóstico Estratégico
+          </p>
+          <p
+            className={`${boldonse.className} text-[1.6rem] uppercase leading-[1.35] text-neutral-900 md:text-[2.3rem]`}
+          >
+            {LEAD.gancho}
+          </p>
+        </div>
+
+        {/* Direita: mock do Instagram */}
+        <div className="flex justify-center md:justify-end">
+          {p ? (
+            <InstagramProfileCard perfil={p} />
+          ) : (
+            <div className="text-center">
+              <div className="text-3xl font-extrabold text-neutral-900">
+                {LEAD.nome}
+              </div>
+              <div className="mt-2 text-lg font-medium text-neutral-400">
                 @{LEAD.instagram}
-              </span>
-            </Title>
-            <div className="mx-auto mt-10 flex max-w-xl flex-wrap justify-center gap-2.5 text-sm">
-              <Pill>{LEAD.seguidores} seguidores</Pill>
-              <Pill>{LEAD.nicho}</Pill>
-              <Pill>Fat.: {LEAD.faturamento}</Pill>
+              </div>
+              <div className="mt-6 flex flex-wrap justify-center gap-2.5 text-sm">
+                <Pill>{LEAD.seguidores} seguidores</Pill>
+                <Pill>{LEAD.nicho}</Pill>
+                <Pill>Fat.: {LEAD.faturamento}</Pill>
+              </div>
             </div>
-          </>
-        )}
-        <p className="mx-auto mt-7 max-w-xl text-[15px] font-medium leading-relaxed text-neutral-600">
-          {LEAD.gancho}
-        </p>
+          )}
+        </div>
       </div>
-    </Section>
+    </section>
   );
 }
 
@@ -708,7 +729,9 @@ function ProvaSection() {
   return (
     <Section className="bg-neutral-900">
       <Kicker>Quem vai te guiar</Kicker>
-      <Title>Não é teoria — é caminho já percorrido.</Title>
+      <Title className="!text-[1.8rem] md:!text-[2.7rem]">
+        Não é teoria — é caminho já percorrido.
+      </Title>
       <div className="mt-7 flex items-center gap-4">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -1025,25 +1048,38 @@ function DuvidasSection() {
     },
   ];
   return (
-    <Section className="bg-gradient-to-b from-neutral-950 to-black">
-      <Kicker>Dúvidas</Kicker>
-      <Title>O que ficou no ar?</Title>
-      <div className="mt-8 space-y-4">
-        {faq.map((f) => (
-          <div
-            key={f.q}
-            className="rounded-xl border border-neutral-800 bg-neutral-900/60 px-5 py-4"
-          >
-            <h3 className="text-base font-bold text-white">{f.q}</h3>
-            <p className="mt-1.5 text-[14px] leading-relaxed text-neutral-400">
-              {f.a}
-            </p>
-          </div>
-        ))}
+    <section className="relative flex h-screen w-full snap-start items-center overflow-hidden px-6 py-20">
+      {/* Fundo: Augusto à esquerda, escuro à direita pra abrigar o conteúdo */}
+      <div className="absolute inset-0">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/creator-elite/augusto-fechamento.webp"
+          alt="Augusto Felipe"
+          className="h-full w-full object-cover object-left"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-black/75 to-black/90" />
       </div>
-      <p className="mt-10 text-center text-lg font-semibold text-amber-300">
-        Bora começar, {LEAD.primeiroNome}?
-      </p>
-    </Section>
+
+      <div className="relative z-10 mx-auto w-full max-w-2xl text-center">
+        <Kicker>Dúvidas</Kicker>
+        <Title>O que ficou no ar?</Title>
+        <div className="mt-8 space-y-4">
+          {faq.map((f) => (
+            <div
+              key={f.q}
+              className="rounded-xl border border-neutral-800 bg-neutral-900/70 px-5 py-4 backdrop-blur-sm"
+            >
+              <h3 className="text-base font-bold text-white">{f.q}</h3>
+              <p className="mt-1.5 text-[14px] leading-relaxed text-neutral-300">
+                {f.a}
+              </p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-10 text-lg font-semibold text-amber-300">
+          Bora começar, {LEAD.primeiroNome}?
+        </p>
+      </div>
+    </section>
   );
 }
