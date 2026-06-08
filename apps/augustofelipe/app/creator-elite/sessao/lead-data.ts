@@ -177,7 +177,7 @@ export const LEAD: Lead = {
   },
 
   dreamOutcome: {
-    headline: "Daqui a 90 dias, seu perfil trabalha por você.",
+    headline: "Daqui a 30 dias, seu perfil trabalha por você.",
     bullets: [
       "Conteúdo simples alcançando muito além da obra — você cresce sem depender de viral nem de produção gigante.",
       "Um sistema de postagem leve que roda na sua rotina, mesmo nos dias de canteiro.",
