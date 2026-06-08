@@ -1,19 +1,18 @@
-# OpenAPI schema da Action "Análise de Perfil" do Custom GPT "Construindo um Viral".
-# Cole isto em: builder do GPT -> Configure -> Actions -> Create new action -> Schema.
+# OpenAPI schema da Action "Análise de Perfil" do Custom GPT (bônus grátis).
+# Cole no builder: Configure -> Actions -> Create new action -> Schema.
 #
-# Authentication (no mesmo painel):
-#   - Authentication Type: API Key
-#   - Auth Type: Bearer
-#   - API Key: <o mesmo valor de ANALISE_API_KEY configurado no Vercel>
+# Authentication: API Key -> Bearer -> valor da ANALISE_API_KEY.
+# Privacy policy: URL da política de privacidade do site.
+# Troque servers.url se o domínio/preview mudar.
 #
-# Privacy policy: aponte pra https://augustofelipe.com/privacidade (ou a que existir).
-#
-# IMPORTANTE: troque o `servers.url` se o domínio/preview mudar.
+# Nota: a `description` de cada operação tem limite de 300 caracteres no builder.
+# Por isso ela é curta aqui — a lógica detalhada (allowed:false, modo manual etc.)
+# fica nas Instructions do GPT, não no schema.
 
 openapi: 3.1.0
 info:
   title: Análise de Perfil — Construindo um Viral
-  description: Puxa dados públicos do perfil do Instagram (bio, métricas e últimos posts) para o diagnóstico do aluno.
+  description: Dados do perfil do Instagram para o diagnóstico.
   version: 1.0.0
 servers:
   - url: https://augustofelipe.com
@@ -21,27 +20,19 @@ paths:
   /api/analise-perfil:
     get:
       operationId: analisarPerfil
-      summary: Busca dados do perfil do Instagram para diagnóstico
-      description: >
-        Recebe o @ do Instagram do aluno e retorna os dados públicos do perfil
-        (nome, bio, seguidores, seguindo, nº de posts, categoria, link) e os
-        últimos posts/Reels com legenda, curtidas, comentários e views.
-        Use estes dados reais para escrever o diagnóstico — não invente números.
-        Se "notes" vier preenchido ou "posts" vier vazio, peça ao aluno os dados
-        que faltam.
+      summary: Busca dados do perfil do Instagram
+      description: Recebe o @ e o email do aluno e retorna os dados do perfil (bio, seguidores, posts) e os últimos posts (legenda, views). Use os números reais. Se vier allowed=false, o aluno já usou a análise gratuita.
       parameters:
         - name: handle
           in: query
           required: true
-          description: O @ do Instagram do aluno (pode vir com @, sem @, ou como URL).
+          description: O @ do Instagram do aluno (com @, sem @ ou como URL).
           schema:
             type: string
         - name: email
           in: query
           required: true
-          description: >
-            Email do aluno (o do cadastro na área de membros). Usado para liberar
-            UMA análise gratuita por aluno. Sempre peça o email antes de chamar.
+          description: Email do cadastro do aluno. Libera 1 análise por aluno.
           schema:
             type: string
       responses:
@@ -56,9 +47,6 @@ paths:
                     type: boolean
                   allowed:
                     type: boolean
-                    description: >
-                      false = aluno já usou a análise gratuita (não rode outra; veja "reason"/"message").
-                      true = liberado, use os dados.
                   reason:
                     type: string
                     nullable: true
@@ -96,9 +84,9 @@ paths:
                     type: string
                     nullable: true
         "400":
-          description: Handle inválido
+          description: Handle ou email inválido
         "401":
-          description: Não autorizado (API key errada)
+          description: Não autorizado
         "404":
           description: Perfil não encontrado, privado, ou scrape falhou
         "429":
