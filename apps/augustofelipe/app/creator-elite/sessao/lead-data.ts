@@ -199,7 +199,7 @@ export const LEAD: Lead = {
       "Cada mês com 100k+ sem produto próprio é faturamento recorrente deixado na mesa — e dependência total da publi.",
     garantia:
       "Garantia de execução: se você seguir o plano das calls e não tiver clareza do caminho na primeira semana, a gente refaz seu diagnóstico do zero — sem custo.",
-    recomendado: "3 Meses", // ela pediu acompanhamento p/ executar com suporte
+    recomendado: "1 Mês", // plano de 30 dias em destaque
     // ⚠️ VALORES DE ANCORAGEM SÃO RASCUNHO — TROCAR pelos números reais.
     stack: [
       {
