@@ -98,7 +98,9 @@ export type Lead = {
   };
 };
 
-export const LEAD: Lead = {
+// Deck completo da Stéfani — exemplo personalizado, servido via ?ig=eustefanimaia
+// (ver LOCAL_EXAMPLES). NÃO é mais o default: o default é o LEAD placeholder.
+const STEFANI: Lead = {
   nome: "Stéfani Maia",
   primeiroNome: "Stéfani",
   instagram: "eustefanimaia", // sem @
@@ -298,6 +300,75 @@ export const LEAD: Lead = {
         insignia: "/creator-elite/plano-3-ouro.webp",
       },
     ],
+  },
+};
+
+// =============================================================================
+// LEAD — PLACEHOLDER padrão (URL sem ?ig= / ?email=). Conteúdo genérico de
+// template: deixa óbvio que é um modelo, não dados reais. Também é o fallback
+// para campos não preenchidos em mapLeadToDeck. A oferta (planos/preços) é a
+// padrão da Creator Elite — herdada da STEFANI pra ficar consistente.
+// =============================================================================
+export const LEAD: Lead = {
+  ...STEFANI,
+  nome: "Nome do Creator",
+  primeiroNome: "Creator",
+  instagram: "seuusuario",
+  whatsapp: "",
+  seguidores: "00.000",
+  nicho: "Seu nicho",
+  faturamento: "—",
+  monetizacao: "—",
+  gancho:
+    "Sua tese principal aparece aqui. Esta linha descreve e complementa o gancho — personalize por lead no lead-data.ts.",
+  precisaAgora: "—",
+  travaPrincipal: "—",
+  porqueAugusto: "—",
+  prontidao: "—",
+  jaFezMentoria: "—",
+  dor: "A dor da lead, nas palavras dela, aparece aqui. Personalize por lead.",
+  objetivo: "O objetivo da lead aparece aqui.",
+  prazo: "—",
+  perfil: {
+    fullName: "Nome do Creator",
+    username: "seuusuario",
+    bio: "Bio do perfil aparece aqui.\nLinha 2 da bio.\nLinha 3 da bio.",
+    posts: 0,
+    seguidores: 0,
+    seguindo: 0,
+    verificado: false,
+  },
+  scorecard: {
+    notaGeral: 0,
+    resumo: "Resumo do diagnóstico aparece aqui após a avaliação do perfil.",
+    baseadoEm: "Base da avaliação: dados do perfil + respostas da qualificação.",
+    criterios: [
+      { nome: "Critério 1", nota: 0, porque: "Justificativa da nota aqui.", fonte: "Fonte" },
+      { nome: "Critério 2", nota: 0, porque: "Justificativa da nota aqui.", fonte: "Fonte" },
+      { nome: "Critério 3", nota: 0, porque: "Justificativa da nota aqui.", fonte: "Fonte" },
+    ],
+  },
+  dreamOutcome: {
+    headline: "O destino que a mentoria entrega aparece aqui.",
+    bullets: [
+      "Primeiro resultado do depois.",
+      "Segundo resultado do depois.",
+      "Terceiro resultado do depois.",
+    ],
+  },
+  notasPerfil: [
+    "Primeira observação sobre o perfil.",
+    "Segunda observação sobre o perfil.",
+    "Terceira observação sobre o perfil.",
+  ],
+  solucoes: [
+    { n: "01", titulo: "Primeira alavanca", hoje: "Situação atual.", movimento: "O movimento.", resultado: "O resultado." },
+    { n: "02", titulo: "Segunda alavanca", hoje: "Situação atual.", movimento: "O movimento.", resultado: "O resultado." },
+    { n: "03", titulo: "Terceira alavanca", hoje: "Situação atual.", movimento: "O movimento.", resultado: "O resultado." },
+  ],
+  oferta: {
+    ...STEFANI.oferta,
+    custoInacao: "O custo de não agir aparece aqui — personalize por lead.",
   },
 };
 
@@ -559,4 +630,26 @@ export function mapLeadToDeck(raw: RawLead): Lead {
   }
 
   return leadBase;
+}
+
+// =============================================================================
+// EXEMPLOS LOCAIS — decks personalizados que NÃO dependem do Payload. Servidos
+// direto pelo handle (?ig=) ou email (?email=). A Iara não entra aqui: ela vem
+// do form de qualificação em produção (ver fetchLead + isIara em mapLeadToDeck).
+// =============================================================================
+const LOCAL_EXAMPLES: { ig: string[]; email: string[]; lead: Lead }[] = [
+  { ig: ["eustefanimaia"], email: [], lead: STEFANI },
+];
+
+export function getLocalExample(params: {
+  ig?: string;
+  email?: string;
+}): Lead | null {
+  const ig = (params.ig ?? "").trim().toLowerCase().replace(/^@/, "");
+  const email = (params.email ?? "").trim().toLowerCase();
+  for (const ex of LOCAL_EXAMPLES) {
+    if (ig && ex.ig.includes(ig)) return ex.lead;
+    if (email && ex.email.includes(email)) return ex.lead;
+  }
+  return null;
 }

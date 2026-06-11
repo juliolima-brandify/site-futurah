@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import SessionDeck from "./SessionDeck";
-import { LEAD, mapLeadToDeck, type Lead, type RawLead } from "./lead-data";
+import {
+  LEAD,
+  getLocalExample,
+  mapLeadToDeck,
+  type Lead,
+  type RawLead,
+} from "./lead-data";
 
 export const metadata: Metadata = {
   title: "Sessão Estratégica — Creator Elite",
@@ -58,6 +64,10 @@ export default async function CreatorEliteSessaoPage({
   searchParams: Promise<{ ig?: string; email?: string }>;
 }) {
   const sp = await searchParams;
-  const lead = (await fetchLead({ ig: sp.ig, email: sp.email })) ?? LEAD;
+  // 1) exemplos locais (Stéfani) → 2) lead real do Payload (Iara) → 3) placeholder.
+  const lead =
+    getLocalExample({ ig: sp.ig, email: sp.email }) ??
+    (await fetchLead({ ig: sp.ig, email: sp.email })) ??
+    LEAD;
   return <SessionDeck lead={lead} />;
 }
