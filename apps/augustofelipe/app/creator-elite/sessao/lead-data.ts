@@ -94,6 +94,7 @@ export type Lead = {
       preco: string;
       inclui: string[];
       insignia?: string; // path da insígnia (bronze/prata/ouro)
+      selo?: string; // badge no topo da coluna (ex: "Mais vendido")
     }[];
   };
 };
@@ -291,13 +292,15 @@ const STEFANI: Lead = {
         preco: "R$ 6.000",
         inclui: ["4 Calls", "Acesso à I.A", "Grupo no WhatsApp", "Diagnóstico"],
         insignia: "/creator-elite/plano-2-prata.webp",
+        selo: "Mais vendido",
       },
       {
         nome: "3 Meses",
         duracao: "90 dias",
-        preco: "R$ 10.000",
+        preco: "R$ 9.000",
         inclui: ["12 Calls", "Acesso à I.A", "Grupo no WhatsApp", "Diagnóstico"],
         insignia: "/creator-elite/plano-3-ouro.webp",
+        selo: "Mais vantajoso",
       },
     ],
   },

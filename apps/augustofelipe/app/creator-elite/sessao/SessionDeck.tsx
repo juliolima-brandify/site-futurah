@@ -191,7 +191,7 @@ export default function SessionDeck({ lead = LEAD }: { lead?: Lead }) {
       <LeadContext.Provider value={lead}>
         <div
           ref={scrollerRef}
-          className="session-deck-scroller h-full w-full snap-y snap-mandatory overflow-y-scroll scroll-smooth"
+          className="session-deck-scroller h-full w-full overflow-y-scroll scroll-smooth md:snap-y md:snap-mandatory"
         >
           <CapaSection />
           <ContraCapaSection />
@@ -993,12 +993,17 @@ function PlanosSection() {
                   rec ? colBg(true) : "bg-neutral-950",
                 ].join(" ")}
               >
-                {rec && (
-                  <span className="absolute inset-x-0 -top-0 mx-auto block bg-amber-500 py-0.5 text-[9px] font-bold uppercase tracking-wider text-black">
-                    Recomendado
+                {plano.selo && (
+                  <span
+                    className={[
+                      "absolute inset-x-0 -top-0 mx-auto block py-0.5 text-[9px] font-bold uppercase tracking-wider text-black",
+                      rec ? "bg-amber-500" : "bg-lime-400",
+                    ].join(" ")}
+                  >
+                    {plano.selo}
                   </span>
                 )}
-                <div className={rec ? "mt-3" : ""}>
+                <div className={plano.selo ? "mt-3" : ""}>
                   {plano.insignia && (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -1071,7 +1076,11 @@ function PlanosSection() {
                 <span
                   className={[
                     "text-lg font-extrabold tracking-tight sm:text-2xl",
-                    rec ? "text-amber-400" : "text-white",
+                    rec
+                      ? "text-amber-400"
+                      : plano.selo
+                        ? "text-lime-400"
+                        : "text-white",
                   ].join(" ")}
                 >
                   {plano.preco}
