@@ -413,96 +413,97 @@ export function mapLeadToDeck(raw: RawLead): Lead {
         verificado: false,
       },
       gancho:
-        "Você já tem autoridade, produto validado e um mercado rico. O gargalo não é conhecimento — é transformar temas técnicos em comunidade, demanda e venda.",
+        "Você tem autoridade real no agro e um curso validado de R$ 297. Hoje o gargalo não é conhecimento: é transformar crédito, risco e IA em conteúdo que atraia gente nova do mercado.",
       objetivo:
         "Estruturar um posicionamento claro, uma linha editorial eficiente e uma estratégia de crescimento para construir uma comunidade qualificada no agro.",
       scorecard: {
-        notaGeral: 4.7,
+        notaGeral: 4.4,
         resumo:
-          "Autoridade alta e produto validado, mas o Instagram ainda não virou canal de aquisição. O ativo existe; falta embalagem, cadência e ponte com o público certo.",
+          "A autoridade existe, o tema tem valor econômico e já existe produto. O problema é que o Instagram ainda não está funcionando como canal de aquisição: pouca atração de gente nova, conteúdo sem sistema e monetização ainda zerada.",
         baseadoEm:
-          "Respostas da qualificação da Iara, estágio atual de seguidores, monetização declarada e clareza de produto/oferta.",
+          "Respostas da qualificação da Iara: 1.000 a 5.000 seguidores, R$ 0 de faturamento mensal pelo Instagram, ainda sem monetização atual, curso online validado de R$ 297 e dificuldade declarada de organizar produção, formatos e estratégia.",
         criterios: [
           {
             nome: "Autoridade / Expertise",
-            nota: 8,
+            nota: 8.0,
             porque:
-              "Ela tem domínio claro de crédito agro, tecnologia, IA, finanças e bastidores da Haklay. O conteúdo parte de experiência real, não de teoria.",
+              "Ela tem domínio claro de crédito agro, gestão de risco, tecnologia, IA, finanças e bastidores da Haklay. O conteúdo parte de experiência real de negócio, não de teoria.",
             fonte: "Qualificação: nicho, temas de autoridade e contexto",
           },
           {
             nome: "Clareza de posicionamento",
-            nota: 4.5,
+            nota: 4.0,
             porque:
-              "Os temas são fortes, mas ainda aparecem como ideias soltas: crédito, empreendedorismo, IA, liderança, maternidade e bastidores precisam virar um eixo central reconhecível.",
-            fonte: "Qualificação: maior dor e lista de temas",
+              "Os temas são fortes, mas ainda aparecem como um leque amplo: crédito agro, empreendedorismo, IA, Haklay, liderança feminina, negócios, família e maternidade. Falta uma promessa central que organize tudo.",
+            fonte: "Qualificação: nicho principal e maior dor com o Instagram",
           },
           {
             nome: "Consistência editorial",
-            nota: 3.5,
+            nota: 3.0,
             porque:
-              "A principal dor declarada é não saber o que postar, quais formatos usar e como transformar muitas ideias numa rotina prática.",
+              "A principal dor declarada é ter muitas ideias, mas não saber o que postar, quais formatos usar, como explorar melhor o Instagram e como transformar conhecimento em rotina prática.",
             fonte: "Qualificação: maior desafio com Instagram",
           },
           {
             nome: "Atração de público qualificado",
-            nota: 3,
+            nota: 2.5,
             porque:
-              "As interações ainda vêm majoritariamente de amigos e familiares. O perfil não está atraindo novas pessoas do mercado agro no volume necessário.",
-            fonte: "Qualificação: percepção de audiência atual",
+              "Ela percebe que a maior parte das interações ainda vem de amigos e familiares, com pouca entrada de novas pessoas do mercado agro.",
+            fonte: "Qualificação: maior dor com o Instagram hoje",
           },
           {
             nome: "Monetização / Oferta",
-            nota: 4.5,
+            nota: 3.5,
             porque:
-              "Ainda marcou R$ 0 no Instagram, mas já tem um curso validado de R$ 297. Existe produto; falta audiência, narrativa e funil orgânico.",
+              "No formulário ela marcou que ainda não monetiza e faturamento mensal médio R$ 0. O ponto positivo é já ter um curso online validado de R$ 297, mas a audiência ainda não está aquecida para venda.",
             fonte: "Qualificação: monetização, faturamento e produto validado",
           },
         ],
       },
       dreamOutcome: {
-        headline: "Daqui a 30 dias, seu perfil começa a vender autoridade.",
+        headline: "Daqui a 30 dias, seu perfil tem uma direção clara.",
         bullets: [
-          "Um posicionamento simples de explicar: crédito agro, inteligência e negócios traduzidos para quem decide no campo.",
-          "Linha editorial organizada em pilares claros, sem depender de inspiração todo dia.",
-          "Conteúdo técnico com gancho humano: bastidores da Haklay, liderança feminina, maternidade e decisões reais de negócio.",
-          "Uma comunidade mais qualificada antes da venda — criando demanda para curso, mentoria e novos produtos.",
+          "Uma promessa central para o perfil: crédito agro, risco, decisão e tecnologia traduzidos para empresas, produtores e profissionais do agro.",
+          "Pilares editoriais claros para parar de depender de inspiração: autoridade, educação, bastidor, opinião e vida real.",
+          "Formatos práticos para transformar conhecimento técnico em posts, reels e stories com linguagem mais acessível.",
+          "Uma audiência mais qualificada antes da venda, preparando terreno para curso, mentoria, consultoria e novos negócios.",
         ],
       },
       notasPerfil: [
-        "Ela não parte do zero: já tem produto validado, ticket de R$ 297 e domínio de um nicho com alto valor econômico.",
-        "O problema central não é falta de tema; é excesso de temas sem arquitetura editorial.",
-        "Crédito agro é técnico demais para vender cru. Precisa de tradução: risco, decisão, dinheiro, bastidor e caso real.",
-        "A audiência atual ainda é social, não estratégica. O conteúdo precisa começar a chamar produtor, empresa e profissional de crédito.",
-        "Família/maternidade não precisa competir com o técnico; pode humanizar a autoridade e aumentar conexão.",
+        "Ela está em estágio inicial de audiência: declarou 1.000 a 5.000 seguidores e o perfil real mostra 2.340 seguidores. O foco agora é qualidade de atração, não escala vazia.",
+        "Ela ainda não monetiza pelo Instagram e declarou R$ 0 de faturamento mensal, mas já tem um curso online validado de R$ 297. Existe oferta; falta canal e demanda aquecida.",
+        "A dor principal é operacional e estratégica: organizar produção, entender o que o público deseja, escolher formatos e usar o Instagram com método.",
+        "O público atual ainda é próximo demais: amigos e familiares interagem, mas pouca gente nova do mercado agro chega até ela.",
+        "O tema central precisa ser traduzido. Crédito, risco, decisão, dados e IA são fortes, mas precisam virar histórias, dilemas e decisões que o agro reconhece.",
+        "Família e maternidade podem humanizar a autoridade, desde que entrem como vida real por trás da liderança, não como um segundo posicionamento desconectado.",
       ],
       solucoes: [
         {
           n: "01",
-          titulo: "Transformar crédito agro em conteúdo desejável",
-          hoje: "O tema é valioso, mas técnico. Se entrar direto em crédito, dados e risco, pouca gente para para assistir.",
+          titulo: "Traduzir crédito agro para decisões reais",
+          hoje: "O tema é valioso, mas técnico. Crédito, risco, dados e IA podem parecer distantes para quem ainda não entende a consequência prática.",
           movimento:
-            "Criamos uma ponte: decisões ruins que custam caro, erros de crédito no campo, bastidores de negociação, histórias da Haklay e linguagem de negócio. O técnico vira consequência de uma tensão real.",
+            "Criamos uma ponte editorial: erros de crédito que custam caro, decisões que protegem o produtor, bastidores da Haklay, casos de risco e tecnologia aplicada ao campo.",
           resultado:
-            "Pessoas certas entendendo rápido por que seguir você aumenta repertório, segurança e resultado no agro.",
+            "O público certo entende rapidamente por que seguir você aumenta segurança, repertório e qualidade de decisão no agro.",
         },
         {
           n: "02",
           titulo: "Organizar os temas em uma linha editorial",
-          hoje: "Você tem muitas ideias fortes, mas elas ainda disputam espaço: crédito, IA, empreendedorismo, liderança, maternidade e bastidores.",
+          hoje: "Ela tem muitas ideias fortes, mas elas ainda disputam espaço: crédito agro, IA, empreendedorismo, Haklay, liderança feminina, negócios, família e maternidade.",
           movimento:
-            "Montamos pilares com função: autoridade, educação, bastidor, opinião e conversão. Cada post passa a ter papel claro no crescimento ou na venda.",
+            "Montamos pilares com função definida: autoridade, educação, bastidor, opinião, humanização e conversão. Cada post passa a ter um papel claro no crescimento ou na venda futura.",
           resultado:
-            "Menos dúvida na hora de postar e mais consistência para construir reconhecimento de marca pessoal.",
+            "Menos dúvida na hora de postar e mais consistência para construir reconhecimento de marca pessoal sem perder naturalidade.",
         },
         {
           n: "03",
-          titulo: "Preparar a audiência antes de vender",
-          hoje: "O curso existe, mas vender agora para uma audiência pouco qualificada força oferta antes de demanda.",
+          titulo: "Aquecer audiência antes de vender o curso",
+          hoje: "O curso de R$ 297 já existe, mas a própria resposta dela mostra que precisa construir audiência e comunidade antes de focar em vendas.",
           movimento:
-            "Criamos uma sequência de conteúdo que aquece o mercado: problema, consequência, oportunidade, método e prova. A venda deixa de parecer lançamento isolado.",
+            "Criamos uma sequência de conteúdo que educa o mercado: problema, consequência, oportunidade, método, prova e chamada para relacionamento. A oferta entra depois de a demanda estar mais consciente.",
           resultado:
-            "Comunidade mais qualificada para curso, consultoria, mentoria e novos negócios da Haklay.",
+            "Comunidade mais qualificada para comprar curso, mentoria, consultoria ou se aproximar dos novos negócios da Haklay.",
         },
       ],
       oferta: {
@@ -512,6 +513,39 @@ export function mapLeadToDeck(raw: RawLead): Lead {
         garantia:
           "Garantia de direção: se na primeira semana você não sair com clareza de posicionamento e linha editorial, a gente refaz o diagnóstico do zero — sem custo.",
         recomendado: "1 Mês",
+        stack: [
+          {
+            item: "Calls estratégicas 1:1 com o Augusto",
+            valor: "R$ 8.000",
+            nota: "4 sessões ao vivo para posicionamento, linha editorial e decisões de conteúdo",
+          },
+          {
+            item: "Diagnóstico estratégico do perfil",
+            valor: "R$ 3.000",
+            nota: "mapa do que atacar primeiro para sair da confusão operacional",
+          },
+          {
+            item: "Sistema de conteúdo para crédito agro",
+            valor: "R$ 5.000",
+            nota: "pilares, quadros, ganchos e formatos para traduzir temas técnicos",
+          },
+          {
+            item: "Acesso à I.A Creator Elite",
+            valor: "R$ 6.000",
+            nota: "apoio para ideias, roteiros e análise de conteúdo entre as calls",
+          },
+          {
+            item: "Grupo no WhatsApp + suporte contínuo",
+            valor: "R$ 4.000",
+            nota: "ajuste de rota sem esperar a próxima call",
+          },
+          {
+            item: "Trilha de aquecimento para o curso",
+            valor: "R$ 4.000",
+            nota: "conteúdo para preparar a audiência antes de vender o produto de R$ 297",
+          },
+        ],
+        valorAncora: "R$ 30.000",
         urgencia:
           "O melhor momento é antes de tentar vender mais. Primeiro audiência qualificada, depois escala de produto.",
       },
