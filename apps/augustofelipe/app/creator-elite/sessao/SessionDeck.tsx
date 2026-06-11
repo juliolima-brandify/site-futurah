@@ -926,7 +926,7 @@ function ValueStackSection() {
               <span>{s.valor}</span>
               <span
                 aria-hidden
-                className="absolute -inset-x-0.5 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.9)]"
+                className="absolute -inset-x-0.5 top-1/2 h-[2px] -translate-y-1/2 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.7)]"
               />
             </div>
           </div>
