@@ -548,6 +548,7 @@ export function mapLeadToDeck(raw: RawLead): Lead {
         ],
       },
       notasPerfil: [
+        "Insight do agro: o agronegócio pesa perto de 1/4 do PIB e tem público de altíssimo poder de compra — mas o conteúdo de creator é dominado por máquina, lavoura e lifestyle. Quase ninguém traduz crédito, risco e decisão financeira pro produtor. Esse vazio de autoridade técnica é exatamente o espaço que você pode ocupar.",
         "Ela está em estágio inicial de audiência: declarou 1.000 a 5.000 seguidores e o perfil real mostra 2.340 seguidores. O foco agora é qualidade de atração, não escala vazia.",
         "Ela ainda não monetiza pelo Instagram e declarou R$ 0 de faturamento mensal, mas já tem um curso online validado de R$ 297. Existe oferta; falta canal e demanda aquecida.",
         "A dor principal é operacional e estratégica: organizar produção, entender o que o público deseja, escolher formatos e usar o Instagram com método.",

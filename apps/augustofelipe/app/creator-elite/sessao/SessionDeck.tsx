@@ -572,23 +572,23 @@ function DiagnosticoSection() {
     <Section className="bg-neutral-900">
       <Kicker>Diagnóstico</Kicker>
       <Title>Onde seu perfil está travando.</Title>
-      <blockquote className="mt-8 border-l-2 border-amber-500 pl-6 text-lg font-medium leading-relaxed text-neutral-100 md:text-xl">
+      <blockquote className="mt-6 border-l-2 border-amber-500 pl-6 text-base font-medium leading-relaxed text-neutral-100 md:text-lg">
         “{LEAD.dor}”
       </blockquote>
-      <div className="mt-8 grid gap-3 sm:grid-cols-2">
+      <div className="mt-5 grid gap-3 sm:grid-cols-2">
         <DataCard label="Tração">{LEAD.seguidores} seguidores</DataCard>
         <DataCard label="Nicho">{LEAD.nicho}</DataCard>
         <DataCard label="Faturamento">{LEAD.faturamento}</DataCard>
         <DataCard label="Como monetiza">{LEAD.monetizacao}</DataCard>
       </div>
       {LEAD.notasPerfil.length > 0 && (
-        <div className="mt-8">
-          <div className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-amber-400">
+        <div className="mt-5">
+          <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-amber-400">
             O que eu enxergo no seu perfil
           </div>
-          <ul className="space-y-2.5">
+          <ul className="space-y-2">
             {LEAD.notasPerfil.map((n, i) => (
-              <li key={i} className="flex gap-3 text-[15px] leading-relaxed text-neutral-200">
+              <li key={i} className="flex gap-3 text-[13.5px] leading-relaxed text-neutral-200">
                 <span className="mt-1 text-amber-500">→</span>
                 <span>{n}</span>
               </li>
