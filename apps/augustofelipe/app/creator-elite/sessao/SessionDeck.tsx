@@ -362,6 +362,19 @@ function parcelar12x(preco: string): string | null {
   return `ou 12x de ${parcela}`;
 }
 
+// "R$ 9.000" + 12 calls → "R$ 750 / call". null se não der pra calcular.
+function valorPorCall(preco: string, calls?: number): string | null {
+  if (!calls || calls < 1) return null;
+  const n = Number(preco.replace(/\D/g, ""));
+  if (!n) return null;
+  const v = Math.round(n / calls).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    maximumFractionDigits: 0,
+  });
+  return `${v} / call`;
+}
+
 function VerifiedBadge() {
   return (
     <svg
@@ -965,6 +978,9 @@ function PlanosSection() {
   const linhas: { label: string; match: RegExp; kind: "value" | "bool" }[] = [
     { label: "Calls estratégicas", match: /call/i, kind: "value" },
     { label: "Acesso à I.A", match: /i\.?\s*a\b|intelig/i, kind: "bool" },
+    { label: "Planejamento de conteúdo", match: /planejamento/i, kind: "bool" },
+    { label: "Pautas diárias do nicho", match: /pauta/i, kind: "bool" },
+    { label: "Análise de concorrentes", match: /concorrent/i, kind: "bool" },
     { label: "Grupo no WhatsApp", match: /whats/i, kind: "bool" },
     { label: "Diagnóstico do perfil", match: /diagn/i, kind: "bool" },
   ];
@@ -1090,8 +1106,13 @@ function PlanosSection() {
                 >
                   {plano.preco}
                 </span>
+                {valorPorCall(plano.preco, plano.calls) && (
+                  <div className="mt-1 text-[11px] font-semibold leading-tight text-neutral-300">
+                    {valorPorCall(plano.preco, plano.calls)}
+                  </div>
+                )}
                 {parcelar12x(plano.preco) && (
-                  <div className="mt-1 text-[10.5px] font-medium leading-tight text-neutral-500">
+                  <div className="mt-0.5 text-[10.5px] font-medium leading-tight text-neutral-500">
                     {parcelar12x(plano.preco)}
                   </div>
                 )}

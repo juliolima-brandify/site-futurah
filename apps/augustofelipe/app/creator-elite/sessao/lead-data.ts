@@ -95,6 +95,7 @@ export type Lead = {
       inclui: string[];
       insignia?: string; // path da insígnia (bronze/prata/ouro)
       selo?: string; // badge no topo da coluna (ex: "Mais vendido")
+      calls?: number; // nº de calls — usado pra calcular o valor por call
     }[];
   };
 };
@@ -283,24 +284,48 @@ const STEFANI: Lead = {
         nome: "1 Call",
         duracao: "Sessão única",
         preco: "R$ 3.000",
-        inclui: ["1 Call estratégica", "Acesso à I.A", "Diagnóstico"],
+        inclui: [
+          "1 Call estratégica",
+          "Acesso à I.A",
+          "Análise de concorrentes",
+          "Diagnóstico",
+        ],
         insignia: "/creator-elite/plano-1-bronze.webp",
+        calls: 1,
       },
       {
         nome: "1 Mês",
         duracao: "30 dias",
         preco: "R$ 6.000",
-        inclui: ["4 Calls", "Acesso à I.A", "Grupo no WhatsApp", "Diagnóstico"],
+        inclui: [
+          "4 Calls",
+          "Acesso à I.A",
+          "Planejamento de conteúdo",
+          "Pautas diárias do nicho",
+          "Análise de concorrentes",
+          "Grupo no WhatsApp",
+          "Diagnóstico",
+        ],
         insignia: "/creator-elite/plano-2-prata.webp",
         selo: "Mais vendido",
+        calls: 4,
       },
       {
         nome: "3 Meses",
         duracao: "90 dias",
         preco: "R$ 9.000",
-        inclui: ["12 Calls", "Acesso à I.A", "Grupo no WhatsApp", "Diagnóstico"],
+        inclui: [
+          "12 Calls",
+          "Acesso à I.A",
+          "Planejamento de conteúdo",
+          "Pautas diárias do nicho",
+          "Análise de concorrentes",
+          "Grupo no WhatsApp",
+          "Diagnóstico",
+        ],
         insignia: "/creator-elite/plano-3-ouro.webp",
         selo: "Mais vantajoso",
+        calls: 12,
       },
     ],
   },
