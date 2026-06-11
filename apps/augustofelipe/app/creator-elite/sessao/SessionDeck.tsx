@@ -140,6 +140,10 @@ export default function SessionDeck({ lead = LEAD }: { lead?: Lead }) {
           .session-deck-scroller > section {
             height: 100vh !important;
             min-height: 100vh !important;
+            /* No PDF (print) o breakpoint md: do Chrome não casa de forma
+               confiável; força a centralização vertical do desktop aqui pra o
+               PDF não herdar o items-start (base mobile). */
+            align-items: center !important;
             break-after: page;
             page-break-after: always;
             scroll-snap-align: none !important;
@@ -226,7 +230,7 @@ function Section({
   return (
     <section
       className={[
-        "flex h-screen w-full snap-start items-center justify-center px-6 py-20",
+        "flex min-h-screen w-full snap-start items-start justify-center px-6 py-16 md:h-screen md:items-center md:py-20",
         className,
       ].join(" ")}
     >
@@ -472,7 +476,7 @@ function ContraCapaSection() {
   const [titulo, ...resto] = LEAD.gancho.split(/(?<=\.)\s+/);
   const descricao = resto.join(" ");
   return (
-    <section className="flex h-screen w-full snap-start items-center justify-center bg-white px-5 py-6">
+    <section className="flex min-h-screen w-full snap-start items-start justify-center bg-white px-5 py-10 md:h-screen md:items-center md:py-6">
       <div className="grid w-full max-w-5xl items-center gap-6 md:grid-cols-2 md:gap-8">
         {/* Esquerda: textos */}
         <div className="text-left">
@@ -979,7 +983,8 @@ function PlanosSection() {
       <Kicker>Opções da mentoria</Kicker>
       <Title>Compare e escolha.</Title>
 
-      <div className="mt-7 overflow-hidden rounded-2xl border border-neutral-800">
+      <div className="mt-7 -mx-6 overflow-x-auto px-6 md:mx-0 md:overflow-visible md:px-0">
+       <div className="min-w-[34rem] overflow-hidden rounded-2xl border border-neutral-800 md:min-w-0">
         {/* Cabeçalho: nome + duração de cada plano */}
         <div className="grid items-stretch" style={gridCols}>
           <div className="border-b border-neutral-800 bg-neutral-950 px-3 py-4" />
@@ -1094,6 +1099,7 @@ function PlanosSection() {
             );
           })}
         </div>
+       </div>
       </div>
 
       {LEAD.oferta.garantia && !LEAD.oferta.garantia.includes("TROCAR") && (
@@ -1131,7 +1137,7 @@ function DuvidasSection() {
     },
   ];
   return (
-    <section className="relative flex h-screen w-full snap-start items-center overflow-hidden px-6 py-20">
+    <section className="relative flex min-h-screen w-full snap-start items-center overflow-hidden px-6 py-16 md:h-screen md:py-20">
       {/* Fundo: Augusto à esquerda, escuro à direita pra abrigar o conteúdo */}
       <div className="absolute inset-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
