@@ -634,11 +634,22 @@ export function mapLeadToDeck(raw: RawLead): Lead {
 
 // =============================================================================
 // EXEMPLOS LOCAIS — decks personalizados que NÃO dependem do Payload. Servidos
-// direto pelo handle (?ig=) ou email (?email=). A Iara não entra aqui: ela vem
-// do form de qualificação em produção (ver fetchLead + isIara em mapLeadToDeck).
+// direto pelo handle (?ig=) ou email (?email=), de forma instantânea e à prova
+// de falha de rede. A Iara reaproveita o branch isIara (que já hardcoda todo o
+// conteúdo dela) via um RawLead sintético — sem fetch ao Payload.
 // =============================================================================
+const IARA: Lead = mapLeadToDeck({
+  social: "iararezende_",
+  nome: "Iara Rezende Moraes",
+});
+
 const LOCAL_EXAMPLES: { ig: string[]; email: string[]; lead: Lead }[] = [
   { ig: ["eustefanimaia"], email: [], lead: STEFANI },
+  {
+    ig: ["iararezende_", "iararezende"],
+    email: ["iararezende87@gmail.com"],
+    lead: IARA,
+  },
 ];
 
 export function getLocalExample(params: {
