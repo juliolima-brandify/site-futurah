@@ -402,6 +402,13 @@ export function mapLeadToDeck(raw: RawLead): Lead {
     return {
       ...leadBase,
       nicho: "Agronegócio · crédito agro · IA aplicada",
+      // Diagnóstico lapidado (sobrescreve o texto cru do formulário).
+      seguidores: "2.340",
+      faturamento: "R$ 0 pelo Instagram",
+      monetizacao:
+        "Ainda não monetiza — curso de R$ 297 validado, fora da plataforma",
+      dor:
+        "Tenho autoridade real em crédito agro, tecnologia e IA — e até um curso validado de R$ 297. Só que não consigo transformar isso numa estratégia de conteúdo consistente: tenho muitas ideias e não sei o que postar nem em que formato. No fim, minhas interações ainda vêm quase só de amigos e familiares, com pouca gente nova do mercado agro chegando até mim.",
       perfil: {
         fullName: "Iara Rezende Moraes | Crédito Agro",
         username: "iararezende_",
