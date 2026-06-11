@@ -546,8 +546,7 @@ export function mapLeadToDeck(raw: RawLead): Lead {
           },
         ],
         valorAncora: "R$ 30.000",
-        urgencia:
-          "O melhor momento é antes de tentar vender mais. Primeiro audiência qualificada, depois escala de produto.",
+        urgencia: "",
       },
     };
   }

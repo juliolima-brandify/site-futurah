@@ -102,9 +102,57 @@ export default function SessionDeck({ lead = LEAD }: { lead?: Lead }) {
   const total = SECTION_LABELS.length;
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden bg-neutral-950 text-neutral-100">
+    <div className="session-deck-root relative h-screen w-screen overflow-hidden bg-neutral-950 text-neutral-100">
+      <style jsx global>{`
+        @media print {
+          @page {
+            size: 1440px 900px;
+            margin: 0;
+          }
+
+          html,
+          body {
+            margin: 0 !important;
+            background: #0a0a0a !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+
+          .session-deck-root {
+            height: auto !important;
+            width: 100% !important;
+            overflow: visible !important;
+          }
+
+          .session-deck-topbar,
+          .session-deck-progress,
+          .session-deck-hint {
+            display: none !important;
+          }
+
+          .session-deck-scroller {
+            height: auto !important;
+            overflow: visible !important;
+            scroll-behavior: auto !important;
+            scroll-snap-type: none !important;
+          }
+
+          .session-deck-scroller > section {
+            height: 100vh !important;
+            min-height: 100vh !important;
+            break-after: page;
+            page-break-after: always;
+            scroll-snap-align: none !important;
+          }
+
+          .session-deck-scroller > section:last-child {
+            break-after: auto;
+            page-break-after: auto;
+          }
+        }
+      `}</style>
       {/* Top bar: marca + progress */}
-      <header className="pointer-events-none fixed inset-x-0 top-0 z-30 flex items-center justify-between px-6 py-4 text-xs text-neutral-400">
+      <header className="session-deck-topbar pointer-events-none fixed inset-x-0 top-0 z-30 flex items-center justify-between px-6 py-4 text-xs text-neutral-400">
         <span className="font-semibold tracking-[0.18em] uppercase">
           Creator Elite · Diagnóstico Estratégico
         </span>
@@ -117,7 +165,7 @@ export default function SessionDeck({ lead = LEAD }: { lead?: Lead }) {
       </header>
 
       {/* Side progress dots */}
-      <nav className="fixed right-5 top-1/2 z-30 hidden -translate-y-1/2 flex-col gap-2.5 md:flex">
+      <nav className="session-deck-progress fixed right-5 top-1/2 z-30 hidden -translate-y-1/2 flex-col gap-2.5 md:flex">
         {SECTION_LABELS.map((label, i) => (
           <button
             key={label}
@@ -135,7 +183,7 @@ export default function SessionDeck({ lead = LEAD }: { lead?: Lead }) {
       </nav>
 
       {/* Hint */}
-      <div className="pointer-events-none fixed bottom-6 left-1/2 z-20 -translate-x-1/2 animate-pulse text-neutral-600">
+      <div className="session-deck-hint pointer-events-none fixed bottom-6 left-1/2 z-20 -translate-x-1/2 animate-pulse text-neutral-600">
         {active < total - 1 ? "↓" : ""}
       </div>
 
@@ -143,7 +191,7 @@ export default function SessionDeck({ lead = LEAD }: { lead?: Lead }) {
       <LeadContext.Provider value={lead}>
         <div
           ref={scrollerRef}
-          className="h-full w-full snap-y snap-mandatory overflow-y-scroll scroll-smooth"
+          className="session-deck-scroller h-full w-full snap-y snap-mandatory overflow-y-scroll scroll-smooth"
         >
           <CapaSection />
           <ContraCapaSection />
@@ -208,6 +256,36 @@ function Title({
     >
       {children}
     </h2>
+  );
+}
+
+function Headline({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <h2
+      className={`${boldonse.className} text-[1.25rem] uppercase leading-[1.45] text-white md:text-[1.8rem] ${className}`}
+    >
+      {children}
+    </h2>
+  );
+}
+
+function Body2({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <p className={`text-[13px] leading-relaxed text-neutral-400 ${className}`}>
+      {children}
+    </p>
   );
 }
 
@@ -310,11 +388,11 @@ function InstagramProfileCard({
     ["seguindo", p.seguindo],
   ];
   return (
-    <div className="mx-auto max-w-md overflow-hidden rounded-2xl bg-white text-neutral-900 shadow-2xl ring-1 ring-neutral-200">
+    <div className="mx-auto max-w-sm overflow-hidden rounded-2xl bg-white text-neutral-900 shadow-2xl ring-1 ring-neutral-200">
       {/* Barra de topo do app */}
       <div className="flex items-center justify-between border-b border-neutral-200 px-4 py-2.5">
-        <span className="text-lg leading-none text-neutral-800">‹</span>
-        <span className="flex items-center gap-1 text-[15px] font-semibold">
+        <span className="text-base leading-none text-neutral-800">‹</span>
+        <span className="flex items-center gap-1 text-[14px] font-semibold">
           {p.username}
           {p.verificado && <VerifiedBadge />}
         </span>
@@ -331,10 +409,10 @@ function InstagramProfileCard({
                 <img
                   src={p.avatar}
                   alt={p.fullName}
-                  className="h-[72px] w-[72px] rounded-full object-cover sm:h-[88px] sm:w-[88px]"
+                  className="h-[60px] w-[60px] rounded-full object-cover sm:h-[72px] sm:w-[72px]"
                 />
               ) : (
-                <div className="grid h-[72px] w-[72px] place-items-center rounded-full bg-neutral-950 text-xl font-extrabold text-white sm:h-[88px] sm:w-[88px]">
+                <div className="grid h-[60px] w-[60px] place-items-center rounded-full bg-neutral-950 text-lg font-extrabold text-white sm:h-[72px] sm:w-[72px]">
                   {p.fullName
                     .split(/\s+/)
                     .filter(Boolean)
@@ -349,17 +427,17 @@ function InstagramProfileCard({
           <div className="grid flex-1 grid-cols-3 gap-1 text-center">
             {stats.map(([label, n]) => (
               <div key={label}>
-                <div className="text-base font-bold leading-tight sm:text-lg">
+                <div className="text-sm font-bold leading-tight sm:text-base">
                   {n === null ? "—" : igNum(n)}
                 </div>
-                <div className="text-[12px] text-neutral-600">{label}</div>
+                <div className="text-[11px] text-neutral-600">{label}</div>
               </div>
             ))}
           </div>
         </div>
 
         {/* Nome + bio + link */}
-        <div className="mt-3 text-[13.5px] leading-snug">
+        <div className="mt-3 text-[12.5px] leading-snug">
           <div className="font-semibold">{p.fullName}</div>
           <div className="mt-0.5 whitespace-pre-line text-neutral-800">
             {p.bio}
@@ -371,13 +449,13 @@ function InstagramProfileCard({
 
         {/* Botões */}
         <div className="mt-3.5 flex gap-2">
-          <button className="flex-1 rounded-lg bg-[#0095F6] py-1.5 text-[13px] font-semibold text-white">
+          <button className="flex-1 rounded-lg bg-[#0095F6] py-1.5 text-[12px] font-semibold text-white">
             Seguir
           </button>
-          <button className="flex-1 rounded-lg bg-neutral-100 py-1.5 text-[13px] font-semibold text-neutral-900">
+          <button className="flex-1 rounded-lg bg-neutral-100 py-1.5 text-[12px] font-semibold text-neutral-900">
             Mensagem
           </button>
-          <button className="rounded-lg bg-neutral-100 px-3 py-1.5 text-[13px] font-semibold text-neutral-900">
+          <button className="rounded-lg bg-neutral-100 px-3 py-1.5 text-[12px] font-semibold text-neutral-900">
             ▾
           </button>
         </div>
@@ -389,19 +467,24 @@ function InstagramProfileCard({
 function ContraCapaSection() {
   const LEAD = useLead();
   const p = LEAD.perfil;
+  // O gancho costuma ser "frase de impacto. elaboração." — a 1ª frase vira o
+  // título (Headline) e o restante o texto descritivo (Body2).
+  const [titulo, ...resto] = LEAD.gancho.split(/(?<=\.)\s+/);
+  const descricao = resto.join(" ");
   return (
     <section className="flex h-screen w-full snap-start items-center justify-center bg-white px-5 py-6">
-      <div className="grid w-full max-w-6xl items-center gap-6 md:grid-cols-2 md:gap-8">
+      <div className="grid w-full max-w-5xl items-center gap-6 md:grid-cols-2 md:gap-8">
         {/* Esquerda: textos */}
         <div className="text-left">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-amber-600">
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-600">
             Creator Elite · Diagnóstico Estratégico
           </p>
-          <p
-            className={`${boldonse.className} text-[1.6rem] uppercase leading-[1.35] text-neutral-900 md:text-[2.3rem]`}
-          >
-            {LEAD.gancho}
-          </p>
+          <Headline className="!text-neutral-900">{titulo}</Headline>
+          {descricao && (
+            <Body2 className="mt-4 max-w-md !text-neutral-600">
+              {descricao}
+            </Body2>
+          )}
         </div>
 
         {/* Direita: mock do Instagram */}
@@ -815,8 +898,12 @@ function ValueStackSection() {
   return (
     <Section className="bg-neutral-950">
       <Kicker>O que você recebe</Kicker>
-      <Title>Tudo que entra na mentoria.</Title>
-      <div className="mt-7 divide-y divide-neutral-800 overflow-hidden rounded-2xl border border-neutral-800">
+      <Headline>Tudo que entra na mentoria.</Headline>
+      <Body2 className="mt-4 max-w-2xl">
+        Um pacote de direção, diagnóstico, sistema de conteúdo e suporte para
+        transformar o perfil em canal de aquisição.
+      </Body2>
+      <div className="mt-6 divide-y divide-neutral-800 overflow-hidden rounded-2xl border border-neutral-800">
         {o.stack.map((s, i) => (
           <div
             key={i}
@@ -829,14 +916,18 @@ function ValueStackSection() {
                   {s.item}
                 </div>
                 {s.nota && (
-                  <div className="text-[12.5px] leading-snug text-neutral-500">
+                  <Body2 className="mt-0.5 !text-[12.5px] !leading-snug !text-neutral-500">
                     {s.nota}
-                  </div>
+                  </Body2>
                 )}
               </div>
             </div>
-            <div className="shrink-0 text-[13px] font-semibold text-neutral-500 line-through decoration-neutral-700">
-              {s.valor}
+            <div className="relative mt-0.5 inline-block shrink-0 px-1 text-[13px] font-semibold text-neutral-500">
+              <span>{s.valor}</span>
+              <span
+                aria-hidden
+                className="absolute -inset-x-0.5 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.9)]"
+              />
             </div>
           </div>
         ))}
