@@ -603,9 +603,15 @@ function IntroScreen({
   onRestart: () => void;
 }) {
   return (
-    <div className="min-h-screen bg-neutral-50 text-neutral-900 flex flex-col">
+    <div className="min-h-screen bg-black text-white flex flex-col">
       <main className="flex-1 px-6 py-16 max-w-2xl mx-auto w-full">
-        <p className="text-xs uppercase tracking-[0.18em] text-neutral-500 font-semibold">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/creator-elite/logo-creator-elite.png"
+          alt="Creator Elite"
+          className="mb-10 w-56 max-w-[72vw] object-contain"
+        />
+        <p className="text-xs uppercase tracking-[0.18em] text-yellow-400 font-semibold">
           Creator Elite · Onboarding
         </p>
         <h1 className="mt-4 text-3xl md:text-4xl font-extrabold tracking-tight leading-[1.15]">
@@ -613,34 +619,34 @@ function IntroScreen({
           <br />
           Antes da sua call, preciso te conhecer.
         </h1>
-        <p className="mt-6 text-neutral-600 text-[17px] leading-relaxed">
-          Esse questionário cobre a <strong className="text-neutral-900">Etapa 1</strong>{" "}
-          (seu contexto) e o <strong className="text-neutral-900">Diagnóstico
+        <p className="mt-6 text-neutral-300 text-[17px] leading-relaxed">
+          Esse questionário cobre a <strong className="text-white">Etapa 1</strong>{" "}
+          (seu contexto) e o <strong className="text-white">Diagnóstico
           Estratégico Profundo (Etapa 2)</strong>. As suas respostas vão direto
           pro Augusto e são a base da sua sessão estratégica.
         </p>
-        <p className="mt-3 text-neutral-600 text-[17px] leading-relaxed">
-          Reserve uns <strong className="text-neutral-900">15 a 20 minutos</strong>{" "}
+        <p className="mt-3 text-neutral-300 text-[17px] leading-relaxed">
+          Reserve uns <strong className="text-white">15 a 20 minutos</strong>{" "}
           e responda com sinceridade — quanto mais específico, mais útil.
         </p>
 
-        <ul className="mt-8 space-y-3 text-neutral-700 text-[15px]">
+        <ul className="mt-8 space-y-3 text-neutral-300 text-[15px]">
           <li className="flex gap-3">
-            <span className="text-emerald-500 font-bold">✓</span>
+            <span className="text-yellow-400 font-bold">✓</span>
             <span>Suas respostas ficam salvas no seu navegador automaticamente.</span>
           </li>
           <li className="flex gap-3">
-            <span className="text-emerald-500 font-bold">✓</span>
+            <span className="text-yellow-400 font-bold">✓</span>
             <span>Você pode voltar e editar antes de enviar.</span>
           </li>
           <li className="flex gap-3">
-            <span className="text-emerald-500 font-bold">✓</span>
+            <span className="text-yellow-400 font-bold">✓</span>
             <span>Tudo é confidencial — só o Augusto e o time vão ler.</span>
           </li>
         </ul>
 
         {restored && (
-          <div className="mt-8 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 flex items-start gap-3">
+          <div className="mt-8 rounded-xl border border-yellow-400/35 bg-yellow-400/10 px-4 py-3 text-sm text-yellow-100 flex items-start gap-3">
             <span className="font-bold">↻</span>
             <div className="flex-1">
               Encontramos respostas que você começou antes. Pode continuar de onde
@@ -659,12 +665,12 @@ function IntroScreen({
         <button
           onClick={onStart}
           type="button"
-          className="mt-10 w-full md:w-auto px-8 py-4 rounded-2xl bg-neutral-900 text-white font-semibold text-lg hover:bg-neutral-800 transition"
+          className="mt-10 w-full md:w-auto px-8 py-4 rounded-2xl bg-yellow-400 text-black font-semibold text-lg hover:bg-yellow-300 transition"
         >
           {restored ? "Continuar de onde parei" : "Começar →"}
         </button>
       </main>
-      <footer className="text-center text-xs text-neutral-400 py-6">
+      <footer className="text-center text-xs text-neutral-500 py-6">
         © 2026 — augustofelipe.com · Creator Elite
       </footer>
     </div>
@@ -673,10 +679,10 @@ function IntroScreen({
 
 function SubmittingScreen() {
   return (
-    <div className="min-h-screen bg-neutral-50 grid place-items-center px-6">
+    <div className="min-h-screen bg-black grid place-items-center px-6">
       <div className="text-center">
-        <div className="mx-auto w-12 h-12 rounded-full border-4 border-neutral-200 border-t-neutral-900 animate-spin" />
-        <p className="mt-6 text-neutral-700 font-medium">
+        <div className="mx-auto w-12 h-12 rounded-full border-4 border-neutral-800 border-t-yellow-400 animate-spin" />
+        <p className="mt-6 text-neutral-200 font-medium">
           Enviando suas respostas pro Augusto…
         </p>
         <p className="mt-1 text-sm text-neutral-500">Não feche esta janela.</p>
@@ -687,18 +693,18 @@ function SubmittingScreen() {
 
 function SuccessScreen() {
   return (
-    <div className="min-h-screen bg-neutral-50 flex flex-col">
+    <div className="min-h-screen bg-black text-white flex flex-col">
       <main className="flex-1 grid place-items-center px-6 py-16">
         <div className="max-w-xl w-full text-center">
-          <div className="mx-auto w-20 h-20 rounded-full bg-emerald-100 grid place-items-center text-4xl">
+          <div className="mx-auto w-20 h-20 rounded-full bg-yellow-400 text-black grid place-items-center text-4xl">
             ✓
           </div>
-          <h1 className="mt-8 text-3xl md:text-4xl font-extrabold tracking-tight leading-tight text-neutral-900">
+          <h1 className="mt-8 text-3xl md:text-4xl font-extrabold tracking-tight leading-tight text-white">
             Obrigado por preencher o formulário.
           </h1>
-          <p className="mt-5 text-[17px] text-neutral-600 leading-relaxed">
+          <p className="mt-5 text-[17px] text-neutral-300 leading-relaxed">
             E seja bem-vindo à mentoria{" "}
-            <span className="font-semibold text-neutral-900">Creator Elite</span>.
+            <span className="font-semibold text-white">Creator Elite</span>.
           </p>
           <p className="mt-3 text-sm text-neutral-500">
             Suas respostas foram enviadas pro Augusto. Em breve você recebe os
@@ -706,7 +712,7 @@ function SuccessScreen() {
           </p>
         </div>
       </main>
-      <footer className="text-center text-xs text-neutral-400 py-6">
+      <footer className="text-center text-xs text-neutral-500 py-6">
         © 2026 — augustofelipe.com · Creator Elite
       </footer>
     </div>
@@ -735,11 +741,11 @@ function FormShell({
   const pct = ((stepIdx + 1) / total) * 100;
 
   return (
-    <div className="min-h-screen bg-neutral-50 text-neutral-900 flex flex-col">
-      <header className="sticky top-0 z-10 bg-neutral-50/90 backdrop-blur border-b border-neutral-200">
-        <div className="h-1 w-full bg-neutral-200">
+    <div className="min-h-screen bg-black text-white flex flex-col">
+      <header className="sticky top-0 z-10 bg-black/90 backdrop-blur border-b border-neutral-800">
+        <div className="h-1 w-full bg-neutral-900">
           <div
-            className="h-full bg-neutral-900 transition-all duration-300"
+            className="h-full bg-yellow-400 transition-all duration-300"
             style={{ width: `${pct}%` }}
           />
         </div>
@@ -747,12 +753,12 @@ function FormShell({
           <button
             onClick={onBack}
             type="button"
-            className="text-neutral-500 hover:text-neutral-900 transition"
+            className="text-neutral-400 hover:text-white transition"
             aria-label="Voltar"
           >
             ← Voltar
           </button>
-          <div className="text-xs text-neutral-500 font-medium tabular-nums">
+          <div className="text-xs text-neutral-400 font-medium tabular-nums">
             Etapa {stepIdx + 1} de {total} · {label}
           </div>
         </div>
@@ -762,24 +768,24 @@ function FormShell({
         {children}
 
         {submitError && (
-          <p className="mt-6 text-sm text-rose-600 text-center">{submitError}</p>
+          <p className="mt-6 text-sm text-red-300 text-center">{submitError}</p>
         )}
 
         <button
           onClick={onNext}
           type="button"
-          className="mt-10 w-full py-4 rounded-2xl bg-neutral-900 text-white font-semibold text-lg hover:bg-neutral-800 transition"
+          className="mt-10 w-full py-4 rounded-2xl bg-yellow-400 text-black font-semibold text-lg hover:bg-yellow-300 transition"
         >
           {isFinal ? "Enviar respostas" : "Continuar →"}
         </button>
-        <p className="mt-3 text-center text-xs text-neutral-400">
-          Dica: aperte <kbd className="px-1.5 py-0.5 border border-neutral-300 rounded text-[10px]">Enter</kbd>{" "}
-          pra avançar (ou <kbd className="px-1.5 py-0.5 border border-neutral-300 rounded text-[10px]">Ctrl</kbd>+
-          <kbd className="px-1.5 py-0.5 border border-neutral-300 rounded text-[10px]">Enter</kbd> nos campos longos).
+        <p className="mt-3 text-center text-xs text-neutral-500">
+          Dica: aperte <kbd className="px-1.5 py-0.5 border border-neutral-700 rounded text-[10px]">Enter</kbd>{" "}
+          pra avançar (ou <kbd className="px-1.5 py-0.5 border border-neutral-700 rounded text-[10px]">Ctrl</kbd>+
+          <kbd className="px-1.5 py-0.5 border border-neutral-700 rounded text-[10px]">Enter</kbd> nos campos longos).
         </p>
       </main>
 
-      <footer className="text-center text-xs text-neutral-400 py-6">
+      <footer className="text-center text-xs text-neutral-500 py-6">
         Suas respostas ficam salvas automaticamente no seu navegador.
       </footer>
     </div>
@@ -1109,7 +1115,7 @@ function PosicionamentoStep({
 
 function DiagKicker() {
   return (
-    <p className="text-xs uppercase tracking-[0.18em] text-fuchsia-600 font-semibold mb-3">
+    <p className="text-xs uppercase tracking-[0.18em] text-yellow-400 font-semibold mb-3">
       Etapa 2 · Diagnóstico Estratégico Profundo
     </p>
   );
@@ -1352,7 +1358,7 @@ function MonetizacaoStep({
       </StepHelper>
 
       <div className="mt-8">
-        <div className="text-sm font-semibold text-neutral-700 mb-3">
+        <div className="text-sm font-semibold text-neutral-300 mb-3">
           Como monetiza seu Instagram hoje?
         </div>
         <RadioGroup
@@ -1381,7 +1387,7 @@ function MonetizacaoStep({
       </div>
 
       <div className="mt-10">
-        <div className="text-sm font-semibold text-neutral-700 mb-1">
+        <div className="text-sm font-semibold text-neutral-300 mb-1">
           Faturamento mensal médio nos últimos 3 meses
         </div>
         <p className="text-xs text-neutral-500 mb-3">
@@ -1436,7 +1442,7 @@ function ObjetivoStep({
       </div>
 
       <div className="mt-10">
-        <div className="text-sm font-semibold text-neutral-700 mb-3">
+        <div className="text-sm font-semibold text-neutral-300 mb-3">
           Em quanto tempo você quer atingir?
         </div>
         <RadioGroup
@@ -1457,14 +1463,14 @@ function ObjetivoStep({
 
 function StepTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="text-2xl md:text-[28px] font-extrabold tracking-tight leading-[1.2] text-neutral-900">
+    <h2 className="text-2xl md:text-[28px] font-extrabold tracking-tight leading-[1.2] text-white">
       {children}
     </h2>
   );
 }
 
 function StepHelper({ children }: { children: React.ReactNode }) {
-  return <p className="mt-3 text-neutral-600 text-[15px]">{children}</p>;
+  return <p className="mt-3 text-neutral-400 text-[15px]">{children}</p>;
 }
 
 function Field({
@@ -1478,22 +1484,22 @@ function Field({
 }) {
   return (
     <div>
-      <label className="block text-sm font-semibold text-neutral-700 mb-1.5">
+      <label className="block text-sm font-semibold text-neutral-300 mb-1.5">
         {label}
       </label>
       {children}
-      {error && <p className="mt-1.5 text-sm text-rose-600">{error}</p>}
+      {error && <p className="mt-1.5 text-sm text-red-300">{error}</p>}
     </div>
   );
 }
 
 function inputCls(hasError: boolean) {
   return [
-    "w-full px-4 py-3 rounded-xl border bg-white text-neutral-900 transition",
-    "focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-neutral-900",
+    "w-full px-4 py-3 rounded-xl border bg-neutral-950 text-white placeholder:text-neutral-600 transition",
+    "focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400",
     hasError
-      ? "border-rose-400 focus:ring-rose-400 focus:border-rose-400"
-      : "border-neutral-300 hover:border-neutral-400",
+      ? "border-red-400 focus:ring-red-400 focus:border-red-400"
+      : "border-neutral-800 hover:border-neutral-600",
   ].join(" ");
 }
 
@@ -1521,8 +1527,8 @@ function RadioGroup({
               className={[
                 "flex items-start gap-3 px-4 py-4 rounded-xl border cursor-pointer transition",
                 checked
-                  ? "border-neutral-900 bg-neutral-900 text-white shadow-sm"
-                  : "border-neutral-300 bg-white text-neutral-800 hover:border-neutral-500 hover:bg-neutral-100",
+                  ? "border-yellow-400 bg-yellow-400 text-black shadow-sm"
+                  : "border-neutral-800 bg-neutral-950 text-neutral-200 hover:border-neutral-600 hover:bg-neutral-900",
               ].join(" ")}
             >
               <input
@@ -1537,13 +1543,13 @@ function RadioGroup({
                 className={[
                   "shrink-0 mt-0.5 w-5 h-5 rounded-full border-2 grid place-items-center",
                   checked
-                    ? "border-white bg-white"
-                    : "border-neutral-400 bg-white",
+                    ? "border-black bg-black"
+                    : "border-neutral-500 bg-neutral-950",
                 ].join(" ")}
                 aria-hidden
               >
                 {checked && (
-                  <span className="w-2.5 h-2.5 rounded-full bg-neutral-900" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
                 )}
               </span>
               <span className="text-[15px] leading-snug">{opt}</span>
@@ -1551,7 +1557,7 @@ function RadioGroup({
           );
         })}
       </div>
-      {error && <p className="mt-2 text-sm text-rose-600">{error}</p>}
+      {error && <p className="mt-2 text-sm text-red-300">{error}</p>}
     </div>
   );
 }
@@ -1641,10 +1647,10 @@ function TextareaField({
 
   const len = value.length;
   const counterTone = useMemo(() => {
-    if (len === 0) return "text-neutral-400";
-    if (len < minLen) return "text-amber-600";
-    if (len > maxLen) return "text-rose-600";
-    return "text-emerald-600";
+    if (len === 0) return "text-neutral-500";
+    if (len < minLen) return "text-yellow-300";
+    if (len > maxLen) return "text-red-300";
+    return "text-emerald-300";
   }, [len, minLen, maxLen]);
 
   const onKeyDown = (ev: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -1657,7 +1663,7 @@ function TextareaField({
   return (
     <div>
       {label && (
-        <label className="block text-sm font-semibold text-neutral-700 mb-1.5">
+        <label className="block text-sm font-semibold text-neutral-300 mb-1.5">
           {label}
         </label>
       )}
@@ -1671,20 +1677,20 @@ function TextareaField({
         autoFocus={autoFocus}
         placeholder={placeholder}
         className={[
-          "w-full px-4 py-3 rounded-xl border bg-white text-neutral-900 transition resize-none leading-relaxed",
-          "focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-neutral-900",
+          "w-full px-4 py-3 rounded-xl border bg-neutral-950 text-white placeholder:text-neutral-600 transition resize-none leading-relaxed",
+          "focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400",
           error
-            ? "border-rose-400 focus:ring-rose-400 focus:border-rose-400"
-            : "border-neutral-300 hover:border-neutral-400",
+            ? "border-red-400 focus:ring-red-400 focus:border-red-400"
+            : "border-neutral-800 hover:border-neutral-600",
         ].join(" ")}
       />
       <div className="mt-1.5 flex items-start justify-between gap-3">
         <div className="text-sm">
           {error ? (
-            <span className="text-rose-600">{error}</span>
+            <span className="text-red-300">{error}</span>
           ) : why ? (
             <span className="text-neutral-500 text-xs">
-              <span className="font-semibold text-neutral-600">
+              <span className="font-semibold text-neutral-400">
                 Por que pergunto:
               </span>{" "}
               {why}
@@ -1694,7 +1700,7 @@ function TextareaField({
         <div className={`text-xs tabular-nums shrink-0 ${counterTone}`}>
           {len}/{maxLen}
           {len < minLen && len > 0 && (
-            <span className="ml-1 text-neutral-400">(mín. {minLen})</span>
+            <span className="ml-1 text-neutral-500">(mín. {minLen})</span>
           )}
         </div>
       </div>
