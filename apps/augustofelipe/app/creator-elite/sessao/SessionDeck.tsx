@@ -978,6 +978,7 @@ function PlanosSection() {
   const linhas: { label: string; match: RegExp; kind: "value" | "bool" }[] = [
     { label: "Calls estratégicas", match: /call/i, kind: "value" },
     { label: "Acesso à I.A", match: /i\.?\s*a\b|intelig/i, kind: "bool" },
+    { label: "Curso Construindo um Viral", match: /construindo/i, kind: "bool" },
     { label: "Planejamento de conteúdo", match: /planejamento/i, kind: "bool" },
     { label: "Pautas diárias do nicho", match: /pauta/i, kind: "bool" },
     { label: "Análise de concorrentes", match: /concorrent/i, kind: "bool" },

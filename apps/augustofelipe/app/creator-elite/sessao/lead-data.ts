@@ -287,6 +287,7 @@ const STEFANI: Lead = {
         inclui: [
           "1 Call estratégica",
           "Acesso à I.A",
+          "Curso Construindo um Viral",
           "Análise de concorrentes",
           "Diagnóstico",
         ],
@@ -300,6 +301,7 @@ const STEFANI: Lead = {
         inclui: [
           "4 Calls",
           "Acesso à I.A",
+          "Curso Construindo um Viral",
           "Planejamento de conteúdo",
           "Pautas diárias do nicho",
           "Análise de concorrentes",
@@ -317,6 +319,7 @@ const STEFANI: Lead = {
         inclui: [
           "12 Calls",
           "Acesso à I.A",
+          "Curso Construindo um Viral",
           "Planejamento de conteúdo",
           "Pautas diárias do nicho",
           "Análise de concorrentes",
