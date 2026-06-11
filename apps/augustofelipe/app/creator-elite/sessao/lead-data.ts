@@ -626,23 +626,33 @@ export function mapLeadToDeck(raw: RawLead): Lead {
         stack: [
           {
             item: "Calls estratégicas 1:1 com o Augusto",
-            valor: "R$ 8.000",
-            nota: "4 sessões ao vivo para posicionamento, linha editorial e decisões de conteúdo",
-          },
-          {
-            item: "Diagnóstico estratégico do perfil",
-            valor: "R$ 3.000",
-            nota: "mapa do que atacar primeiro para sair da confusão operacional",
-          },
-          {
-            item: "Sistema de conteúdo para crédito agro",
-            valor: "R$ 5.000",
-            nota: "pilares, quadros, ganchos e formatos para traduzir temas técnicos",
+            valor: "R$ 9.000",
+            nota: "sessões ao vivo de direção cirúrgica pro seu perfil",
           },
           {
             item: "Acesso à I.A Creator Elite",
             valor: "R$ 6.000",
-            nota: "apoio para ideias, roteiros e análise de conteúdo entre as calls",
+            nota: "ideias, roteiros e análise de conteúdo entre as calls",
+          },
+          {
+            item: "Curso Construindo um Viral",
+            valor: "R$ 2.000",
+            nota: "o método completo de gancho, retenção e viralização",
+          },
+          {
+            item: "Planejamento de conteúdo",
+            valor: "R$ 5.000",
+            nota: "pilares, quadros e formatos pra traduzir crédito agro e IA",
+          },
+          {
+            item: "Pautas diárias do nicho",
+            valor: "R$ 3.000",
+            nota: "ideias prontas todo dia pra você nunca travar",
+          },
+          {
+            item: "Análise de concorrentes",
+            valor: "R$ 3.000",
+            nota: "o que funciona no agro e nos criadores de referência",
           },
           {
             item: "Grupo no WhatsApp + suporte contínuo",
@@ -650,12 +660,12 @@ export function mapLeadToDeck(raw: RawLead): Lead {
             nota: "ajuste de rota sem esperar a próxima call",
           },
           {
-            item: "Trilha de aquecimento para o curso",
-            valor: "R$ 4.000",
-            nota: "conteúdo para preparar a audiência antes de vender o produto de R$ 297",
+            item: "Diagnóstico estratégico do perfil",
+            valor: "R$ 3.000",
+            nota: "mapa do que atacar primeiro pra sair da confusão operacional",
           },
         ],
-        valorAncora: "R$ 30.000",
+        valorAncora: "R$ 35.000",
         urgencia: "",
       },
     };
