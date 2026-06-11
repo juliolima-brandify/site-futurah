@@ -42,11 +42,11 @@ export type Lead = {
   perfil?: {
     fullName: string;
     username: string; // sem @
-    avatar: string; // path local em /public
+    avatar?: string; // path local em /public
     bio: string; // pode conter \n
-    posts: number;
+    posts: number | null;
     seguidores: number;
-    seguindo: number;
+    seguindo: number | null;
     verificado: boolean;
     link?: string; // externalUrl sem https://
   };
@@ -402,6 +402,16 @@ export function mapLeadToDeck(raw: RawLead): Lead {
     return {
       ...leadBase,
       nicho: "Agronegócio · crédito agro · IA aplicada",
+      perfil: {
+        fullName: "Iara Rezende Moraes | Crédito Agro",
+        username: "iararezende_",
+        avatar: "/creator-elite/iara-avatar.jpg",
+        bio: "Co-founder @haklaytech\nEntre o agro e a vida real 🌾\nCrédito | Risco | Decisão\nTe ensino a decidir com segurança\nMãe • Esposa • Agrônoma • Jesus 🤍",
+        posts: 293,
+        seguidores: 2340,
+        seguindo: 1268,
+        verificado: false,
+      },
       gancho:
         "Você já tem autoridade, produto validado e um mercado rico. O gargalo não é conhecimento — é transformar temas técnicos em comunidade, demanda e venda.",
       objetivo:

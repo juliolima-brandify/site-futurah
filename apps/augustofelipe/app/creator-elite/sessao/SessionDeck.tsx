@@ -304,7 +304,7 @@ function InstagramProfileCard({
 }: {
   perfil: NonNullable<Lead["perfil"]>;
 }) {
-  const stats: [string, number][] = [
+  const stats: [string, number | null][] = [
     ["publicações", p.posts],
     ["seguidores", p.seguidores],
     ["seguindo", p.seguindo],
@@ -326,12 +326,23 @@ function InstagramProfileCard({
           {/* Avatar com anel de stories */}
           <div className="shrink-0 rounded-full bg-gradient-to-tr from-amber-400 via-pink-500 to-purple-600 p-[2.5px]">
             <div className="rounded-full bg-white p-[2px]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={p.avatar}
-                alt={p.fullName}
-                className="h-[72px] w-[72px] rounded-full object-cover sm:h-[88px] sm:w-[88px]"
-              />
+              {p.avatar ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={p.avatar}
+                  alt={p.fullName}
+                  className="h-[72px] w-[72px] rounded-full object-cover sm:h-[88px] sm:w-[88px]"
+                />
+              ) : (
+                <div className="grid h-[72px] w-[72px] place-items-center rounded-full bg-neutral-950 text-xl font-extrabold text-white sm:h-[88px] sm:w-[88px]">
+                  {p.fullName
+                    .split(/\s+/)
+                    .filter(Boolean)
+                    .slice(0, 2)
+                    .map((part) => part[0])
+                    .join("")}
+                </div>
+              )}
             </div>
           </div>
           {/* Stats */}
@@ -339,7 +350,7 @@ function InstagramProfileCard({
             {stats.map(([label, n]) => (
               <div key={label}>
                 <div className="text-base font-bold leading-tight sm:text-lg">
-                  {igNum(n)}
+                  {n === null ? "—" : igNum(n)}
                 </div>
                 <div className="text-[12px] text-neutral-600">{label}</div>
               </div>
