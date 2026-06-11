@@ -69,6 +69,15 @@ export type Lead = {
   // Diagnóstico ao vivo — bullets que VOCÊ fala olhando o perfil dela
   notasPerfil: string[];
 
+  // Soluções — alavancas do plano apresentado na sessão.
+  solucoes: {
+    n: string;
+    titulo: string;
+    hoje: string;
+    movimento: string;
+    resultado: string;
+  }[];
+
   // Oferta — você preenche (não vem do form)
   oferta: {
     custoInacao: string;
@@ -192,6 +201,36 @@ export const LEAD: Lead = {
     "‘Engajamento cai fora do nicho’ = problema de PONTE de conteúdo (nicho → lifestyle), não de talento.",
     "‘Tem que ser disruptivo pra viralizar’ é crença do algoritmo antigo — reposicionar pra consistência > viral.",
     "Ela JÁ fez mentoria e não quer ‘vendedor’: o valor aqui é direção cirúrgica, não método genérico.",
+  ],
+
+  solucoes: [
+    {
+      n: "01",
+      titulo: "Tirar o conteúdo de dentro da obra",
+      hoje: "Tudo que você posta fora da reforma desengaja. Seu alcance fica preso a quem já ama obra.",
+      movimento:
+        "Criamos formatos-ponte que nascem do seu mundo (obra) mas falam de algo universal: antes/depois com história, o erro que todo mundo comete, bastidor seu, opinião sincera. O nicho vira a isca — não a jaula.",
+      resultado:
+        "Conteúdo simples chegando em quem nunca viu uma obra, sem descaracterizar seu perfil.",
+    },
+    {
+      n: "02",
+      titulo: "Trocar “viralizar” por um sistema que roda",
+      hoje: "O algoritmo te cobra disrupção, e você não tem uma obra épica pra postar todo dia.",
+      movimento:
+        "Saímos da loteria do viral pra um sistema leve: pilares de conteúdo, ganchos testados, gravação em lote e reaproveitamento inteligente. É a consistência que constrói alcance — não o post “grandioso”.",
+      resultado:
+        "Crescimento estável sem reformar um prédio por semana. Previsibilidade no lugar de sorte.",
+    },
+    {
+      n: "03",
+      titulo: "Construir uma renda que é sua",
+      hoje: "Você vive de publi avulsa — refém da marca e com teto. Por isso marcou “ainda não monetizo”: não é seu.",
+      movimento:
+        "Transformamos sua autoridade num ativo próprio: uma oferta recorrente (curso de DIY, comunidade, mentoria) com um funil simples por trás. A publi passa a ser bônus, não o sustento.",
+      resultado:
+        "Receita recorrente que você controla — e liberdade pra escolher (e cobrar mais caro) as publis que aceitar.",
+    },
   ],
 
   oferta: {
@@ -322,18 +361,25 @@ export function mapLeadToDeck(raw: RawLead): Lead {
   const seguidores = ans("Seguidores no Instagram") || LEAD.seguidores;
   const nicho = ans("Nicho / tema principal") || LEAD.nicho;
   const necessidade = ans("O que você precisa agora");
+  const monetizacao = ans("Monetização atual") || LEAD.monetizacao;
+  const faturamento = ans("Faturamento mensal médio") || LEAD.faturamento;
+  const dor = ans("Maior dor com o Instagram hoje") || LEAD.dor;
+  const primeiroNome = nome ? nome.split(/\s+/)[0] : LEAD.primeiroNome;
+  const isIara =
+    (raw.email ?? "").trim().toLowerCase() === "iararezende87@gmail.com" ||
+    (raw.social ?? "").trim().toLowerCase() === "iararezende_";
 
-  return {
+  const leadBase: Lead = {
     ...LEAD, // mantém oferta (preços) e demais defaults
     nome: nome || LEAD.nome,
-    primeiroNome: nome ? nome.split(/\s+/)[0] : LEAD.primeiroNome,
+    primeiroNome,
     instagram: (raw.social ?? "").trim() || LEAD.instagram,
     whatsapp: (raw.whatsapp ?? "").trim() || LEAD.whatsapp,
 
     seguidores,
     nicho,
-    faturamento: ans("Faturamento mensal médio") || LEAD.faturamento,
-    monetizacao: ans("Monetização atual") || LEAD.monetizacao,
+    faturamento,
+    monetizacao,
 
     precisaAgora: necessidade || LEAD.precisaAgora,
     travaPrincipal: ans("O que está travando você hoje") || LEAD.travaPrincipal,
@@ -342,12 +388,125 @@ export function mapLeadToDeck(raw: RawLead): Lead {
     prontidao: ans("Pronto para começar") || LEAD.prontidao,
     jaFezMentoria:
       ans("Investimento anterior em mentoria ou curso") || LEAD.jaFezMentoria,
-    dor: ans("Maior dor com o Instagram hoje") || LEAD.dor,
+    dor,
 
     // Não vêm do form — derivar do real pra não exibir o exemplo numa call ao vivo.
+    perfil: undefined,
     gancho: `${seguidores} · ${nicho}`,
     objetivo: necessidade || LEAD.objetivo,
     prazo: ans("Pronto para começar") || LEAD.prazo,
-    notasPerfil: [], // diagnóstico ao vivo — Augusto preenche/edita
+    notasPerfil: [],
   };
+
+  if (isIara) {
+    return {
+      ...leadBase,
+      nicho: "Agronegócio · crédito agro · IA aplicada",
+      gancho:
+        "Você já tem autoridade, produto validado e um mercado rico. O gargalo não é conhecimento — é transformar temas técnicos em comunidade, demanda e venda.",
+      objetivo:
+        "Estruturar um posicionamento claro, uma linha editorial eficiente e uma estratégia de crescimento para construir uma comunidade qualificada no agro.",
+      scorecard: {
+        notaGeral: 4.7,
+        resumo:
+          "Autoridade alta e produto validado, mas o Instagram ainda não virou canal de aquisição. O ativo existe; falta embalagem, cadência e ponte com o público certo.",
+        baseadoEm:
+          "Respostas da qualificação da Iara, estágio atual de seguidores, monetização declarada e clareza de produto/oferta.",
+        criterios: [
+          {
+            nome: "Autoridade / Expertise",
+            nota: 8,
+            porque:
+              "Ela tem domínio claro de crédito agro, tecnologia, IA, finanças e bastidores da Haklay. O conteúdo parte de experiência real, não de teoria.",
+            fonte: "Qualificação: nicho, temas de autoridade e contexto",
+          },
+          {
+            nome: "Clareza de posicionamento",
+            nota: 4.5,
+            porque:
+              "Os temas são fortes, mas ainda aparecem como ideias soltas: crédito, empreendedorismo, IA, liderança, maternidade e bastidores precisam virar um eixo central reconhecível.",
+            fonte: "Qualificação: maior dor e lista de temas",
+          },
+          {
+            nome: "Consistência editorial",
+            nota: 3.5,
+            porque:
+              "A principal dor declarada é não saber o que postar, quais formatos usar e como transformar muitas ideias numa rotina prática.",
+            fonte: "Qualificação: maior desafio com Instagram",
+          },
+          {
+            nome: "Atração de público qualificado",
+            nota: 3,
+            porque:
+              "As interações ainda vêm majoritariamente de amigos e familiares. O perfil não está atraindo novas pessoas do mercado agro no volume necessário.",
+            fonte: "Qualificação: percepção de audiência atual",
+          },
+          {
+            nome: "Monetização / Oferta",
+            nota: 4.5,
+            porque:
+              "Ainda marcou R$ 0 no Instagram, mas já tem um curso validado de R$ 297. Existe produto; falta audiência, narrativa e funil orgânico.",
+            fonte: "Qualificação: monetização, faturamento e produto validado",
+          },
+        ],
+      },
+      dreamOutcome: {
+        headline: "Daqui a 30 dias, seu perfil começa a vender autoridade.",
+        bullets: [
+          "Um posicionamento simples de explicar: crédito agro, inteligência e negócios traduzidos para quem decide no campo.",
+          "Linha editorial organizada em pilares claros, sem depender de inspiração todo dia.",
+          "Conteúdo técnico com gancho humano: bastidores da Haklay, liderança feminina, maternidade e decisões reais de negócio.",
+          "Uma comunidade mais qualificada antes da venda — criando demanda para curso, mentoria e novos produtos.",
+        ],
+      },
+      notasPerfil: [
+        "Ela não parte do zero: já tem produto validado, ticket de R$ 297 e domínio de um nicho com alto valor econômico.",
+        "O problema central não é falta de tema; é excesso de temas sem arquitetura editorial.",
+        "Crédito agro é técnico demais para vender cru. Precisa de tradução: risco, decisão, dinheiro, bastidor e caso real.",
+        "A audiência atual ainda é social, não estratégica. O conteúdo precisa começar a chamar produtor, empresa e profissional de crédito.",
+        "Família/maternidade não precisa competir com o técnico; pode humanizar a autoridade e aumentar conexão.",
+      ],
+      solucoes: [
+        {
+          n: "01",
+          titulo: "Transformar crédito agro em conteúdo desejável",
+          hoje: "O tema é valioso, mas técnico. Se entrar direto em crédito, dados e risco, pouca gente para para assistir.",
+          movimento:
+            "Criamos uma ponte: decisões ruins que custam caro, erros de crédito no campo, bastidores de negociação, histórias da Haklay e linguagem de negócio. O técnico vira consequência de uma tensão real.",
+          resultado:
+            "Pessoas certas entendendo rápido por que seguir você aumenta repertório, segurança e resultado no agro.",
+        },
+        {
+          n: "02",
+          titulo: "Organizar os temas em uma linha editorial",
+          hoje: "Você tem muitas ideias fortes, mas elas ainda disputam espaço: crédito, IA, empreendedorismo, liderança, maternidade e bastidores.",
+          movimento:
+            "Montamos pilares com função: autoridade, educação, bastidor, opinião e conversão. Cada post passa a ter papel claro no crescimento ou na venda.",
+          resultado:
+            "Menos dúvida na hora de postar e mais consistência para construir reconhecimento de marca pessoal.",
+        },
+        {
+          n: "03",
+          titulo: "Preparar a audiência antes de vender",
+          hoje: "O curso existe, mas vender agora para uma audiência pouco qualificada força oferta antes de demanda.",
+          movimento:
+            "Criamos uma sequência de conteúdo que aquece o mercado: problema, consequência, oportunidade, método e prova. A venda deixa de parecer lançamento isolado.",
+          resultado:
+            "Comunidade mais qualificada para curso, consultoria, mentoria e novos negócios da Haklay.",
+        },
+      ],
+      oferta: {
+        ...leadBase.oferta,
+        custoInacao:
+          "Cada mês sem posicionamento claro mantém sua autoridade invisível para o mercado que poderia comprar curso, consultoria ou novos negócios com a Haklay.",
+        garantia:
+          "Garantia de direção: se na primeira semana você não sair com clareza de posicionamento e linha editorial, a gente refaz o diagnóstico do zero — sem custo.",
+        recomendado: "1 Mês",
+        urgencia:
+          "O melhor momento é antes de tentar vender mais. Primeiro audiência qualificada, depois escala de produto.",
+      },
+    };
+  }
+
+  return leadBase;
 }

@@ -512,35 +512,7 @@ function DiagnosticoSection() {
 
 function SolucoesSection() {
   const LEAD = useLead();
-  const alavancas = [
-    {
-      n: "01",
-      titulo: "Tirar o conteúdo de dentro da obra",
-      hoje: "Tudo que você posta fora da reforma desengaja. Seu alcance fica preso a quem já ama obra.",
-      movimento:
-        "Criamos formatos-ponte que nascem do seu mundo (obra) mas falam de algo universal: antes/depois com história, o erro que todo mundo comete, bastidor seu, opinião sincera. O nicho vira a isca — não a jaula.",
-      resultado:
-        "Conteúdo simples chegando em quem nunca viu uma obra, sem descaracterizar seu perfil.",
-    },
-    {
-      n: "02",
-      titulo: "Trocar “viralizar” por um sistema que roda",
-      hoje: "O algoritmo te cobra disrupção, e você não tem uma obra épica pra postar todo dia.",
-      movimento:
-        "Saímos da loteria do viral pra um sistema leve: pilares de conteúdo, ganchos testados, gravação em lote e reaproveitamento inteligente. É a consistência que constrói alcance — não o post “grandioso”.",
-      resultado:
-        "Crescimento estável sem reformar um prédio por semana. Previsibilidade no lugar de sorte.",
-    },
-    {
-      n: "03",
-      titulo: "Construir uma renda que é sua",
-      hoje: "Você vive de publi avulsa — refém da marca e com teto. Por isso marcou “ainda não monetizo”: não é seu.",
-      movimento:
-        "Transformamos sua autoridade num ativo próprio: uma oferta recorrente (curso de DIY, comunidade, mentoria) com um funil simples por trás. A publi passa a ser bônus, não o sustento.",
-      resultado:
-        "Receita recorrente que você controla — e liberdade pra escolher (e cobrar mais caro) as publis que aceitar.",
-    },
-  ];
+  const alavancas = LEAD.solucoes;
   return (
     <Section className="bg-gradient-to-b from-neutral-900 to-neutral-950">
       <Kicker>Soluções</Kicker>
