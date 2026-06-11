@@ -636,7 +636,7 @@ export function mapLeadToDeck(raw: RawLead): Lead {
           },
           {
             item: "Curso Construindo um Viral",
-            valor: "R$ 2.000",
+            valor: "R$ 297",
             nota: "o método completo de gancho, retenção e viralização",
           },
           {
@@ -665,7 +665,7 @@ export function mapLeadToDeck(raw: RawLead): Lead {
             nota: "mapa do que atacar primeiro pra sair da confusão operacional",
           },
         ],
-        valorAncora: "R$ 35.000",
+        valorAncora: "R$ 33.297",
         urgencia: "",
       },
     };
