@@ -246,7 +246,7 @@ const STEFANI: Lead = {
     // ⚠️ VALORES DE ANCORAGEM SÃO RASCUNHO — TROCAR pelos números reais.
     stack: [
       {
-        item: "Calls estratégicas 1:1 com o Augusto",
+        item: "Calls estratégicas 1:1 com Augusto Felipe",
         valor: "R$ 18.000",
         nota: "12 sessões ao vivo, direção cirúrgica pro seu perfil",
       },
@@ -625,7 +625,7 @@ export function mapLeadToDeck(raw: RawLead): Lead {
         recomendado: "1 Mês",
         stack: [
           {
-            item: "Calls estratégicas 1:1 com o Augusto",
+            item: "Calls estratégicas 1:1 com Augusto Felipe",
             valor: "R$ 9.000",
             nota: "sessões ao vivo de direção cirúrgica pro seu perfil",
           },

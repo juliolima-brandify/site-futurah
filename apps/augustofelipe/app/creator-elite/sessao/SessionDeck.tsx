@@ -674,7 +674,7 @@ function ComoFuncionaSection() {
   const pilares = [
     {
       titulo: "Calls estratégicas",
-      desc: "Sessões ao vivo, comigo, focadas no SEU perfil — direção cirúrgica, não método genérico.",
+      desc: "Sessões ao vivo com Augusto Felipe, focadas no SEU perfil — direção cirúrgica, não método genérico.",
     },
     {
       titulo: "Acesso à I.A",
