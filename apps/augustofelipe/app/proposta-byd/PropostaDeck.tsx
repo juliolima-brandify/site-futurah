@@ -10,12 +10,14 @@ import {
 import { Boldonse } from "next/font/google";
 import {
   ATIVACAO,
+  AUGUSTO_LOGO,
   BYD_BLUE,
   CAPA,
   CONDICOES,
   EXPERIENCES,
   FECHAMENTO,
   MIDIA_KIT,
+  PROVA,
   SOBRE,
 } from "./proposta-data";
 
@@ -34,6 +36,7 @@ const SECTION_LABELS = [
   "Capa",
   "Quem assina",
   "Mídia Kit",
+  "Prova",
   "Ativação Digital",
   "Art Experiences",
   "Condições",
@@ -186,6 +189,7 @@ export default function PropostaDeck() {
         <CapaSection />
         <SobreSection />
         <MidiaKitSection />
+        <ProvaSection />
         <AtivacaoSection />
         <ExperiencesSection />
         <CondicoesSection />
@@ -262,6 +266,18 @@ function BydLogo({ className = "" }: { className?: string }) {
   );
 }
 
+// Logo pessoal do Augusto Felipe (branco) — usado no lockup de co-branding.
+function AugustoLogo({ className = "" }: { className?: string }) {
+  // eslint-disable-next-line @next/next/no-img-element
+  return (
+    <img
+      src={AUGUSTO_LOGO}
+      alt="Augusto Felipe · Fi de Vidraceiro"
+      className={className}
+    />
+  );
+}
+
 // -----------------------------------------------------------------------------
 // 1 · Capa
 // -----------------------------------------------------------------------------
@@ -286,15 +302,9 @@ function CapaSection() {
         </p>
 
         {/* Lockup co-branding: Augusto × BYD */}
-        <div className="flex items-center justify-center gap-5 sm:gap-8">
-          <span
-            className={`${boldonse.className} text-lg uppercase leading-tight text-white sm:text-2xl`}
-          >
-            Augusto
-            <br />
-            Felipe
-          </span>
-          <span className="text-2xl font-light text-neutral-500 sm:text-4xl">
+        <div className="flex items-center justify-center gap-6 sm:gap-9">
+          <AugustoLogo className="h-12 w-auto sm:h-20" />
+          <span className="text-2xl font-light text-neutral-600 sm:text-4xl">
             ×
           </span>
           <BydLogo className="h-7 w-auto sm:h-10" />
@@ -356,13 +366,16 @@ function MidiaKitSection() {
     <Section>
       <Kicker>{MIDIA_KIT.kicker}</Kicker>
       <Title>{MIDIA_KIT.titulo}</Title>
+      <p className="mt-4 max-w-2xl text-[14px] leading-relaxed text-amber-300">
+        {MIDIA_KIT.crescimento}
+      </p>
 
       {/* Destaques grandes */}
-      <div className="mt-8 grid gap-4 sm:grid-cols-2">
+      <div className="mt-7 grid gap-4 sm:grid-cols-2">
         {MIDIA_KIT.destaques.map((d) => (
           <div
             key={d.label}
-            className="rounded-2xl border border-neutral-800 bg-neutral-900/60 px-6 py-7 text-center"
+            className="rounded-2xl border border-neutral-800 bg-neutral-900/60 px-6 py-6 text-center"
           >
             <div className="text-4xl font-extrabold tracking-tight text-amber-400 sm:text-5xl">
               {d.valor}
@@ -374,27 +387,84 @@ function MidiaKitSection() {
         ))}
       </div>
 
-      {/* Breakdown por plataforma */}
+      {/* Breakdown por plataforma: seguidores + alcance mensal */}
       <div className="mt-4 grid grid-cols-3 gap-3">
         {MIDIA_KIT.plataformas.map((p) => (
           <div
             key={p.nome}
             className="rounded-xl border border-neutral-800 bg-neutral-950 px-3 py-4 text-center"
           >
-            <div className="text-xl font-extrabold tracking-tight text-white sm:text-2xl">
-              {p.valor}
+            <div className="text-[12px] font-semibold uppercase tracking-wider text-neutral-400">
+              {p.nome}
             </div>
-            <div className="mt-0.5 text-[12px] text-neutral-500">{p.nome}</div>
+            <div className="mt-2 text-xl font-extrabold tracking-tight text-white sm:text-2xl">
+              {p.seguidores}
+            </div>
+            <div className="text-[11px] text-neutral-600">seguidores</div>
+            <div className="mt-2 text-base font-bold tracking-tight text-amber-400">
+              {p.alcance}
+            </div>
+            <div className="text-[11px] text-neutral-600">alcance</div>
           </div>
         ))}
       </div>
 
-      <p className="mt-6 text-[13.5px] text-neutral-400">
+      <p className="mt-6 text-[13px] leading-relaxed text-neutral-400">
         <span className="font-semibold uppercase tracking-wider text-amber-400">
-          Público principal:{" "}
+          Público:{" "}
         </span>
         {MIDIA_KIT.publico}
       </p>
+    </Section>
+  );
+}
+
+// -----------------------------------------------------------------------------
+// 3.5 · Prova — marcas que confiam + reels de alcance
+// -----------------------------------------------------------------------------
+
+function ProvaSection() {
+  return (
+    <Section className="bg-neutral-900">
+      <Kicker>{PROVA.kicker}</Kicker>
+      <Title>{PROVA.titulo}</Title>
+
+      {/* Marcas */}
+      <div className="mt-7 flex flex-wrap items-center justify-center gap-x-7 gap-y-4 rounded-2xl border border-neutral-800 bg-neutral-950/60 px-6 py-6">
+        {PROVA.marcas.map((m) => (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            key={m.alt}
+            src={m.src}
+            alt={m.alt}
+            className="h-7 w-auto max-w-[110px] object-contain opacity-80 grayscale transition hover:opacity-100 hover:grayscale-0 sm:h-9"
+          />
+        ))}
+      </div>
+
+      {/* Reels de destaque */}
+      <div className="mt-4 grid grid-cols-4 gap-2.5">
+        {PROVA.reels.map((r, i) => (
+          <div
+            key={i}
+            className="relative aspect-[3/4] overflow-hidden rounded-lg border border-neutral-800 bg-neutral-950"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={r.thumb}
+              alt={`Reel — ${r.views} views`}
+              className="h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 flex items-center gap-1 p-2 text-[13px] font-bold text-white drop-shadow">
+              <svg viewBox="0 0 24 24" className="h-3 w-3 fill-white">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+              {r.views}
+            </div>
+          </div>
+        ))}
+      </div>
     </Section>
   );
 }
@@ -570,13 +640,9 @@ function FechamentoSection() {
         <Title className="!text-[1.75rem] md:!text-[2.5rem]">
           {FECHAMENTO.titulo}
         </Title>
-        <div className="mt-10 flex items-center justify-center gap-5">
-          <span
-            className={`${boldonse.className} text-sm uppercase text-white sm:text-lg`}
-          >
-            Augusto Felipe
-          </span>
-          <span className="text-xl font-light text-neutral-500">×</span>
+        <div className="mt-10 flex items-center justify-center gap-6">
+          <AugustoLogo className="h-8 w-auto sm:h-11" />
+          <span className="text-xl font-light text-neutral-600">×</span>
           <BydLogo className="h-6 w-auto sm:h-8" />
         </div>
         <p className="mt-8 text-[15px] text-neutral-400">

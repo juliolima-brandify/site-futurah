@@ -11,6 +11,9 @@
 // Azul da marca BYD — accent secundário das seções da montadora.
 export const BYD_BLUE = "#2E9BFF";
 
+// Logo pessoal do Augusto (branco) — vindo do media kit @fidevidraceiro.
+export const AUGUSTO_LOGO = "/proposta-byd/augusto-logo.svg";
+
 export const CAPA = {
   kicker: "Proposta Comercial",
   evento: "Festival Interlagos 2026",
@@ -29,20 +32,43 @@ export const SOBRE = {
   avatar: "/creator-elite/augustofelipe-avatar.jpg",
 };
 
-// Seção Mídia Kit — números de alcance.
+// Seção Mídia Kit — números de alcance (extraídos do media kit @fidevidraceiro).
 export const MIDIA_KIT = {
   kicker: "Mídia Kit",
   titulo: "O alcance por trás da arte.",
+  crescimento: "Crescimento orgânico de 1 milhão de seguidores em apenas 17 meses.",
   destaques: [
     { valor: "1.2M", label: "seguidores totais" },
     { valor: "59M", label: "alcance mensal" },
   ],
+  // Seguidores + alcance mensal por plataforma.
   plataformas: [
-    { nome: "Instagram", valor: "730k" },
-    { nome: "TikTok", valor: "430k" },
-    { nome: "Kwai", valor: "110k" },
+    { nome: "Instagram", seguidores: "730k", alcance: "20M/mês" },
+    { nome: "TikTok", seguidores: "430k", alcance: "15M/mês" },
+    { nome: "Kwai", seguidores: "110k", alcance: "24M/mês" },
   ],
-  publico: "25–34 anos",
+  publico: "52% feminino · 48% masculino · principal 25–34 anos · SP, RJ e Uberlândia",
+};
+
+// Seção Prova — credibilidade antes da oferta (marcas + reels do media kit).
+export const PROVA = {
+  kicker: "Quem já confia",
+  titulo: "Marcas e alcance comprovado.",
+  marcas: [
+    { src: "/proposta-byd/marca-tekbond.png", alt: "TekBond" },
+    { src: "/proposta-byd/marca-cebrace.png", alt: "Cebrace" },
+    { src: "/proposta-byd/marca-bombril.png", alt: "Bombril" },
+    { src: "/proposta-byd/marca-temu.png", alt: "Temu" },
+    { src: "/proposta-byd/marca-vonixx.png", alt: "Vonixx" },
+    { src: "/proposta-byd/marca-spotify.png", alt: "Spotify" },
+    { src: "/proposta-byd/marca-cod.png", alt: "Call of Duty" },
+  ],
+  reels: [
+    { thumb: "/proposta-byd/reel-3.png", views: "8M" },
+    { thumb: "/proposta-byd/reel-4.png", views: "6,3M" },
+    { thumb: "/proposta-byd/reel-2.png", views: "5,5M" },
+    { thumb: "/proposta-byd/reel-1.png", views: "684k" },
+  ],
 };
 
 // Seção 4 — Ativação Digital.
