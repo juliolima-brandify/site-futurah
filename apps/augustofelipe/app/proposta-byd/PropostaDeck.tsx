@@ -16,6 +16,7 @@ import {
   CONDICOES,
   EXPERIENCES,
   FECHAMENTO,
+  MARCAS,
   MIDIA_KIT,
   PROVA,
   SOBRE,
@@ -36,7 +37,8 @@ const SECTION_LABELS = [
   "Capa",
   "Quem assina",
   "Mídia Kit",
-  "Prova",
+  "Marcas",
+  "Vídeos",
   "Ativação Digital",
   "Art Experiences",
   "Condições",
@@ -189,6 +191,7 @@ export default function PropostaDeck() {
         <CapaSection />
         <SobreSection />
         <MidiaKitSection />
+        <MarcasSection />
         <ProvaSection />
         <AtivacaoSection />
         <ExperiencesSection />
@@ -350,14 +353,19 @@ function CapaSection() {
 
 function SobreSection() {
   return (
-    <Section className="bg-neutral-900">
-      <div className="grid items-center gap-8 md:grid-cols-[auto,1fr]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={SOBRE.avatar}
-          alt="Augusto Felipe"
-          className="h-28 w-28 rounded-2xl object-cover ring-2 ring-amber-400/60 md:h-40 md:w-40"
-        />
+    <section className="flex min-h-screen w-full snap-start items-center justify-center bg-neutral-900 px-6 py-16 md:h-screen md:py-20">
+      <div className="mx-auto grid w-full max-w-5xl items-center gap-8 md:grid-cols-[minmax(0,0.9fr),1fr] md:gap-12">
+        {/* Foto do Augusto (blazer de espelhos) */}
+        <div className="relative overflow-hidden rounded-3xl ring-1 ring-neutral-800">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={SOBRE.foto}
+            alt="Augusto Felipe — Fi de Vidraceiro"
+            className="aspect-[4/5] w-full object-cover object-top"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+        </div>
+
         <div>
           <Kicker>{SOBRE.kicker}</Kicker>
           <Title>{SOBRE.titulo}</Title>
@@ -373,7 +381,7 @@ function SobreSection() {
           </div>
         </div>
       </div>
-    </Section>
+    </section>
   );
 }
 
@@ -440,7 +448,36 @@ function MidiaKitSection() {
 }
 
 // -----------------------------------------------------------------------------
-// 3.5 · Prova — marcas que confiam + reels de alcance
+// 3.5 · Marcas — social proof em seção própria de fundo branco
+// -----------------------------------------------------------------------------
+
+function MarcasSection() {
+  return (
+    <section className="flex min-h-screen w-full snap-start items-center justify-center bg-white px-6 py-16 md:h-screen md:py-20">
+      <div className="mx-auto w-full max-w-4xl text-center">
+        <Kicker color="text-amber-600">{MARCAS.kicker}</Kicker>
+        <Title className="!text-neutral-900">{MARCAS.titulo}</Title>
+        <p className="mx-auto mt-4 max-w-xl text-[14px] leading-relaxed text-neutral-500">
+          {MARCAS.descricao}
+        </p>
+        <div className="mt-12 flex flex-wrap items-center justify-center gap-x-12 gap-y-9">
+          {MARCAS.logos.map((m) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={m.alt}
+              src={m.src}
+              alt={m.alt}
+              className="h-9 w-auto max-w-[140px] object-contain sm:h-11"
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// -----------------------------------------------------------------------------
+// 3.6 · Vídeos mais assistidos — reels de alcance comprovado
 // -----------------------------------------------------------------------------
 
 function ProvaSection() {
@@ -448,26 +485,12 @@ function ProvaSection() {
     <Section className="bg-neutral-900">
       <Kicker>{PROVA.kicker}</Kicker>
       <Title>{PROVA.titulo}</Title>
+      <p className="mt-4 max-w-2xl text-[14px] leading-relaxed text-neutral-400">
+        Conteúdo simples, feito do jeito certo, alcançando milhões — é esse
+        sistema que entra na ativação da BYD.
+      </p>
 
-      {/* Marcas — cada logo num tile branco pra ler bem no dark */}
-      <div className="mt-7 grid grid-cols-3 gap-3 sm:grid-cols-4">
-        {PROVA.marcas.map((m) => (
-          <div
-            key={m.alt}
-            className="flex items-center justify-center rounded-xl bg-white px-4 py-4"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={m.src}
-              alt={m.alt}
-              className="h-8 w-auto max-w-[100px] object-contain sm:h-9"
-            />
-          </div>
-        ))}
-      </div>
-
-      {/* Reels de destaque */}
-      <div className="mt-4 grid grid-cols-4 gap-2.5">
+      <div className="mt-7 grid grid-cols-4 gap-2.5">
         {PROVA.reels.map((r, i) => (
           <div
             key={i}

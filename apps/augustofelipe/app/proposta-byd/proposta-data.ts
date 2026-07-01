@@ -23,15 +23,16 @@ export const CAPA = {
   foto: "/proposta-byd/capa-fi.png",
 };
 
-// Seção "Quem é o Augusto" — narrativa Fi de Vidraceiro (⚠️ rascunho).
+// Seção "Quem é o Augusto" — bio oficial do media kit @fidevidraceiro.
 export const SOBRE = {
   kicker: "Quem assina a arte",
   titulo: "Fi de vidraceiro.",
   paragrafos: [
-    "Augusto Felipe começou cortando vidro na oficina do pai. A mesma precisão de quem mede duas vezes pra cortar uma vez virou a assinatura de um artista que hoje transforma superfícies em obra — e alcança milhões todo mês.",
-    "Do vidro pro carro: cada ativação é uma peça única, feita à mão, pensada pra virar conteúdo que a audiência para pra assistir — e compartilha.",
+    "Sou o Augusto Felipe, o Fi de Vidraceiro — criador do @fidevidraceiro, onde compartilho um universo criativo que vai muito além de espelhos.",
+    "Transformo vidro em arte, dou dicas práticas para o dia a dia da construção civil, crio peças decorativas únicas e mostro os bastidores com leveza e bom humor.",
+    "Meu conteúdo já impactou mais de 1 milhão de seguidores — unindo informação, entretenimento e inspiração para quem ama ver ideias ganhando forma.",
   ],
-  avatar: "/creator-elite/augustofelipe-avatar.jpg",
+  foto: "/proposta-byd/sobre-fi.jpg",
 };
 
 // Seção Mídia Kit — números de alcance (extraídos do media kit @fidevidraceiro).
@@ -52,11 +53,13 @@ export const MIDIA_KIT = {
   publico: "52% feminino · 48% masculino · principal 25–34 anos · SP, RJ e Uberlândia",
 };
 
-// Seção Prova — credibilidade antes da oferta (marcas + reels do media kit).
-export const PROVA = {
+// Seção Marcas — social proof em seção própria de fundo branco.
+export const MARCAS = {
   kicker: "Quem já confia",
-  titulo: "Marcas e alcance comprovado.",
-  marcas: [
+  titulo: "Marcas que confiam no trabalho.",
+  descricao:
+    "Cada parceria é pensada para gerar visibilidade real, conexão com o público e entrega que valoriza a marca.",
+  logos: [
     { src: "/proposta-byd/marca-tekbond.png", alt: "TekBond" },
     { src: "/proposta-byd/marca-cebrace.png", alt: "Cebrace" },
     { src: "/proposta-byd/marca-bombril.png", alt: "Bombril" },
@@ -65,6 +68,12 @@ export const PROVA = {
     { src: "/proposta-byd/marca-spotify.png", alt: "Spotify" },
     { src: "/proposta-byd/marca-cod.png", alt: "Call of Duty" },
   ],
+};
+
+// Seção Prova — reels de alcance comprovado (do media kit).
+export const PROVA = {
+  kicker: "Prova na prática",
+  titulo: "Reels que viraram alcance.",
   reels: [
     { thumb: "/proposta-byd/reel-3.png", views: "8M" },
     { thumb: "/proposta-byd/reel-4.png", views: "6,3M" },
