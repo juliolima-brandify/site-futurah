@@ -611,12 +611,21 @@ function ExperiencesSection() {
           >
             {p.destaque && (
               <span
-                className="absolute -top-2.5 left-5 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-black"
+                className="absolute -top-2.5 left-5 z-10 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-black"
                 style={{ background: BYD_BLUE }}
               >
                 Experiência máxima
               </span>
             )}
+            {/* Render da ativação */}
+            <div className="mb-4 overflow-hidden rounded-xl">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={p.foto}
+                alt={p.nome}
+                className="aspect-[4/3] w-full object-cover"
+              />
+            </div>
             <h3 className="text-[15px] font-bold leading-tight text-white">
               {p.nome}
             </h3>

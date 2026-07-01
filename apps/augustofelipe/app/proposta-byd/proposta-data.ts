@@ -109,6 +109,7 @@ export const EXPERIENCES = {
       descricao: "Símbolo BYD (50cm por letra)",
       entrega: "Reels + Stories",
       preco: "R$ 20.000",
+      foto: "/proposta-byd/exp-simbolo.jpg",
       destaque: false,
     },
     {
@@ -116,6 +117,7 @@ export const EXPERIENCES = {
       descricao: "Roda artística personalizada",
       entrega: "Reels + Stories",
       preco: "R$ 30.000",
+      foto: "/proposta-byd/exp-roda.jpg",
       destaque: false,
     },
     {
@@ -123,6 +125,7 @@ export const EXPERIENCES = {
       descricao: "Carro artístico exclusivo",
       entrega: "Reels + Stories",
       preco: "R$ 85.000",
+      foto: "/proposta-byd/exp-carro.jpg",
       destaque: true,
     },
   ],
