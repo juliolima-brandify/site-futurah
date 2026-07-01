@@ -285,39 +285,59 @@ function AugustoLogo({ className = "" }: { className?: string }) {
 function CapaSection() {
   return (
     <section
-      className="relative flex w-screen snap-start items-center justify-center overflow-hidden bg-black"
+      className="relative flex w-screen snap-start items-center overflow-hidden bg-black"
       style={{ height: "100vh" }}
     >
-      {/* Glow radial de fundo (Augusto amber × BYD blue) */}
+      {/* Foto do Fi de Vidraceiro em preto e branco */}
+      <div
+        className="absolute inset-0 bg-cover bg-no-repeat"
+        style={{
+          backgroundImage: `url('${CAPA.foto}')`,
+          backgroundPosition: "72% center",
+          filter: "grayscale(1) contrast(1.05) brightness(0.95)",
+        }}
+      />
+      {/* Overlay escuro à esquerda pra o conteúdo respirar */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(60% 50% at 30% 20%, rgba(251,191,36,0.12), transparent 70%), radial-gradient(55% 45% at 75% 85%, rgba(46,155,255,0.16), transparent 70%)",
+            "linear-gradient(90deg, rgba(0,0,0,0.94) 0%, rgba(0,0,0,0.78) 42%, rgba(0,0,0,0.35) 100%)",
         }}
       />
-      <div className="relative z-10 mx-auto max-w-3xl px-8 text-center">
-        <p className="mb-6 text-xs font-semibold uppercase tracking-[0.25em] text-amber-400">
-          {CAPA.kicker}
-        </p>
+      {/* Leve realce da cor da marca sobre o P&B */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(50% 60% at 16% 32%, rgba(251,191,36,0.10), transparent 70%)",
+        }}
+      />
 
-        {/* Lockup co-branding: Augusto × BYD */}
-        <div className="flex items-center justify-center gap-6 sm:gap-9">
-          <AugustoLogo className="h-12 w-auto sm:h-20" />
-          <span className="text-2xl font-light text-neutral-600 sm:text-4xl">
-            ×
-          </span>
-          <BydLogo className="h-7 w-auto sm:h-10" />
-        </div>
+      <div className="relative z-10 mx-auto w-full max-w-5xl px-8 sm:px-16">
+        <div className="max-w-xl text-left">
+          <p className="mb-6 text-xs font-semibold uppercase tracking-[0.25em] text-amber-400">
+            {CAPA.kicker}
+          </p>
 
-        <h1
-          className={`${boldonse.className} mt-10 text-[1.75rem] uppercase leading-[1.4] text-white sm:text-[2.75rem]`}
-        >
-          {CAPA.evento}
-        </h1>
+          {/* Lockup co-branding: Augusto × BYD */}
+          <div className="flex items-center gap-6 sm:gap-8">
+            <AugustoLogo className="h-11 w-auto sm:h-16" />
+            <span className="text-2xl font-light text-neutral-400 sm:text-3xl">
+              ×
+            </span>
+            <BydLogo className="h-6 w-auto sm:h-9" />
+          </div>
 
-        <div className="mt-8 inline-flex items-center gap-2 rounded-full border border-amber-500/40 bg-amber-500/10 px-4 py-1.5 text-[12px] font-semibold uppercase tracking-[0.2em] text-amber-300">
-          {CAPA.selo}
+          <h1
+            className={`${boldonse.className} mt-9 text-[1.6rem] uppercase leading-[1.4] text-white sm:text-[2.6rem]`}
+          >
+            {CAPA.evento}
+          </h1>
+
+          <div className="mt-8 inline-flex items-center gap-2 rounded-full border border-amber-500/40 bg-amber-500/10 px-4 py-1.5 text-[12px] font-semibold uppercase tracking-[0.2em] text-amber-300">
+            {CAPA.selo}
+          </div>
         </div>
       </div>
     </section>
@@ -429,16 +449,20 @@ function ProvaSection() {
       <Kicker>{PROVA.kicker}</Kicker>
       <Title>{PROVA.titulo}</Title>
 
-      {/* Marcas */}
-      <div className="mt-7 flex flex-wrap items-center justify-center gap-x-7 gap-y-4 rounded-2xl border border-neutral-800 bg-neutral-950/60 px-6 py-6">
+      {/* Marcas — cada logo num tile branco pra ler bem no dark */}
+      <div className="mt-7 grid grid-cols-3 gap-3 sm:grid-cols-4">
         {PROVA.marcas.map((m) => (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <div
             key={m.alt}
-            src={m.src}
-            alt={m.alt}
-            className="h-7 w-auto max-w-[110px] object-contain opacity-80 grayscale transition hover:opacity-100 hover:grayscale-0 sm:h-9"
-          />
+            className="flex items-center justify-center rounded-xl bg-white px-4 py-4"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={m.src}
+              alt={m.alt}
+              className="h-8 w-auto max-w-[100px] object-contain sm:h-9"
+            />
+          </div>
         ))}
       </div>
 

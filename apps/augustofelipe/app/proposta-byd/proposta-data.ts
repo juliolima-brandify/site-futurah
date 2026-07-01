@@ -19,6 +19,8 @@ export const CAPA = {
   evento: "Festival Interlagos 2026",
   selo: "Fi de Vidraceiro",
   criador: "Augusto Felipe",
+  // Foto de capa do Augusto (vinda do media kit) — renderizada em P&B.
+  foto: "/proposta-byd/capa-fi.png",
 };
 
 // Seção "Quem é o Augusto" — narrativa Fi de Vidraceiro (⚠️ rascunho).
