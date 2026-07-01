@@ -142,9 +142,13 @@ export const CONDICOES = {
   ],
 };
 
-// Seção 7 — Fechamento / CTA. ⚠️ preencher contato real.
+// Seção final — Fechamento / CTA com botões de contato.
 export const FECHAMENTO = {
   kicker: "Vamos criar juntos",
   titulo: "Bora transformar a BYD em obra?",
-  contato: "augustofelipe@futurah.co",
+  email: "augustofelipe@futurah.co",
+  whatsapp: {
+    display: "+55 34 9254-8114",
+    href: "https://wa.me/553492548114",
+  },
 };
